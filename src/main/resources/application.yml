@@ -1,0 +1,33 @@
+# SpringBoot的设置
+server:
+  port: 18800
+spring:
+  application:
+    name: endpoint-test #为你的应用起个名字，该名字将注册到Eureka注册中心
+  profiles:
+    active: dev
+  mvc:
+    throw-exception-if-no-handler-found: true # 404 交给异常处理器处理
+  resources:
+    add-mappings: false
+
+# logback配置
+debug: true
+logging:
+  path: /opt
+  file: /opt/stdout.log
+  level:
+    root: INFO
+    org:
+      springframework:
+        web: INFO
+    com:
+      cfioter:
+        msp:
+          endpoint:
+            base:
+              mapper: DEBUG
+              dao: DEBUG
+            core:
+              exception: DEBUG
+
