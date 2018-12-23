@@ -21,6 +21,8 @@ logging:
     org:
       springframework:
         web: INFO
+        boot:
+          autoconfigure: ERROR
     com:
       cfioter:
         msp:

@@ -17,6 +17,7 @@ import java.util.Properties;
 
 /**
  * Mybatis & Mapper & PageHelper 配置
+ *
  * @author 朱峰
  * @date 2018年11月12日
  */
@@ -38,7 +39,7 @@ public class MybatisConfigurer {
         properties.setProperty("reasonable", "true");
         Interceptor interceptor = new PageInterceptor();
         interceptor.setProperties(properties);
-        factory.setPlugins(new Interceptor[] {interceptor});
+        factory.setPlugins(new Interceptor[]{interceptor});
 
         // 添加XML目录
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
@@ -50,7 +51,7 @@ public class MybatisConfigurer {
     public MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
         mapperScannerConfigurer.setSqlSessionFactoryBeanName("sqlSessionFactoryBean");
-        mapperScannerConfigurer.setBasePackage(ProjectConstant.MAPPER_PACKAGE +","+ ProjectConstant.BASE_PACKAGE+"/base/mapper" +","+ ProjectConstant.BASE_PACKAGE+"/core/exception");
+        mapperScannerConfigurer.setBasePackage(ProjectConstant.MAPPER_PACKAGE + "," + ProjectConstant.BASE_PACKAGE + "/base/repo" + "," + ProjectConstant.BASE_PACKAGE + "/core/exception");
         // 配置通用Mapper，详情请查阅官方文档
         Properties properties = new Properties();
         properties.setProperty("mappers", ProjectConstant.MAPPER_INTERFACE_REFERENCE);
