@@ -3,7 +3,7 @@ package ${basePackage}.base.controller;
 import ${basePackage}.core.Result;
 import ${basePackage}.core.ResultGenerator;
 import ${basePackage}.base.model.${modelNameUpperCamel};
-import ${basePackage}.base.dao.${modelNameUpperCamel}BaseDao;
+import ${basePackage}.base.service.${modelNameUpperCamel}BaseService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("${baseRequestMapping}")
 public class ${modelNameUpperCamel}Controller {
     @Resource
-    private ${modelNameUpperCamel}BaseDao ${modelNameLowerCamel}BaseService;
+    private ${modelNameUpperCamel}BaseService ${modelNameLowerCamel}BaseService;
 
     @PostMapping
     public Result add(@RequestBody ${modelNameUpperCamel} ${modelNameLowerCamel}) {

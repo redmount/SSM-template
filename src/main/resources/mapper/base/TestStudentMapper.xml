@@ -6,5 +6,9 @@
       WARNING - @mbg.generated
     -->
     <result column="pk" jdbcType="CHAR" property="pk" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="clazzPk" jdbcType="CHAR" property="clazzpk" />
+    <result column="updated" jdbcType="TIMESTAMP" property="updated" />
+    <result column="created" jdbcType="TIMESTAMP" property="created" />
   </resultMap>
 </mapper>

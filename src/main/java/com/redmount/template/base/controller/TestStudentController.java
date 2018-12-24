@@ -3,7 +3,7 @@ package com.redmount.template.base.controller;
 import com.redmount.template.core.Result;
 import com.redmount.template.core.ResultGenerator;
 import com.redmount.template.base.model.TestStudent;
-import com.redmount.template.base.dao.TestStudentBaseDao;
+import com.redmount.template.base.service.TestStudentBaseService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/testStudent")
 public class TestStudentController {
     @Resource
-    private TestStudentBaseDao testStudentBaseService;
+    private TestStudentBaseService testStudentBaseService;
 
     @PostMapping
     public Result add(@RequestBody TestStudent testStudent) {
