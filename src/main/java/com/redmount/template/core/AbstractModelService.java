@@ -1,16 +1,22 @@
 package com.redmount.template.core;
 
 import com.redmount.template.util.ReflectUtil;
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractModelService<T, TBase> implements ModelService<T, TBase> {
 
     @Autowired
     private Mapper<TBase> mapper;
+
+    @Autowired
+    SqlSession sqlSession;
 
     /**
      * 当前泛型真实类型的Class
@@ -33,8 +39,33 @@ public abstract class AbstractModelService<T, TBase> implements ModelService<T, 
     public T getByPk(String pk, String relations) {
         TBase baseResult = mapper.selectByPrimaryKey(pk);
         T model = ReflectUtil.cloneObj(baseResult, modelClass);
-        List<String> relationList = Arrays.asList(relations.split(","));
+        List<String> relationList = ReflectUtil.getFieldList(modelClass, relations);
+        Field field;
+        String className;
+        String methodName;
+        String[] fullClassNamePath;
+        Mapper mapper;
+        Object result;
+        for (String relation : relationList) {
+            try {
+                field = modelClass.getDeclaredField(relation);
+                fullClassNamePath = field.getGenericType().getTypeName().split("\\.|<|>");
+                className = fullClassNamePath[fullClassNamePath.length - 1];
+                mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + className + "Mapper"));
+                result = mapper.selectByPrimaryKey("t1");
+                if (field.getGenericType().getTypeName().startsWith("java.util.List")) {
+                    // 是数组
 
+                } else {
+                    methodName = "findById";
+                }
+
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
         return model;
     }
 

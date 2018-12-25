@@ -1,9 +1,9 @@
 package com.redmount.template.util;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
+import org.springframework.util.Assert;
+
+import java.lang.reflect.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -84,7 +84,7 @@ public class ReflectUtil {
     private static boolean isWrapType(Field field) {
         String[] types = {"java.lang.Integer", "java.lang.Double", "java.lang.Float", "java.lang.Long",
                 "java.lang.Short", "java.lang.Byte", "java.lang.Boolean", "java.lang.Char", "java.lang.String", "int",
-                "double", "long", "short", "byte", "boolean", "char", "float"};
+                "double", "long", "short", "byte", "boolean", "char", "float", "java.util.Date"};
         List<String> typeList = Arrays.asList(types);
         return typeList.contains(field.getType().getName()) ? true : false;
     }
@@ -119,5 +119,19 @@ public class ReflectUtil {
         }
         fieldList.addAll(getFieldList(superClass));
         return fieldList;
+    }
+
+    public static List<String> getFieldList(Class<?> clazz, String relations) {
+        List<String> propertyNameList = Arrays.asList(relations.split(","));
+        List<Field> fieldList = getFieldList(clazz);
+        List<String> fieldNameList = new ArrayList<>();
+        for (Field field : fieldList) {
+            if (!isWrapType(field)) {
+                fieldNameList.add(field.getName());
+            }
+        }
+        fieldNameList.retainAll(propertyNameList);
+
+        return fieldNameList;
     }
 }
