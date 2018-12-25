@@ -115,9 +115,11 @@ public class CodeGenerator {
         context.setJavaClientGeneratorConfiguration(javaClientGeneratorConfiguration);
 
         TableConfiguration tableConfiguration = new TableConfiguration(context);
+
         tableConfiguration.setTableName(tableName);
         if (StringUtils.isNotEmpty(modelName)) {
             tableConfiguration.setDomainObjectName(modelName);
+//            tableConfiguration.addProperty("useActualColumnNames", "true");
         }
         tableConfiguration.setGeneratedKey(new GeneratedKey("id", "Mysql", true, null));
         context.addTableConfiguration(tableConfiguration);

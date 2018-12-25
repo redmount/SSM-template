@@ -7,7 +7,7 @@
     -->
     <id column="pk" jdbcType="CHAR" property="pk" />
     <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="adviserPk" jdbcType="CHAR" property="adviserpk" />
+    <result column="adviser_pk" jdbcType="CHAR" property="adviserPk" />
     <result column="updated" jdbcType="TIMESTAMP" property="updated" />
     <result column="created" jdbcType="TIMESTAMP" property="created" />
   </resultMap>
