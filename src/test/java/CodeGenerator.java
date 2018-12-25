@@ -43,6 +43,7 @@ public class CodeGenerator {
         tableNames.add("test_clazz");
         tableNames.add("test_student");
         tableNames.add("test_teacher");
+        tableNames.add("r_test_clazz_t_test_teacher");
         /// tableNames.add("sys_service_exception"); 这个的实体已经被定义在项目内部,不允许生成,否则会由于类名相同而无法启动.
         for (String tableName : tableNames) {
             if (!"sys_service_exception".equalsIgnoreCase(tableName)) {
