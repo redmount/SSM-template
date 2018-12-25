@@ -14,7 +14,7 @@ public class TestClazz extends BaseDO {
      * 班主任pk
      */
     @Column(name = "adviserPk")
-    private String adviserpk;
+    private String adviserPk;
 
     /**
      * 获取班级名称
@@ -39,8 +39,8 @@ public class TestClazz extends BaseDO {
      *
      * @return adviserPk - 班主任pk
      */
-    public String getAdviserpk() {
-        return adviserpk;
+    public String getAdviserPk() {
+        return adviserPk;
     }
 
     /**
@@ -48,7 +48,7 @@ public class TestClazz extends BaseDO {
      *
      * @param adviserpk 班主任pk
      */
-    public void setAdviserpk(String adviserpk) {
-        this.adviserpk = adviserpk;
+    public void setAdviserPk(String adviserpk) {
+        this.adviserPk = adviserpk;
     }
 }

@@ -52,12 +52,13 @@ public abstract class AbstractModelService<T, TBase> implements ModelService<T, 
                 fullClassNamePath = field.getGenericType().getTypeName().split("\\.|<|>");
                 className = fullClassNamePath[fullClassNamePath.length - 1];
                 mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + className + "Mapper"));
-                result = mapper.selectByPrimaryKey("t1");
+
                 if (field.getGenericType().getTypeName().startsWith("java.util.List")) {
                     // 是数组
 
                 } else {
-                    methodName = "findById";
+                    result = mapper.selectByPrimaryKey(ReflectUtil.getFieldValue(model, relation + "Pk"));
+                    ReflectUtil.setFieldValue(model, relation, result);
                 }
 
             } catch (NoSuchFieldException e) {
