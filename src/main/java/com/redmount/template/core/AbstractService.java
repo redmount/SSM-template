@@ -53,6 +53,7 @@ public abstract class AbstractService<T extends BaseDO> implements Service<T> {
         List<T> updateList = new ArrayList<>();
         for (T item : models) {
             if (StringUtils.isBlank(item.getPk())) {
+                item.setPk(UUID.randomUUID().toString());
                 insertList.add(item);
             } else {
                 updateList.add(item);

@@ -1,0 +1,24 @@
+package com.redmount.template.core;
+
+import java.util.List;
+
+public interface ModelService<T, TBase> {
+    /**
+     * 取单个实体
+     *
+     * @param pk        单个实体pk
+     * @param relations 关系数据
+     * @return 带关系数据的单个实体
+     */
+    T getByPk(String pk, String relations);
+
+    /**
+     * 取符合条件的实体列表
+     *
+     * @param keywords  关键字
+     * @param relations 关系数据
+     * @param orderBy   排序
+     * @return 带关系数据的排序的实体列表
+     */
+    List<T> list(String keywords, String relations, String orderBy);
+}
