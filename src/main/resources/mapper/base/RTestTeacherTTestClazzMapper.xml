@@ -8,6 +8,8 @@
     <id column="pk" jdbcType="CHAR" property="pk" />
     <result column="test_teacher_pk" jdbcType="CHAR" property="testTeacherPk" />
     <result column="test_clazz_pk" jdbcType="CHAR" property="testClazzPk" />
+    <result column="course" jdbcType="VARCHAR" property="course" />
+    <result column="count" jdbcType="INTEGER" property="count" />
     <result column="created" jdbcType="TIMESTAMP" property="created" />
     <result column="updated" jdbcType="TIMESTAMP" property="updated" />
   </resultMap>

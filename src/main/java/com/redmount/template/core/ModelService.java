@@ -2,7 +2,7 @@ package com.redmount.template.core;
 
 import java.util.List;
 
-public interface ModelService<T, TBase> {
+public interface ModelService<T> {
     /**
      * 取单个实体
      *
@@ -21,4 +21,6 @@ public interface ModelService<T, TBase> {
      * @return 带关系数据的排序的实体列表
      */
     List<T> list(String keywords, String relations, String orderBy);
+
+    T saveAutomatic(T model);
 }

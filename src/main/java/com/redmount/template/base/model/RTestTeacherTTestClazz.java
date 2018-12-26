@@ -11,6 +11,10 @@ public class RTestTeacherTTestClazz extends BaseDO {
     @Column(name = "test_clazz_pk")
     private String testClazzPk;
 
+    private String course;
+
+    private Integer count;
+
     /**
      * @return test_teacher_pk
      */
@@ -37,5 +41,33 @@ public class RTestTeacherTTestClazz extends BaseDO {
      */
     public void setTestClazzPk(String testClazzPk) {
         this.testClazzPk = testClazzPk;
+    }
+
+    /**
+     * @return course
+     */
+    public String getCourse() {
+        return course;
+    }
+
+    /**
+     * @param course
+     */
+    public void setCourse(String course) {
+        this.course = course;
+    }
+
+    /**
+     * @return count
+     */
+    public Integer getCount() {
+        return count;
+    }
+
+    /**
+     * @param count
+     */
+    public void setCount(Integer count) {
+        this.count = count;
     }
 }

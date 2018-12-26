@@ -9,12 +9,14 @@ import tk.mybatis.mapper.entity.Condition;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public abstract class AbstractModelService<T, TBase> implements ModelService<T, TBase> {
+public abstract class AbstractModelService<T extends BaseDO> implements ModelService<T> {
 
-    @Autowired
-    private Mapper<TBase> mapper;
+    private Mapper mapper;
 
     @Autowired
     SqlSession sqlSession;
@@ -25,10 +27,6 @@ public abstract class AbstractModelService<T, TBase> implements ModelService<T, 
     private Class<T> modelClass;
 
     private String modelClassShortName;
-
-    protected AbstractModelService(Class<T> tc, Class<TBase> tbc) {
-
-    }
 
     public AbstractModelService() {
         ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
@@ -45,7 +43,12 @@ public abstract class AbstractModelService<T, TBase> implements ModelService<T, 
      */
     @Override
     public T getByPk(String pk, String relations) {
-        TBase baseResult = mapper.selectByPrimaryKey(pk);
+        try {
+            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassShortName.replaceAll("Model", "") + "Mapper"));
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Object baseResult = mapper.selectByPrimaryKey(pk);
         if (baseResult == null) {
             return null;
         }
@@ -56,13 +59,13 @@ public abstract class AbstractModelService<T, TBase> implements ModelService<T, 
         List<String> relationList = ReflectUtil.getFieldList(modelClass, relations);
         Field field;
         String className;
-        String methodName;
         String[] fullClassNamePath;
         Mapper mapper;
-        Object result;
+        Object result = null;
         Object relationResult;
         String mainPk;
         String sqlFieldName;
+        Map<String, Object> relationMap = new HashMap<>();
         for (String relation : relationList) {
             try {
                 field = modelClass.getDeclaredField(relation);
@@ -74,10 +77,10 @@ public abstract class AbstractModelService<T, TBase> implements ModelService<T, 
                     // 先判断子表中是否有关联到主表的外键
                     // 取子表类型
 
-                    mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + className + "Mapper"));
+                    mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + className.replaceAll("Model", "") + "Mapper"));
                     fullClassNamePath = field.getGenericType().getTypeName().split("<|>");
                     className = fullClassNamePath[1];
-                    mainPk = ReflectUtil.getFieldValue(model, "pk").toString();
+                    mainPk = model.getPk();
                     if (ReflectUtil.containsProperty(Class.forName(className), modelClassShortName.replaceAll("Model", "") + "Pk")) {
                         // 如果有外键,则load进来
                         System.out.println("找到单个对应属性:" + relation + "Pk");
@@ -89,33 +92,53 @@ public abstract class AbstractModelService<T, TBase> implements ModelService<T, 
                         ReflectUtil.setFieldValue(model, relation, result);
                     } else {
                         className = className.split("\\.")[className.split("\\.").length - 1];
-                        String relationClassName = "R" + modelClassShortName.replace("Model", "") + "T" + className;
+                        String relationClassName = "R" + modelClassShortName.replace("Model", "") + "T" + className.replaceAll("Model", "");
                         try {
                             mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + relationClassName + "Mapper"));
                         } catch (ClassNotFoundException ex) {
-                            relationClassName = "R" + className + "T" + modelClassShortName.replace("Model", "");
+                            relationClassName = "R" + className.replaceAll("Model", "") + "T" + modelClassShortName.replace("Model", "");
                             mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + relationClassName + "Mapper"));
                         }
                         sqlFieldName = modelClassShortName.replaceAll("Model", "") + "Pk";
                         sqlFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, sqlFieldName);
                         Condition condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + relationClassName));
                         condition.createCriteria().andCondition(sqlFieldName + "='" + mainPk + "'");
-                        result = mapper.selectByCondition(condition);
-                        if (((List) result).size() > 0) {
+                        relationResult = mapper.selectByCondition(condition);
+                        if (((List) relationResult).size() > 0) {
                             String strIn = "";
-                            for (int i = 0; i < ((List) result).size(); i++) {
-                                strIn += ",'" + ReflectUtil.getFieldValue(((List) result).get(i), className.substring(0, 1).toLowerCase() + className.substring(1) + "Pk") + "'";
+                            for (int i = 0; i < ((List) relationResult).size(); i++) {
+                                strIn += ",'" + ReflectUtil.getFieldValue(((List) relationResult).get(i), className.replaceAll("Model", "").substring(0, 1).toLowerCase() + className.replaceAll("Model", "").substring(1) + "Pk") + "'";
                             }
                             strIn = "(" + strIn.substring(1) + ")";
-                            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + className + "Mapper"));
-                            condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + className));
+                            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + className.replaceAll("Model", "") + "Mapper"));
+                            condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + className.replaceAll("Model", "")));
                             condition.createCriteria().andCondition("pk in " + strIn);
                             result = mapper.selectByCondition(condition);
+                            // 如果包含关系信息
+                            if (ReflectUtil.containsProperty(Class.forName(fullClassNamePath[1]), "relation")) {
+                                List<Object> resultListContainsRelation = new ArrayList<>();
+                                for (Object obj : (List) relationResult) {
+                                    for (Object target : (List) result) {
+                                        Object o = ReflectUtil.cloneObj(target, Class.forName(fullClassNamePath[1]));
+                                        if (ReflectUtil.getFieldValue(obj, className.replaceAll("Model", "").substring(0, 1).toLowerCase() + className.replaceAll("Model", "").substring(1) + "Pk").equals(ReflectUtil.getFieldValue(target, "pk"))) {
+                                            relationMap = new HashMap<>();
+                                            for (Field relationResultField : obj.getClass().getDeclaredFields()) {
+                                                if (!StringUtils.endsWith(relationResultField.getName(), "Pk") && !StringUtils.endsWith(relationResultField.getName(), "pk")) {
+                                                    relationMap.put(relationResultField.getName(), ReflectUtil.getFieldValue(obj, relationResultField.getName()));
+                                                }
+                                            }
+                                            ReflectUtil.setFieldValue(o, "relation", relationMap);
+                                            resultListContainsRelation.add(o);
+                                        }
+                                    }
+                                }
+                                result = resultListContainsRelation;
+                            }
                         }
                         ReflectUtil.setFieldValue(model, relation, result);
                     }
                 } else {
-                    mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + className + "Mapper"));
+                    mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + className.replaceAll("Model", "") + "Mapper"));
                     result = mapper.selectByPrimaryKey(ReflectUtil.getFieldValue(model, relation + "Pk"));
                     ReflectUtil.setFieldValue(model, relation, result);
                 }
@@ -140,5 +163,12 @@ public abstract class AbstractModelService<T, TBase> implements ModelService<T, 
     @Override
     public List<T> list(String keywords, String relations, String orderBy) {
         return null;
+    }
+
+    @Override
+    public T saveAutomatic(T model) {
+        if (StringUtils.isBlank(model.getPk())) {
+        }
+        return model;
     }
 }
