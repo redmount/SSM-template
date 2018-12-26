@@ -10,7 +10,8 @@ import java.util.List;
 
 @Data
 @Table(name = "test_clazz")
-public class ClazzModel extends TestClazz {
+public class TestClazzModel extends TestClazz {
     private TestTeacher adviser;
     private List<TestStudent> students;
+    private List<TestTeacher> teachers;
 }

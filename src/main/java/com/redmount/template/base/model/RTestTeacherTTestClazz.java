@@ -3,8 +3,8 @@ package com.redmount.template.base.model;
 import com.redmount.template.core.BaseDO;
 import javax.persistence.*;
 
-@Table(name = "r_test_clazz_t_test_teacher")
-public class RTestClazzTTestTeacher extends BaseDO {
+@Table(name = "r_test_teacher_t_test_clazz")
+public class RTestTeacherTTestClazz extends BaseDO {
     @Column(name = "test_teacher_pk")
     private String testTeacherPk;
 
