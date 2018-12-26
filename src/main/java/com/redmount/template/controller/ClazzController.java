@@ -16,11 +16,8 @@ public class ClazzController {
     ClazzService service;
 
     @GetMapping
-    public Result list(@RequestParam(value = "relations", defaultValue = "") String relations,
-                       @RequestParam(value = "condition", defaultValue = "") String condition,
-                       @RequestParam(value = "orderBy", defaultValue = "update desc") String orderBy,
-                       @RequestParam(value = "page", defaultValue = "1") int page,
-                       @RequestParam(value = "size", defaultValue = "10") int size) {
-        return ResultGenerator.genSuccessResult(service.getByPk("c1", relations));
+    public Result getByPk(@RequestParam(value = "pk") String pk,
+                          @RequestParam(value = "relations", defaultValue = "") String relations) {
+        return ResultGenerator.genSuccessResult(service.getByPk(pk, relations));
     }
 }

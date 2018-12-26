@@ -2,7 +2,7 @@ package com.redmount.template.core;
 
 import com.google.common.base.CaseFormat;
 import com.redmount.template.util.ReflectUtil;
-import com.redmount.template.util.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import tk.mybatis.mapper.entity.Condition;
@@ -26,7 +26,7 @@ public abstract class AbstractModelService<T, TBase> implements ModelService<T, 
 
     private String modelClassShortName;
 
-    protected AbstractModelService(Class<T> tc,Class<TBase> tbc){
+    protected AbstractModelService(Class<T> tc, Class<TBase> tbc) {
 
     }
 
@@ -46,7 +46,13 @@ public abstract class AbstractModelService<T, TBase> implements ModelService<T, 
     @Override
     public T getByPk(String pk, String relations) {
         TBase baseResult = mapper.selectByPrimaryKey(pk);
+        if (baseResult == null) {
+            return null;
+        }
         T model = ReflectUtil.cloneObj(baseResult, modelClass);
+        if (StringUtils.isBlank(relations)) {
+            return model;
+        }
         List<String> relationList = ReflectUtil.getFieldList(modelClass, relations);
         Field field;
         String className;
@@ -54,6 +60,7 @@ public abstract class AbstractModelService<T, TBase> implements ModelService<T, 
         String[] fullClassNamePath;
         Mapper mapper;
         Object result;
+        Object relationResult;
         String mainPk;
         String sqlFieldName;
         for (String relation : relationList) {
@@ -89,31 +96,24 @@ public abstract class AbstractModelService<T, TBase> implements ModelService<T, 
                             relationClassName = "R" + className + "T" + modelClassShortName.replace("Model", "");
                             mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + relationClassName + "Mapper"));
                         }
-
                         sqlFieldName = modelClassShortName.replaceAll("Model", "") + "Pk";
                         sqlFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, sqlFieldName);
                         Condition condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + relationClassName));
                         condition.createCriteria().andCondition(sqlFieldName + "='" + mainPk + "'");
-                        result = (List) mapper.selectByCondition(condition);
-                        String targetSqlFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, className);
-                        String strIn = "(";
-                        for (int i = 0; i < ((List) result).size(); i++) {
-                            strIn += "'" + ReflectUtil.getFieldValue(((List) result).get(i), className.substring(0, 1).toLowerCase() + className.substring(1) + "Pk") + "'";
-                            if (i < ((List) result).size() - 1) {
-                                strIn += ",";
-                            }
-                        }
-                        strIn += ")";
-                        mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + className + "Mapper"));
-                        condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + className));
-                        condition.createCriteria().andCondition("pk in " + strIn);
                         result = mapper.selectByCondition(condition);
+                        if (((List) result).size() > 0) {
+                            String strIn = "";
+                            for (int i = 0; i < ((List) result).size(); i++) {
+                                strIn += ",'" + ReflectUtil.getFieldValue(((List) result).get(i), className.substring(0, 1).toLowerCase() + className.substring(1) + "Pk") + "'";
+                            }
+                            strIn = "(" + strIn.substring(1) + ")";
+                            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + className + "Mapper"));
+                            condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + className));
+                            condition.createCriteria().andCondition("pk in " + strIn);
+                            result = mapper.selectByCondition(condition);
+                        }
                         ReflectUtil.setFieldValue(model, relation, result);
                     }
-
-                    // 如果没有外键,则查找关系表
-
-
                 } else {
                     mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + className + "Mapper"));
                     result = mapper.selectByPrimaryKey(ReflectUtil.getFieldValue(model, relation + "Pk"));
