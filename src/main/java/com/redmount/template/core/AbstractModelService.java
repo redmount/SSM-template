@@ -683,23 +683,36 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                              * 如果有relation数据,还得把relation数据放在关系表DO里面
                              */
                             if (isContainsRelation) {
+                                /**
+                                 * 取出传入数据的relation
+                                 */
                                 relationDataMap = (Map<String, Object>) ReflectUtil.getFieldValue(currentRelationedListItem, "relation");
                                 for (String key : relationDataMap.keySet()) {
+                                    /**
+                                     * 把每个relation的值灌到DO实体中,以便保存
+                                     */
                                     ReflectUtil.setFieldValue(currentRelatioinedDO, key, relationDataMap.get(key));
                                 }
                                 /**
                                  * 赋值数据创建时间
                                  */
                                 ReflectUtil.setFieldValue(currentRelatioinedDO, "created", new Date());
+                                /**
+                                 * 单条插入关系表数据.
+                                 * mapper.insertList(List)只支持主键有默认值的.
+                                 * 看看以后如何解决此事,是从数据结构上解决,还是自己写个批量插入语句解决.
+                                 */
                                 mapper.insert(currentRelatioinedDO);
                             }
                         }
                     }
                 } else {
-                    System.out.println(currentField.getName() + ":Single");
+                    javaTargetFieldName = currentField.getName() + "Pk";
+                    ReflectUtil.setFieldValue(model, javaTargetFieldName, ((BaseDO) currentFeildValue).getPk());
                 }
             }
-
+            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassShortName + "Mapper"));
+            mapper.updateByPrimaryKeySelective(model);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
