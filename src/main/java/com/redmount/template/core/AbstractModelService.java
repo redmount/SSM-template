@@ -36,6 +36,10 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
 
     /**
      * 取单个实体
+     *
+     * @param pk        单个实体pk
+     * @param relations 关系数据
+     * @return 带关系数据的单个实体
      * 此方法以TestClazzModel作为说明.
      * TestClazzModel定义如下:
      * public class TestClazzModel extends TestClazz {
@@ -48,10 +52,6 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * public class TestTeacherModel extends TestTeacher {
      * private Map<String, Object> relation; // 关系表的关系数据存放容器,现在只支持Map<String,Object>类型,以对应多种数据结构
      * }
-     *
-     * @param pk        单个实体pk
-     * @param relations 关系数据
-     * @return 带关系数据的单个实体
      */
     @Override
     public T getByPk(String pk, String relations) {
@@ -150,25 +150,15 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
          */
         String javaMainFieldName;
         /**
-         * SQL语句中子表的关系字段名
-         * test_teacher_pk
-         */
-        String sqlTargetFieldName;
-        /**
-         * SQL语句中主表的字段名
-         * test_clazz_pk
-         */
-        String sqlMainFieldName;
-        /**
          * 关系数据的暂存结果
          */
-        Map<String, Object> relationMap = new HashMap<>();
+        Map<String, Object> relationMap;
         /**
          * 关系表的查询结果
          * 如果在实体中中,存在"relation"字段,则会将关系表中的所有不以"pk"结尾的字段值以Map<String,Object>的方式赋值给relation字段.
          * 在老师对班级(或者是班级对老师)的关系表中,不仅存着老师与班级的关系,并且还存着这个老师给这个班级上什么课,总共上了多少节等信息.
          */
-        Object relationResult;
+        Object relationResults;
         /**
          * 循环可以load的关系列表
          * 此列表已经由前面的函数进行过过滤
@@ -250,16 +240,6 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                      */
                     if (ReflectUtil.containsProperty(Class.forName(realFullClassName), javaMainFieldName)) {
                         /**
-                         * 如果子表中含有主表的外键
-                         * 例如 TestStudent 中,含有testClazzPk
-                         *
-                         * 取出来主表pk对应的SQL字段名
-                         * testClazzPk
-                         * ->
-                         * test_clazz_pk
-                         */
-                        sqlMainFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, javaMainFieldName);
-                        /**
                          * 创建Condition,用来查询子表
                          */
                         Condition condition = new Condition(Class.forName(realFullClassName));
@@ -283,7 +263,6 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                          * 拼装表名,规则是R_表名A_T_表名B
                          * 其中表名是完全限定名,包括表名的前缀都得带上
                          */
-                        // shortClassName = fullClassNamePath[fullClassNamePath.length - 1];
                         String relationClassName = "R" + modelClassShortName + "T" + shortClassNameWithoutModel;
                         try {
                             /**
@@ -300,13 +279,6 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                             mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + relationClassName + "Mapper"));
                         }
                         /**
-                         * 还是取主表pk的数据库字段名
-                         * TestClazz
-                         * ->
-                         * test_clazz_pk
-                         */
-                        sqlMainFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, modelClassShortName + "Pk");
-                        /**
                          * 取对应表的Condition
                          * relationClassName在上面已经试错过了,所以肯定会有效的.
                          */
@@ -318,11 +290,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                         /**
                          * 取关系表结果集
                          */
-                        relationResult = mapper.selectByCondition(condition);
+                        relationResults = mapper.selectByCondition(condition);
                         /**
                          * 判断是否取回来了结果集
                          */
-                        if (((List) relationResult).size() > 0) {
+                        if (((List) relationResults).size() > 0) {
                             /**
                              * 如果取回来了结果,则拼装 "in" 条件的List
                              */
@@ -337,7 +309,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                             /**
                              * 把关系表结果集中的子表pk值都取出来
                              */
-                            for (Object target : (List) relationResult) {
+                            for (Object target : (List) relationResults) {
                                 targetPkList.add(ReflectUtil.getFieldValue(target, javaTargetFieldName).toString());
                             }
                             /**
@@ -362,35 +334,104 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                             /**
                              * 取出来之后不能直接用,还得看java实体类中,是不是有relation,关系.
                              */
-                            if (ReflectUtil.containsProperty(Class.forName(realFullClassName), "relation")) {
+                            if (ReflectUtil.isRelationMap(Class.forName(realFullClassName), "relation")) {
                                 /**
                                  * 如果有relation关系,还得把刚才查出来的关系表里面的其他数据,给赋值到这个relation身上.
                                  * 这里写的很难看,值得继续抽象,继续优化
                                  */
                                 List<Object> resultListContainsRelation = new ArrayList<>();
-                                for (Object obj : (List) relationResult) {
-                                    for (Object target : (List) result) {
-                                        Object o = ReflectUtil.cloneObj(target, Class.forName(realFullClassName));
-                                        if (ReflectUtil.getFieldValue(obj, shortClassName.replaceAll("Model", "").substring(0, 1).toLowerCase() + shortClassName.replaceAll("Model", "").substring(1) + "Pk").equals(ReflectUtil.getFieldValue(target, "pk"))) {
+                                /**
+                                 * 循环关系表中的每一条记录
+                                 * [
+                                 *  {"clazzPk":"c1","teacherPk":"t1","course":"思想政治课","count":10}, // 每次取出一条这个
+                                 *  ...]
+                                 */
+                                for (Object relationResult : (List) relationResults) {
+                                    /**
+                                     * 循环结果集表中的每一条记录
+                                     * [
+                                     *  {"pk":"t1","name":"一班班主任"}, // 每次取一条这个
+                                     *  ...
+                                     * ]
+                                     */
+                                    for (Object sourceResult : (List) result) {
+                                        /**
+                                         * 创建一个与结果集对应的Model类的实例,并把结果集中的数据复制过去.
+                                         * 规则里Model必须继承自DO.
+                                         * 结果为:
+                                         * {
+                                         *  "pk":"",
+                                         *  "name":"一班班主任",
+                                         *  "relation":{} // 主要多了一个这个,而这个是Model类里面定义的Map<String,Object>
+                                         *  }
+                                         */
+                                        Object relationTarget = ReflectUtil.cloneObj(sourceResult, Class.forName(realFullClassName));
+                                        /**
+                                         * 取出对应的两条数据
+                                         * 条件为关系结果集中的"teacherPk"的值等于结果中的"pk"的值
+                                         */
+                                        if (ReflectUtil.getFieldValue(relationResult, javaTargetFieldName).equals(ReflectUtil.getFieldValue(sourceResult, "pk"))) {
+                                            /**
+                                             * 取到了,则创建一个Map,作为装在relation的容器
+                                             */
                                             relationMap = new HashMap<>();
-                                            for (Field relationResultField : obj.getClass().getDeclaredFields()) {
+                                            /**
+                                             * 循环关系结果集中的每一个字段
+                                             * count,course等
+                                             */
+                                            for (Field relationResultField : relationResult.getClass().getDeclaredFields()) {
+                                                /**
+                                                 * 如果不以pk作为结尾,则说明是有意义的数据
+                                                 * 对于关系表,他自己的pk是无意义的.
+                                                 * 对于数据的观察者来说,关系表中的两表的pk也是无意义的,已经在返回的数据结构中体现出了关系.
+                                                 * 所以不需要返回所有"pk"结尾的字段了.
+                                                 */
                                                 if (!StringUtils.endsWith(relationResultField.getName(), "Pk") && !StringUtils.endsWith(relationResultField.getName(), "pk")) {
-                                                    relationMap.put(relationResultField.getName(), ReflectUtil.getFieldValue(obj, relationResultField.getName()));
+                                                    /**
+                                                     * 把有意义的数据放在Map中
+                                                     */
+                                                    relationMap.put(relationResultField.getName(), ReflectUtil.getFieldValue(relationResult, relationResultField.getName()));
                                                 }
                                             }
-                                            ReflectUtil.setFieldValue(o, "relation", relationMap);
-                                            resultListContainsRelation.add(o);
+                                            /**
+                                             * 把拼装好的关系数据Map赋值给刚才拷贝出来的,带关系的Model的relation字段中.
+                                             * 就是拿这个"relation"进行的判断,所以这个肯定是能赋值的.
+                                             */
+                                            ReflectUtil.setFieldValue(relationTarget, "relation", relationMap);
+                                            /**
+                                             * 带关系的Model列表里,添加组织好的数据.
+                                             */
+                                            resultListContainsRelation.add(relationTarget);
                                         }
                                     }
                                 }
+                                /**
+                                 * 这层是在有relation的情况下进行的.
+                                 * 为了代码逻辑统一,统一的将result最为最终的结果,赋值给最终的返回实体类.
+                                 */
                                 result = resultListContainsRelation;
                             }
                         }
+                        /**
+                         * 无论取没取出来列表类型的数据,都把取出来的值赋值给最终的返回结果.
+                         */
                         ReflectUtil.setFieldValue(model, relation, result);
                     }
                 } else {
+                    /**
+                     * 一对一关系,一个班级取唯一的班主任,而且主表知道自己的从表是谁的情况下.
+                     * 班级知道自己的班主任是谁,班主任不知道自己属于哪个班级.
+                     * 现在取的是班级,所以班级表中一定含有班主任的pk.
+                     * 规则...
+                     */
                     mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + shortClassNameWithoutModel + "Mapper"));
+                    /**
+                     * 拼装查询条件,在班级中取adviserPk对应的值.
+                     */
                     result = mapper.selectByPrimaryKey(ReflectUtil.getFieldValue(model, relation + "Pk"));
+                    /**
+                     * 取出来的值放到最终的返回结果的相应字段中
+                     */
                     ReflectUtil.setFieldValue(model, relation, result);
                 }
             } catch (NoSuchFieldException e) {

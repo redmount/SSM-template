@@ -1,9 +1,6 @@
 package com.redmount.template.util;
 
-import org.springframework.util.Assert;
-
 import java.lang.reflect.*;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -297,5 +294,17 @@ public class ReflectUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean isRelationMap(Class<?> clazz, String propertyName) {
+        List<Field> fieldList = getFieldList(clazz);
+        for (Field field : fieldList) {
+            if (field.getName().equals(propertyName)) {
+                if (field.getType().getName().startsWith("java.util.Map")) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
