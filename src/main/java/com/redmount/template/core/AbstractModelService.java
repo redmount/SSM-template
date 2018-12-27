@@ -2,7 +2,6 @@ package com.redmount.template.core;
 
 import com.google.common.base.CaseFormat;
 import com.redmount.template.util.ReflectUtil;
-import com.redmount.template.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -492,11 +491,20 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         /**
          * clazzPk
          */
-        String javaMainFieldName;
+        String javaMainFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, modelClassShortName) + "Pk";
         /**
          * 关系表对应的实体名
          */
         String relationClassName;
+        /**
+         * 关系表对应的DO对象
+         */
+        Object currentRelatioinedDO;
+        /**
+         * 关系表中是否有relation
+         */
+        boolean isContainsRelation;
+        Map<String, Object> relationDataMap;
         /**
          * 上来就开始try,有点那啥哈..
          * 先实现功能再说.
@@ -581,6 +589,15 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                          */
                         mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + realFieldShortNameWithoutModel + "Mapper"));
                         /**
+                         * 先清除原有的父级pk
+                         * 注意: 这样就可能产生没有父级的野数据
+                         */
+                        Condition condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + realFieldShortNameWithoutModel));
+                        condition.createCriteria().andEqualTo(javaMainFieldName, mainPk);
+                        Object childDOWithoutMainPk = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + realFieldShortNameWithoutModel).newInstance();
+                        ReflectUtil.setFieldValue(childDOWithoutMainPk, javaMainFieldName, "");
+                        mapper.updateByConditionSelective(childDOWithoutMainPk, condition);
+                        /**
                          * 把从表的主表pk值更新
                          * 这得循环赋值
                          */
@@ -590,7 +607,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                              * todo:没有咋办?
                              */
                             if (!StringUtils.isBlank(((BaseDO) currentItem).getPk())) {
-                                ReflectUtil.setFieldValue(currentItem, CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, modelClassShortName) + "Pk", mainPk);
+                                ReflectUtil.setFieldValue(currentItem, javaMainFieldName, mainPk);
                                 mapper.updateByPrimaryKeySelective(currentItem);
                             } else {
                                 System.out.println("子表没有pk");
@@ -600,17 +617,82 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                          * 至此,从表知道自己属于哪个主表的这种情况就完事儿了.
                          */
                     } else {
+
                         /**
                          * 没有主表pk的情况下,走的是关系表
                          *
+                         * 取从表pk的字段名
+                         * testTeacherPk
+                         */
+                        javaTargetFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, realFieldShortNameWithoutModel) + "Pk";
+                        /**
                          * 先取出关系表的Mapper
                          */
                         relationClassName = "R" + modelClassShortName + "T" + realFieldShortNameWithoutModel;
                         try {
+                            /**
+                             * 先抱着"试试看"的心态,取一下mapper
+                             * 没取到的时候就换个马甲再取一遍
+                             */
                             mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + relationClassName + "Mapper"));
                         } catch (ClassNotFoundException ex) {
+                            /**
+                             * 到这了,就说明刚才没试成功,换个马甲
+                             */
                             relationClassName = "R" + realFieldShortNameWithoutModel + "T" + modelClassShortName;
+                            /**
+                             * 再取一遍
+                             */
                             mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + relationClassName + "Mapper"));
+                        }
+                        /**
+                         * 删除主表对应的关系表
+                         */
+                        Condition condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + relationClassName));
+                        condition.createCriteria().andEqualTo(javaMainFieldName, mainPk);
+                        mapper.deleteByCondition(condition);
+                        /**
+                         * 看这个类里面是否有关系数据
+                         */
+                        isContainsRelation = ReflectUtil.isRelationMap(Class.forName(realFieldFullClassName), "relation");
+                        /**
+                         * 到这了,说明关系表的mapper就已经取到了
+                         *
+                         * 应该循环关系数据里面的数据了
+                         */
+                        for (Object currentRelationedListItem : (List) currentFeildValue) {
+                            /**
+                             * 创建一个要进数据库的关系表DO
+                             * 所有生成的DO都包含在MODEL_PACKAGE里,这是规范...
+                             * 所以一定能找得到
+                             */
+                            currentRelatioinedDO = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + relationClassName).newInstance();
+                            /**
+                             * 给关系表生成pk
+                             */
+                            ((BaseDO) currentRelatioinedDO).setPk(UUID.randomUUID().toString());
+                            /**
+                             * 关系表里的主表pk
+                             */
+                            ReflectUtil.setFieldValue(currentRelatioinedDO, javaMainFieldName, mainPk);
+                            /**
+                             * 关系表里的从表pk
+                             */
+                            ReflectUtil.setFieldValue(currentRelatioinedDO, javaTargetFieldName, ((BaseDO) currentRelationedListItem).getPk());
+                            /**
+                             * 如果有relation数据,还得把relation数据放在关系表DO里面
+                             */
+                            if (isContainsRelation) {
+                                relationDataMap = (Map<String, Object>) ReflectUtil.getFieldValue(currentRelationedListItem, "relation");
+                                for (String key : relationDataMap.keySet()) {
+                                    ReflectUtil.setFieldValue(currentRelatioinedDO, key, relationDataMap.get(key));
+                                }
+                                /**
+                                 * 赋值数据创建时间
+                                 */
+                                ReflectUtil.setFieldValue(currentRelatioinedDO, "created", new Date());
+                                mapper.insert(currentRelatioinedDO);
+                            }
                         }
                     }
                 } else {
@@ -619,6 +701,10 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             }
 
         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
             e.printStackTrace();
         }
 
