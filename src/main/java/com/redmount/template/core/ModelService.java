@@ -22,5 +22,11 @@ public interface ModelService<T> {
      */
     List<T> list(String keywords, String relations, String orderBy);
 
+    /**
+     * 自动保存
+     *
+     * @param model 需要保存的数据,目前的限制是只保存表现层中的两层,带关系数据的,保存关系数据.再往下就不管了.
+     * @return 保存之后的结果
+     */
     T saveAutomatic(T model);
 }

@@ -2,6 +2,7 @@ package com.redmount.template.core;
 
 import com.google.common.base.CaseFormat;
 import com.redmount.template.util.ReflectUtil;
+import com.redmount.template.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,7 @@ import tk.mybatis.mapper.entity.Condition;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class AbstractModelService<T extends BaseDO> implements ModelService<T> {
 
@@ -150,6 +148,10 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
          */
         String javaMainFieldName;
         /**
+         * 关系表的对应实体类名
+         */
+        String relationClassName;
+        /**
          * 关系数据的暂存结果
          */
         Map<String, Object> relationMap;
@@ -263,7 +265,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                          * 拼装表名,规则是R_表名A_T_表名B
                          * 其中表名是完全限定名,包括表名的前缀都得带上
                          */
-                        String relationClassName = "R" + modelClassShortName + "T" + shortClassNameWithoutModel;
+                        relationClassName = "R" + modelClassShortName + "T" + shortClassNameWithoutModel;
                         try {
                             /**
                              * 尝试用拼装的表名取Mapper.
@@ -458,8 +460,168 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
 
     @Override
     public T saveAutomatic(T model) {
-        if (StringUtils.isBlank(model.getPk())) {
+        /**
+         * 首先保存主表,并拿到主表的pk
+         */
+        String mainPk = model.getPk();
+        /**
+         * 主实体包含的关系实体列表
+         */
+        List<Field> relationFields;
+        /**
+         * 关系实体对应的
+         */
+        String realFieldFullClassName;
+        /**
+         * 关系实体对应的短类名
+         */
+        String realFieldShortName;
+        /**
+         * 关系实体对应的DO短类名
+         */
+        String realFieldShortNameWithoutModel;
+        /**
+         * 关系数据的实际值
+         */
+        Object currentFeildValue;
+        /**
+         * java实体中子表的字段名
+         * teachers
+         */
+        String javaTargetFieldName;
+        /**
+         * clazzPk
+         */
+        String javaMainFieldName;
+        /**
+         * 关系表对应的实体名
+         */
+        String relationClassName;
+        /**
+         * 上来就开始try,有点那啥哈..
+         * 先实现功能再说.
+         */
+        try {
+            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassShortName + "Mapper"));
+            /**
+             * 如果传进来的model没有pk,则说明是条新记录
+             */
+            if (StringUtils.isBlank(mainPk)) {
+                /**
+                 * 新的数据,要给pk.UUID的形式
+                 */
+                mainPk = UUID.randomUUID().toString();
+                model.setPk(mainPk);
+                /**
+                 * 插入新记录
+                 */
+                mapper.insert(model);
+            } else {
+                /**
+                 * 更新实体
+                 */
+                mapper.updateByPrimaryKeySelective(model);
+            }
+            /**
+             * 取出所有的关系字段
+             */
+            relationFields = ReflectUtil.getRelationFields(model);
+            /**
+             * 循环每一个关系字段
+             */
+            for (Field currentField : relationFields) {
+                /**
+                 * 先判断这个字段是否为空
+                 */
+                currentFeildValue = ReflectUtil.getFieldValue(model, currentField.getName());
+                /**
+                 * 如果取出来的值是空,就啥也不管了,继续下一个
+                 * 不管是实体还是list还是啥,都不管.
+                 */
+                if (currentFeildValue == null) {
+                    continue;
+                }
+                /**
+                 * 先判断这个关系是不是实体
+                 */
+                if (currentField.getType().getName().startsWith("java.util.List")) {
+                    /**
+                     * 取出List包含的真正完全类型
+                     * java.util.List<com.redmount.template.model.TestTeacherModel>
+                     *     ->
+                     * com.redmount.template.model.TestTeacherModel
+                     */
+                    realFieldFullClassName = currentField.getGenericType().getTypeName().split("<|>")[1];
+                    /**
+                     * 取出实体的短类名
+                     * com.redmount.template.model.TestTeacherModel
+                     * ->
+                     * TestTeacherModel
+                     */
+                    realFieldShortName = realFieldFullClassName.split("\\.")[realFieldFullClassName.split("\\.").length - 1];
+                    /**
+                     * 取出实体对应的DO短类名
+                     * 这个名称是取mapper啥的用的.
+                     * TestTeacherModel
+                     * ->
+                     * TestTeacher
+                     */
+                    realFieldShortNameWithoutModel = realFieldShortName.replaceAll("Model", "");
+                    /**
+                     * 如果是list,先判断从表里面有没有主表的pk
+                     */
+                    if (ReflectUtil.containsProperty(Class.forName(realFieldFullClassName), modelClassShortName + "Pk")) {
+
+                        /**
+                         * 有主表pk的情况下,走的是从表的主表pk
+                         */
+                        System.out.println(currentField.getGenericType() + ":有主表pk");
+                        /**
+                         * 得到子表操作的Mapper
+                         */
+                        mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + realFieldShortNameWithoutModel + "Mapper"));
+                        /**
+                         * 把从表的主表pk值更新
+                         * 这得循环赋值
+                         */
+                        for (Object currentItem : (List) currentFeildValue) {
+                            /**
+                             * 判断子表是不是有pk,如果有,则update
+                             * todo:没有咋办?
+                             */
+                            if (!StringUtils.isBlank(((BaseDO) currentItem).getPk())) {
+                                ReflectUtil.setFieldValue(currentItem, CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, modelClassShortName) + "Pk", mainPk);
+                                mapper.updateByPrimaryKeySelective(currentItem);
+                            } else {
+                                System.out.println("子表没有pk");
+                            }
+                        }
+                        /**
+                         * 至此,从表知道自己属于哪个主表的这种情况就完事儿了.
+                         */
+                    } else {
+                        /**
+                         * 没有主表pk的情况下,走的是关系表
+                         *
+                         * 先取出关系表的Mapper
+                         */
+                        relationClassName = "R" + modelClassShortName + "T" + realFieldShortNameWithoutModel;
+                        try {
+                            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + relationClassName + "Mapper"));
+                        } catch (ClassNotFoundException ex) {
+                            relationClassName = "R" + realFieldShortNameWithoutModel + "T" + modelClassShortName;
+                            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + relationClassName + "Mapper"));
+                        }
+                    }
+                } else {
+                    System.out.println(currentField.getName() + ":Single");
+                }
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
+
         return model;
     }
 }

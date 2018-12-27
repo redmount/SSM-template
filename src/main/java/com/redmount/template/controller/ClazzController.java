@@ -20,7 +20,7 @@ public class ClazzController {
     }
 
     @PostMapping
-    public Result save(@RequestBody TestClazzModel model) {
+    public Result saveAutomaic(@RequestBody TestClazzModel model) {
         return ResultGenerator.genSuccessResult(service.saveAutomatic(model));
     }
 }

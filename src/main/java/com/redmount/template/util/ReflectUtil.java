@@ -307,4 +307,9 @@ public class ReflectUtil {
         }
         return false;
     }
+
+    public static List<Field> getRelationFields(Object object) {
+        Class clazz = object.getClass();
+        return Arrays.asList(clazz.getDeclaredFields());
+    }
 }
