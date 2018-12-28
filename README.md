@@ -88,6 +88,7 @@
     除了BASE_PACKAGE外,其余值不建议修改.
     
     其中生成的代码建议放在base文件夹下,以便维护.
+    
     |常量名|作用|默认值|说明|
     |-----|----|----|---|
     |BASE_PACKAGE|生成代码所在的基础包名称，可根据自己公司的项目修改（注意：这个配置修改之后需要手工修改src目录项目默认的包路径，使其保持一致，不然会找不到类）|com.redmount.template|根据项目进行修改|
@@ -97,7 +98,9 @@
     |SERVICE_IMPL_PACKAGE|生成的ServiceImpl所在包|SERVICE_PACKAGE + ".impl"|不建议修改|
     |CONTROLLER_PACKAGE|生成的Controller所在包|BASE_PACKAGE + ".base.controller"|不建议修改|
     |MAPPER_INTERFACE_REFERENCE|Mapper插件基础接口的完全限定名|BASE_PACKAGE + ".core.Mapper"|不能修改|
+    
 1. 调整```src/test/CodeGenerator.java```中的配置值.
+
     |常量名|作用|默认值|
     |-----|----|-----|
     |JDBC_URL|数据库链接地址|jdbc:mysql://localhost:3306/test?serverTimezone=GMT%2B8|
