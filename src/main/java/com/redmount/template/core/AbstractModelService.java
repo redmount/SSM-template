@@ -1,6 +1,7 @@
 package com.redmount.template.core;
 
 import com.google.common.base.CaseFormat;
+import com.redmount.template.util.NameUtil;
 import com.redmount.template.util.ReflectUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
@@ -166,6 +167,10 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
          * 取值仅取非简单类型的实体字段名
          */
         for (String relation : relationList) {
+            /**
+             * 初始化结果
+             */
+            result = null;
             /**
              * todo:try是try了,出错之后怎么处理,是个问题...2018年12月26日
              */
@@ -687,7 +692,17 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                                  * 取出传入数据的relation
                                  */
                                 relationDataMap = (Map<String, Object>) ReflectUtil.getFieldValue(currentRelationedListItem, "relation");
+                                /**
+                                 * 取关系表DO中的所有属性
+                                 */
+                                List<String> fieldsListOfDO = ReflectUtil.getFieldListNamesList(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + relationClassName));
+                                List<String> fieldsListOfDataMap = new ArrayList<>();
                                 for (String key : relationDataMap.keySet()) {
+                                    fieldsListOfDataMap.add(key);
+                                }
+                                fieldsListOfDO = NameUtil.getRetain(fieldsListOfDO, fieldsListOfDataMap);
+
+                                for (String key : fieldsListOfDO) {
                                     /**
                                      * 把每个relation的值灌到DO实体中,以便保存
                                      */

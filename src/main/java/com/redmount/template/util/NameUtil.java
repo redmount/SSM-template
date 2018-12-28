@@ -3,6 +3,8 @@ package com.redmount.template.util;
 import com.google.common.base.CaseFormat;
 import com.redmount.template.core.ProjectConstant;
 
+import java.util.List;
+
 public class NameUtil {
     /**
      * 小驼峰/大驼峰格式转为下划线格式
@@ -27,5 +29,13 @@ public class NameUtil {
 
     public static String getShortClassName(String fullClassName) {
         return null;
+    }
+
+    public static List<String> getRetain(List<String>... strList) {
+        List<String> retList = strList[0];
+        for (List<String> currentList : strList) {
+            retList.retainAll(currentList);
+        }
+        return retList;
     }
 }

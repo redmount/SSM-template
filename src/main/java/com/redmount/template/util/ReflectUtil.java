@@ -127,6 +127,33 @@ public class ReflectUtil {
         return fieldList;
     }
 
+    public static List<String> getFieldListNamesList(Class<?> clazz){
+        List<String> retList=new ArrayList<>();
+        if (null == clazz) {
+            return retList;
+        }
+        // List<Field> fieldList = new LinkedList<>();
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            /** 过滤静态属性**/
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+            /** 过滤transient 关键字修饰的属性**/
+            if (Modifier.isTransient(field.getModifiers())) {
+                continue;
+            }
+            retList.add(field.getName());
+        }
+        /** 处理父类字段**/
+        Class<?> superClass = clazz.getSuperclass();
+        if (superClass.equals(Object.class)) {
+            return retList;
+        }
+        retList.addAll(getFieldListNamesList(superClass));
+        return retList;
+    }
+
     public static List<String> getFieldList(Class<?> clazz, String relations) {
         List<String> propertyNameList = Arrays.asList(relations.split(","));
         List<Field> fieldList = getFieldList(clazz);
