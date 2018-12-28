@@ -525,6 +525,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                  */
                 mainPk = UUID.randomUUID().toString();
                 model.setPk(mainPk);
+                model.setCreated(new Date());
                 /**
                  * 插入新记录
                  */
@@ -727,6 +728,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 }
             }
             mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassShortName + "Mapper"));
+            model.setUpdated(new Date());
             mapper.updateByPrimaryKeySelective(model);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
