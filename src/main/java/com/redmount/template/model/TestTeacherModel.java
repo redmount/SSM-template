@@ -10,9 +10,9 @@ import java.util.Map;
 @Data
 @RelationData(BaseDOTypeName = "TestTeacher")
 public class TestTeacherModel extends TestTeacher {
-    @RelationData(BaseDOTypeName = "TestClazz", isManyToMany = true,relationTableName = "RTestTeacherTTestClazz")
+    @RelationData(BaseDOTypeName = "TestClazz", isManyToMany = true, relationTableName = "RTestTeacherTTestClazz")
     private List<TestClazzModel> clazzes;
 
-    @RelationData(BaseDOTypeName = "RTestTeacherTTestClazz")
+    @RelationData(BaseDOTypeName = "RTestTeacherTTestClazz", isRelation = true)
     private Map<String, Object> courseData;
 }

@@ -2,6 +2,7 @@ package com.redmount.template.core;
 
 import com.google.common.base.CaseFormat;
 import com.redmount.template.core.annotation.RelationData;
+import com.redmount.template.util.NameUtil;
 import com.redmount.template.util.ReflectUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
@@ -113,12 +114,12 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                             targetPkList.add(ReflectUtil.getFieldValue(target, javaTargetFieldName).toString());
                         }
                         mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + fieldBaseDOTypeName + "Mapper"));
-                        realSlaveDOClass = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) fieldRelationDataAnnotation).BaseDOTypeName());
+                        realSlaveDOClass = Class.forName(((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName());
                         condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + fieldBaseDOTypeName));
                         condition.createCriteria().andIn("pk", targetPkList);
                         result = mapper.selectByCondition(condition);
-                        Field RelationDataField = ReflectUtil.getRelationDataField(realSlaveDOClass);
-                        if (RelationDataField != null) {
+                        Field relationDataField = ReflectUtil.getRelationDataField(realSlaveDOClass);
+                        if (relationDataField != null) {
                             List<Object> resultListContainsRelation = new ArrayList<>();
                             for (Object relationResult : (List) relationResults) {
                                 for (Object sourceResult : (List) result) {
@@ -130,7 +131,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                                                 relationMap.put(relationResultField.getName(), ReflectUtil.getFieldValue(relationResult, relationResultField.getName()));
                                             }
                                         }
-                                        ReflectUtil.setFieldValue(relationTarget, RelationDataField.getName(), relationMap);
+                                        ReflectUtil.setFieldValue(relationTarget, relationDataField.getName(), relationMap);
                                         resultListContainsRelation.add(relationTarget);
                                     }
                                 }
@@ -171,111 +172,108 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
 
     @Override
     public T saveAutomatic(T model) {
-        return null;
-//        String mainPk = model.getPk();
-//        Annotation mainClassBaseDOType = modelClass.getAnnotation(BaseDOType.class);
-//        if (mainClassBaseDOType != null) {
-//            modelClassShortName = ((BaseDOType) mainClassBaseDOType).value();
-//        }
-//        List<Field> relationFields;
-//        String realFieldShortNameWithoutModel;
-//        Object currentFeildValue;
-//        String javaTargetFieldName;
-//        String javaMainFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, modelClassShortName) + "Pk";
-//        String relationClassName;
-//        Object currentRelatioinedDO;
-//        boolean isContainsRelation;
-//        Map<String, Object> relationDataMap;
-//        try {
-//            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassShortName + "Mapper"));
-//            if (StringUtils.isBlank(mainPk)) {
-//                mainPk = UUID.randomUUID().toString();
-//                model.setPk(mainPk);
-//                model.setCreated(new Date());
-//                mapper.insert(model);
-//            } else {
-//                mapper.updateByPrimaryKeySelective(model);
-//            }
-//            relationFields = ReflectUtil.getRelationFields(model);
-//            for (Field currentField : relationFields) {
-//                currentFeildValue = ReflectUtil.getFieldValue(model, currentField.getName());
-//                if (currentFeildValue == null) {
-//                    continue;
-//                }
-//                Annotation baseDOTypeAnnotation = currentField.getAnnotation(BaseDOType.class);
-//                if (baseDOTypeAnnotation == null) {
-//                    continue;
-//                }
-//                Annotation collectionAnnotation = currentField.getAnnotation(Collection.class);
-//                if (collectionAnnotation != null && ((Collection) collectionAnnotation).value()) {
-//                    javaMainFieldName = ((Collection) collectionAnnotation).foreignProperty();
-//                    realFieldShortNameWithoutModel = ((BaseDOType) baseDOTypeAnnotation).value();
-//                    if (StringUtils.isNoneBlank(((Collection) collectionAnnotation).foreignProperty())) {
-//                        System.out.println(currentField.getGenericType() + ":有主表pk");
-//                        mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + ((BaseDOType) baseDOTypeAnnotation).value() + "Mapper"));
-//                        Condition condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((BaseDOType) baseDOTypeAnnotation).value()));
-//                        condition.createCriteria().andEqualTo(((Collection) collectionAnnotation).foreignProperty(), mainPk);
-//                        Object childDOWithoutMainPk = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((BaseDOType) baseDOTypeAnnotation).value()).newInstance();
-//                        ReflectUtil.setFieldValue(childDOWithoutMainPk, ((Collection) collectionAnnotation).foreignProperty(), "");
-//                        mapper.updateByConditionSelective(childDOWithoutMainPk, condition);
-//                        for (Object currentItem : (List) currentFeildValue) {
-//                            if (!StringUtils.isBlank(((BaseDO) currentItem).getPk())) {
-//                                ReflectUtil.setFieldValue(currentItem, javaMainFieldName, mainPk);
-//                                mapper.updateByPrimaryKeySelective(currentItem);
-//                            } else {
-//                                System.out.println("子表没有pk");
-//                            }
-//                        }
-//                    } else {
-//                        javaTargetFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, realFieldShortNameWithoutModel) + "Pk";
-//                        relationClassName = "R" + modelClassShortName + "T" + realFieldShortNameWithoutModel;
-//                        try {
-//                            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + relationClassName + "Mapper"));
-//                        } catch (ClassNotFoundException ex) {
-//                            relationClassName = "R" + realFieldShortNameWithoutModel + "T" + modelClassShortName;
-//                            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + relationClassName + "Mapper"));
-//                        }
-//                        Condition condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + relationClassName));
-//                        condition.createCriteria().andEqualTo(javaMainFieldName, mainPk);
-//                        mapper.deleteByCondition(condition);
-//                        isContainsRelation = ReflectUtil.isRelationMap(currentField.getClass(), "relation");
-//                        for (Object currentRelationedListItem : (List) currentFeildValue) {
-//                            currentRelatioinedDO = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + relationClassName).newInstance();
-//                            ((BaseDO) currentRelatioinedDO).setPk(UUID.randomUUID().toString());
-//                            ReflectUtil.setFieldValue(currentRelatioinedDO, javaMainFieldName, mainPk);
-//                            ReflectUtil.setFieldValue(currentRelatioinedDO, javaTargetFieldName, ((BaseDO) currentRelationedListItem).getPk());
-//                            if (isContainsRelation) {
-//                                relationDataMap = (Map<String, Object>) ReflectUtil.getFieldValue(currentRelationedListItem, "relation");
-//                                List<String> fieldsListOfDO = ReflectUtil.getFieldListNamesList(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + relationClassName));
-//                                List<String> fieldsListOfDataMap = new ArrayList<>();
-//                                for (String key : relationDataMap.keySet()) {
-//                                    fieldsListOfDataMap.add(key);
-//                                }
-//                                fieldsListOfDO = NameUtil.getRetain(fieldsListOfDO, fieldsListOfDataMap);
-//
-//                                for (String key : fieldsListOfDO) {
-//                                    ReflectUtil.setFieldValue(currentRelatioinedDO, key, relationDataMap.get(key));
-//                                }
-//                                ReflectUtil.setFieldValue(currentRelatioinedDO, "created", new Date());
-//                                mapper.insert(currentRelatioinedDO);
-//                            }
-//                        }
-//                    }
-//                } else {
-//                    javaTargetFieldName = currentField.getName() + "Pk";
-//                    ReflectUtil.setFieldValue(model, javaTargetFieldName, ((BaseDO) currentFeildValue).getPk());
-//                }
-//            }
-//            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassShortName + "Mapper"));
-//            model.setUpdated(new Date());
-//            mapper.updateByPrimaryKeySelective(model);
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
-//        } catch (InstantiationException e) {
-//            e.printStackTrace();
-//        }
-//        return model;
+        String mainPk = model.getPk();
+        Annotation mainClassRelationDataAnnotation = modelClass.getAnnotation(RelationData.class);
+        if (mainClassRelationDataAnnotation != null) {
+            modelClassShortName = ((RelationData) mainClassRelationDataAnnotation).BaseDOTypeName();
+        }
+        List<Field> relationFields;
+        String realFieldClassFullName;
+        String realFieldClassShortName;
+        String realFieldClassShortNameWithoutModel;
+        Object currentFeildValue;
+        String javaTargetFieldName;
+        String javaMainFieldName;
+        String relationClassName;
+        Object currentRelatioinedDO;
+        boolean isContainsRelation;
+        Condition condition;
+        Map<String, Object> relationDataMap;
+        try {
+            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassShortName + "Mapper"));
+            if (StringUtils.isBlank(mainPk)) {
+                mainPk = UUID.randomUUID().toString();
+                model.setPk(mainPk);
+                model.setCreated(new Date());
+                mapper.insert(model);
+            } else {
+                mapper.updateByPrimaryKeySelective(model);
+            }
+            relationFields = ReflectUtil.getRelationFields(model);
+            for (Field currentField : relationFields) {
+                currentFeildValue = ReflectUtil.getFieldValue(model, currentField.getName());
+                if (currentFeildValue == null) {
+                    continue;
+                }
+                Annotation currentFieldRelationDataAnnotation = currentField.getAnnotation(RelationData.class);
+                if (currentFieldRelationDataAnnotation == null) {
+                    continue;
+                }
+                if (((RelationData) currentFieldRelationDataAnnotation).isOneToMany()) {
+                    javaMainFieldName = ((RelationData) currentFieldRelationDataAnnotation).foreignProperty();
+                    mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).BaseDOTypeName() + "Mapper"));
+                    condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).BaseDOTypeName()));
+                    condition.createCriteria().andEqualTo(((RelationData) currentFieldRelationDataAnnotation).foreignProperty(), mainPk);
+                    Object childDOWithoutMainPk = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).BaseDOTypeName()).newInstance();
+                    ReflectUtil.setFieldValue(childDOWithoutMainPk, javaMainFieldName, "");
+                    mapper.updateByConditionSelective(childDOWithoutMainPk, condition);
+                    for (Object currentItem : (List) currentFeildValue) {
+                        if (!StringUtils.isBlank(((BaseDO) currentItem).getPk())) {
+                            ReflectUtil.setFieldValue(currentItem, javaMainFieldName, mainPk);
+                            ReflectUtil.setFieldValue(currentItem, "updated", new Date());
+                            mapper.updateByPrimaryKeySelective(currentItem);
+                        } else {
+                            System.out.println("子表没有pk");
+                        }
+                    }
+                } else if (((RelationData) currentFieldRelationDataAnnotation).isManyToMany()) {
+                    mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).relationTableName() + "Mapper"));
+                    realFieldClassFullName = ((ParameterizedType) currentField.getGenericType()).getActualTypeArguments()[0].getTypeName();
+                    realFieldClassShortNameWithoutModel = Class.forName(realFieldClassFullName).getAnnotation(RelationData.class).BaseDOTypeName();
+                    javaMainFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, modelClass.getAnnotation(RelationData.class).BaseDOTypeName() + "Pk");
+                    javaTargetFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, realFieldClassShortNameWithoutModel + "Pk");
+                    condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + currentField.getAnnotation(RelationData.class).relationTableName()));
+                    condition.createCriteria().andEqualTo(javaMainFieldName, mainPk);
+                    mapper.deleteByCondition(condition);
+                    Field relationDataField = ReflectUtil.getRelationDataField(Class.forName(((ParameterizedType) currentField.getGenericType()).getActualTypeArguments()[0].getTypeName()));
+                    for (Object currentRelationedListItem : (List) currentFeildValue) {
+                        currentRelatioinedDO = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).relationTableName()).newInstance();
+                        ((BaseDO) currentRelatioinedDO).setPk(UUID.randomUUID().toString());
+                        ReflectUtil.setFieldValue(currentRelatioinedDO, javaMainFieldName, mainPk);
+                        ReflectUtil.setFieldValue(currentRelatioinedDO, javaTargetFieldName, ((BaseDO) currentRelationedListItem).getPk());
+                        if (relationDataField != null) {
+                            relationDataMap = (Map<String, Object>) ReflectUtil.getFieldValue(currentRelationedListItem, relationDataField.getName());
+                            if (relationDataMap != null) {
+                                List<String> fieldsListOfDO = ReflectUtil.getFieldListNamesList(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).relationTableName()));
+                                List<String> fieldsListOfDataMap = new ArrayList<>();
+                                for (String key : relationDataMap.keySet()) {
+                                    fieldsListOfDataMap.add(key);
+                                }
+                                fieldsListOfDO = NameUtil.getRetain(fieldsListOfDO, fieldsListOfDataMap);
+
+                                for (String key : fieldsListOfDO) {
+                                    ReflectUtil.setFieldValue(currentRelatioinedDO, key, relationDataMap.get(key));
+                                }
+                            }
+                            ReflectUtil.setFieldValue(currentRelatioinedDO, "created", new Date());
+                            mapper.insert(currentRelatioinedDO);
+                        }
+                    }
+                } else {
+                    javaTargetFieldName = ((RelationData) currentFieldRelationDataAnnotation).foreignProperty();
+                    ReflectUtil.setFieldValue(model, javaTargetFieldName, ((BaseDO) currentFeildValue).getPk());
+                }
+            }
+            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassShortName + "Mapper"));
+            model.setUpdated(new Date());
+            mapper.updateByPrimaryKeySelective(model);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return model;
     }
 }

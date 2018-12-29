@@ -14,7 +14,9 @@ public class ReflectUtil {
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             if (field.getAnnotation(RelationData.class) != null) {
-                return field;
+                if (field.getAnnotation(RelationData.class).isRelation()) {
+                    return field;
+                }
             }
         }
         return null;
