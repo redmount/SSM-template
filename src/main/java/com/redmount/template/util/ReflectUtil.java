@@ -1,5 +1,7 @@
 package com.redmount.template.util;
 
+import com.redmount.template.core.annotation.RelationData;
+
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,6 +9,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ReflectUtil {
+
+    public static Field getRelationDataField(Class clazz) {
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getAnnotation(RelationData.class) != null) {
+                return field;
+            }
+        }
+        return null;
+    }
+
     public static boolean containsProperty(Class clazz, String propertyName) {
         if (null == clazz) {
             return false;
@@ -127,8 +140,8 @@ public class ReflectUtil {
         return fieldList;
     }
 
-    public static List<String> getFieldListNamesList(Class<?> clazz){
-        List<String> retList=new ArrayList<>();
+    public static List<String> getFieldListNamesList(Class<?> clazz) {
+        List<String> retList = new ArrayList<>();
         if (null == clazz) {
             return retList;
         }
@@ -337,6 +350,14 @@ public class ReflectUtil {
 
     public static List<Field> getRelationFields(Object object) {
         Class clazz = object.getClass();
-        return Arrays.asList(clazz.getDeclaredFields());
+        List<Field> fieldList = new ArrayList<>();
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getAnnotation(RelationData.class) != null) {
+                fieldList.add(field);
+            }
+
+        }
+        return fieldList;
     }
 }

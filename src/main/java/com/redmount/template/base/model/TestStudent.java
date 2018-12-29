@@ -13,8 +13,8 @@ public class TestStudent extends BaseDO {
     /**
      * 所属班级pk
      */
-    @Column(name = "test_clazz_pk")
-    private String testClazzPk;
+    @Column(name = "clazz_pk")
+    private String clazzPk;
 
     /**
      * 获取学生名称
@@ -37,18 +37,18 @@ public class TestStudent extends BaseDO {
     /**
      * 获取所属班级pk
      *
-     * @return test_clazz_pk - 所属班级pk
+     * @return clazz_pk - 所属班级pk
      */
-    public String getTestClazzPk() {
-        return testClazzPk;
+    public String getClazzPk() {
+        return clazzPk;
     }
 
     /**
      * 设置所属班级pk
      *
-     * @param testClazzPk 所属班级pk
+     * @param clazzPk 所属班级pk
      */
-    public void setTestClazzPk(String testClazzPk) {
-        this.testClazzPk = testClazzPk;
+    public void setClazzPk(String clazzPk) {
+        this.clazzPk = clazzPk;
     }
 }
