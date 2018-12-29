@@ -18,6 +18,6 @@ public class StudentController {
     @GetMapping
     public Result getByPk(@RequestParam(value = "pk") String pk,
                           @RequestParam(value = "relations", defaultValue = "") String relations) {
-        return ResultGenerator.genSuccessResult(service.getByPk(pk, relations));
+        return ResultGenerator.genSuccessResult(service.getAutomatic(pk, relations));
     }
 }

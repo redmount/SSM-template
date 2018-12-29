@@ -10,7 +10,7 @@ public interface ModelService<T> {
      * @param relations 关系数据
      * @return 带关系数据的单个实体
      */
-    T getByPk(String pk, String relations);
+    T getAutomatic(String pk, String relations);
 
     /**
      * 取符合条件的实体列表

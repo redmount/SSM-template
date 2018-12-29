@@ -1,7 +1,10 @@
 package com.redmount.template.util;
 
+import com.redmount.template.core.BaseDO;
+import com.redmount.template.core.annotation.Keywords;
 import com.redmount.template.core.annotation.RelationData;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -361,5 +364,20 @@ public class ReflectUtil {
 
         }
         return fieldList;
+    }
+
+    public static <T extends BaseDO> List<Field> getKeywordsFields(Class<T> modelClass) {
+        Field[] fields = modelClass.getDeclaredFields();
+        List<Field> ret = new ArrayList<>();
+        Annotation keywordsAnnotation;
+        for (Field field : fields) {
+            keywordsAnnotation = field.getAnnotation(Keywords.class);
+            if (keywordsAnnotation != null) {
+                if (((Keywords) keywordsAnnotation).value()) {
+                    ret.add(field);
+                }
+            }
+        }
+        return ret;
     }
 }

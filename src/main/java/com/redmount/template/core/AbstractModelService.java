@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -54,7 +55,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * }
      */
     @Override
-    public T getByPk(String pk, String relations) {
+    public T getAutomatic(String pk, String relations) {
         Annotation mainClassRelationDataAnnotation = modelClass.getAnnotation(RelationData.class);
         if (mainClassRelationDataAnnotation != null) {
             modelClassShortName = ((RelationData) mainClassRelationDataAnnotation).BaseDOTypeName();
@@ -167,7 +168,26 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      */
     @Override
     public List<T> list(String keywords, String relations, String orderBy) {
-        return null;
+        List<T> retList = new ArrayList<>();
+        List<Field> fields = ReflectUtil.getKeywordsFields(modelClass);
+        List<Object> results;
+        try {
+            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassShortName + "Mapper"));
+            Example condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + modelClass.getAnnotation(RelationData.class).BaseDOTypeName()));
+            Condition.Criteria criteria = condition.createCriteria();
+            for (Field field : fields) {
+                criteria.orLike(field.getName(), "%" + keywords + "%");
+            }
+            condition.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));
+            results = mapper.selectByCondition(condition);
+            for (Object result : results) {
+                retList.add(ReflectUtil.cloneObj(result, modelClass));
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return retList;
     }
 
     @Override
@@ -179,14 +199,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         }
         List<Field> relationFields;
         String realFieldClassFullName;
-        String realFieldClassShortName;
         String realFieldClassShortNameWithoutModel;
         Object currentFeildValue;
         String javaTargetFieldName;
         String javaMainFieldName;
-        String relationClassName;
         Object currentRelatioinedDO;
-        boolean isContainsRelation;
         Condition condition;
         Map<String, Object> relationDataMap;
         try {

@@ -3,6 +3,7 @@ package com.redmount.template.model;
 import com.redmount.template.base.model.TestClazz;
 import com.redmount.template.base.model.TestStudent;
 import com.redmount.template.base.model.TestTeacher;
+import com.redmount.template.core.annotation.Keywords;
 import com.redmount.template.core.annotation.RelationData;
 import lombok.Data;
 
@@ -23,4 +24,10 @@ public class TestClazzModel extends TestClazz {
 
     @RelationData(BaseDOTypeName = "RTestTeacherTTestClazz", isRelation = true)
     private Map<String, Object> courseCount;
+
+    @Keywords
+    private String pk;
+
+    @Keywords
+    private String name;
 }
