@@ -32,4 +32,7 @@ public class TestClazzModel extends TestClazz {
     private String name;
 
     private Integer count;
+
+    @Keywords
+    private String nickName;
 }

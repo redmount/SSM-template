@@ -155,7 +155,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @return 带关系数据的排序的实体列表
      */
     @Override
-    public List<T> list(String keywords, String condition, String relations, String orderBy) {
+    public List list(String keywords, String condition, String relations, String orderBy) {
         List<T> retList = new ArrayList<>();
         List<Field> fields = ReflectUtil.getKeywordsFields(modelClass);
         List<Object> results;
@@ -177,9 +177,15 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 criteriaCondition.andCondition(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, condition));
                 example.and(criteriaCondition);
             }
-
             example.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));
             results = mapper.selectByCondition(example);
+            if (StringUtils.isNotBlank(relations)) {
+                List<Object> resultWithRelations = new ArrayList<>();
+                for (Object item : results) {
+                    resultWithRelations.add(getAutomatic(((BaseDO) item).getPk(), relations));
+                }
+                return resultWithRelations;
+            }
             for (Object result : results) {
                 retList.add(ReflectUtil.cloneObj(result, modelClass));
             }

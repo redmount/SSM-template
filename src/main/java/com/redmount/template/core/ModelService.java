@@ -20,7 +20,7 @@ public interface ModelService<T> {
      * @param orderBy   排序
      * @return 带关系数据的排序的实体列表
      */
-    List<T> list(String keywords,String condition, String relations, String orderBy);
+    List list(String keywords,String condition, String relations, String orderBy);
 
     /**
      * 自动保存
