@@ -10,5 +10,6 @@
     <result column="adviser_pk" jdbcType="CHAR" property="adviserPk" />
     <result column="updated" jdbcType="TIMESTAMP" property="updated" />
     <result column="created" jdbcType="TIMESTAMP" property="created" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
   </resultMap>
 </mapper>

@@ -16,6 +16,9 @@ public class TestClazz extends BaseDO {
     @Column(name = "adviser_pk")
     private String adviserPk;
 
+    @Column(name = "nick_name")
+    private String nickName;
+
     /**
      * 获取班级名称
      *
@@ -50,5 +53,19 @@ public class TestClazz extends BaseDO {
      */
     public void setAdviserPk(String adviserPk) {
         this.adviserPk = adviserPk;
+    }
+
+    /**
+     * @return nick_name
+     */
+    public String getNickName() {
+        return nickName;
+    }
+
+    /**
+     * @param nickName
+     */
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 }

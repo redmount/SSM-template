@@ -32,11 +32,12 @@ public class ClazzController {
     @GetMapping
     public Result getList(@RequestParam(value = "keywords", defaultValue = "") String keywords,
                           @RequestParam(value = "condition", defaultValue = "") String condition,
-                          @RequestParam(value = "orderBy", defaultValue = "update desc") String orderBy,
+                          @RequestParam(value = "relations", defaultValue = "") String relations,
+                          @RequestParam(value = "orderBy", defaultValue = "updated desc") String orderBy,
                           @RequestParam(value = "page", defaultValue = "1") int page,
                           @RequestParam(value = "size", defaultValue = "10") int size) {
         PageHelper.startPage(page, size);
-        List<TestClazzModel> list = service.list(keywords, condition, orderBy);
+        List<TestClazzModel> list = service.list(keywords, condition, relations, orderBy);
         PageInfo pageInfo = new PageInfo(list);
         return ResultGenerator.genSuccessResult(pageInfo);
     }

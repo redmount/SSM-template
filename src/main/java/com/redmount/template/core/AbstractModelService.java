@@ -155,22 +155,31 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @return 带关系数据的排序的实体列表
      */
     @Override
-    public List<T> list(String keywords, String relations, String orderBy) {
+    public List<T> list(String keywords, String condition, String relations, String orderBy) {
         List<T> retList = new ArrayList<>();
         List<Field> fields = ReflectUtil.getKeywordsFields(modelClass);
         List<Object> results;
         try {
             mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassShortName + "Mapper"));
-            Example condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + modelClass.getAnnotation(RelationData.class).BaseDOTypeName()));
-            Condition.Criteria criteria = condition.createCriteria();
-            for (Field field : fields) {
-                if (field.getType() != String.class) {
-                    throw new IllegalArgumentException("@Keywords 注解只能标记在String类型的字段上:" + field.toString());
+            Example example = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + modelClass.getAnnotation(RelationData.class).BaseDOTypeName()));
+            Condition.Criteria criteriaKeywords = example.createCriteria();
+            Condition.Criteria criteriaCondition = example.createCriteria();
+            if (StringUtils.isNotBlank(keywords)) {
+
+                for (Field field : fields) {
+                    if (field.getType() != String.class) {
+                        throw new IllegalArgumentException("@Keywords 注解只能标记在String类型的字段上:" + field.toString());
+                    }
+                    criteriaKeywords.orLike(field.getName(), "%" + keywords + "%");
                 }
-                criteria.orLike(field.getName(), "%" + keywords + "%");
             }
-            condition.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));
-            results = mapper.selectByCondition(condition);
+            if (StringUtils.isNotBlank(condition)) {
+                criteriaCondition.andCondition(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, condition));
+                example.and(criteriaCondition);
+            }
+
+            example.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));
+            results = mapper.selectByCondition(example);
             for (Object result : results) {
                 retList.add(ReflectUtil.cloneObj(result, modelClass));
             }
