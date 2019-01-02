@@ -67,7 +67,7 @@ public class ReflectUtil {
         }
         try {
             T t = toResult.newInstance();
-            List<Field> fields = getFieldList(toResult);
+            List<Field> fields = getFieldList(obj.getClass());
             for (Field field : fields) {
                 field.setAccessible(true);//修改访问权限
                 if (Modifier.isFinal(field.getModifiers()))

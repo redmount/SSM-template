@@ -42,17 +42,6 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @param relations 关系数据
      * @return 带关系数据的单个实体
      * 此方法以TestClazzModel作为说明.
-     * TestClazzModel定义如下:
-     * public class TestClazzModel extends TestClazz {
-     * private TestTeacher adviser; // 类型为生成的DO
-     * private List<TestStudent> students; // 类型为生成的DO
-     * private List<TestTeacherModel> teachers; // 自定义类型,继承自数据库的DO: TestTeacher
-     * }
-     * <p>
-     * TestTeacherModel定义如下:
-     * public class TestTeacherModel extends TestTeacher {
-     * private Map<String, Object> relation; // 关系表的关系数据存放容器,现在只支持Map<String,Object>类型,以对应多种数据结构
-     * }
      */
     @Override
     public T getAutomatic(String pk, String relations) {
@@ -148,7 +137,6 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                     result = ReflectUtil.cloneObj(result, field.getType());
                     ReflectUtil.setFieldValue(model, relation, result);
                 }
-
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -176,6 +164,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             Example condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + modelClass.getAnnotation(RelationData.class).BaseDOTypeName()));
             Condition.Criteria criteria = condition.createCriteria();
             for (Field field : fields) {
+                if (field.getType() != String.class) {
+                    throw new IllegalArgumentException("@Keywords 注解只能标记在String类型的字段上:" + field.toString());
+                }
                 criteria.orLike(field.getName(), "%" + keywords + "%");
             }
             condition.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));

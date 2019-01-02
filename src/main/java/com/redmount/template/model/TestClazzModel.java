@@ -30,4 +30,6 @@ public class TestClazzModel extends TestClazz {
 
     @Keywords
     private String name;
+
+    private Integer count;
 }
