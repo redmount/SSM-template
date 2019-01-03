@@ -5,42 +5,42 @@ import javax.persistence.*;
 
 @Table(name = "r_test_teacher_t_test_clazz")
 public class RTestTeacherTTestClazz extends BaseDO {
-    @Column(name = "test_teacher_pk")
-    private String testTeacherPk;
+    @Column(name = "teacher_pk")
+    private String teacherPk;
 
-    @Column(name = "test_clazz_pk")
-    private String testClazzPk;
+    @Column(name = "clazz_pk")
+    private String clazzPk;
 
     private String course;
 
     private Integer count;
 
     /**
-     * @return test_teacher_pk
+     * @return teacher_pk
      */
-    public String getTestTeacherPk() {
-        return testTeacherPk;
+    public String getTeacherPk() {
+        return teacherPk;
     }
 
     /**
-     * @param testTeacherPk
+     * @param teacherPk
      */
-    public void setTestTeacherPk(String testTeacherPk) {
-        this.testTeacherPk = testTeacherPk;
+    public void setTeacherPk(String teacherPk) {
+        this.teacherPk = teacherPk;
     }
 
     /**
-     * @return test_clazz_pk
+     * @return clazz_pk
      */
-    public String getTestClazzPk() {
-        return testClazzPk;
+    public String getClazzPk() {
+        return clazzPk;
     }
 
     /**
-     * @param testClazzPk
+     * @param clazzPk
      */
-    public void setTestClazzPk(String testClazzPk) {
-        this.testClazzPk = testClazzPk;
+    public void setClazzPk(String clazzPk) {
+        this.clazzPk = clazzPk;
     }
 
     /**

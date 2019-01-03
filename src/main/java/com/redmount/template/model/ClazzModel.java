@@ -11,18 +11,22 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-@RelationData(BaseDOTypeName = "TestClazz")
-public class TestClazzModel extends TestClazz {
-    @RelationData(BaseDOTypeName = "TestTeacher", foreignProperty = "adviserPk")
+@RelationData(baseDOTypeName = "TestClazz")
+public class ClazzModel extends TestClazz {
+    @RelationData(baseDOTypeName = "TestTeacher", foreignProperty = "adviserPk")
     private TestTeacher adviser;
 
-    @RelationData(BaseDOTypeName = "TestStudent", foreignProperty = "clazzPk", isOneToMany = true)
+    @RelationData(baseDOTypeName = "TestStudent", foreignProperty = "clazzPk", isOneToMany = true)
     private List<TestStudent> students;
 
-    @RelationData(BaseDOTypeName = "TestTeacher", isManyToMany = true, relationTableName = "RTestTeacherTTestClazz")
-    private List<TestTeacherModel> teachers;
+    @RelationData(baseDOTypeName = "TestTeacher",
+            isManyToMany = true,
+            relationDOTypeName = "RTestTeacherTTestClazz",
+            foreignProperty = "teacherPk",
+            mainProperty = "clazzPk")
+    private List<TeacherModel> teachers;
 
-    @RelationData(BaseDOTypeName = "RTestTeacherTTestClazz", isRelation = true)
+    @RelationData(baseDOTypeName = "RTestTeacherTTestClazz", isRelation = true)
     private Map<String, Object> courseCount;
 
     @Keywords

@@ -5,8 +5,8 @@ import com.redmount.template.core.annotation.RelationData;
 import lombok.Data;
 
 @Data
-@RelationData(BaseDOTypeName = "TestStudent")
+@RelationData(baseDOTypeName = "TestStudent")
 public class StudentModel extends TestStudent {
-    @RelationData(BaseDOTypeName = "TestClazz", foreignProperty = "clazzPk")
-    TestClazzModel clazz;
+    @RelationData(baseDOTypeName = "TestClazz", foreignProperty = "clazzPk")
+    ClazzModel clazz;
 }

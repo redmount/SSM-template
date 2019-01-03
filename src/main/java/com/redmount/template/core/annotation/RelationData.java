@@ -11,11 +11,13 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RelationData {
-    String BaseDOTypeName();
+    String baseDOTypeName();
 
     String foreignProperty() default "";
 
-    String relationTableName() default "";
+    String relationDOTypeName() default "";
+
+    String mainProperty() default "";
 
     boolean isOneToMany() default false;
 
