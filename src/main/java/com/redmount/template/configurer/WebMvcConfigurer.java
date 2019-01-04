@@ -64,6 +64,7 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         FastJsonHttpMessageConverter converter = new FastJsonHttpMessageConverter();
         FastJsonConfig config = new FastJsonConfig();
+        config.setSerializeFilters(new FastJsonPropertyPreFilter());
         config.setSerializerFeatures(// SerializerFeature.NotWriteDefaultValue, //保留空的字段
                 // SerializerFeature.WriteNullStringAsEmpty, //String null -> ""
                 // SerializerFeature.WriteNullNumberAsZero, //Number null -> 0

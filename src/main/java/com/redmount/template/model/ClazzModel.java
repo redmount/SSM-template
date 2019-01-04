@@ -1,5 +1,7 @@
 package com.redmount.template.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.annotation.JSONType;
 import com.redmount.template.base.model.TestClazz;
 import com.redmount.template.base.model.TestClazzInfo;
 import com.redmount.template.base.model.TestStudent;
