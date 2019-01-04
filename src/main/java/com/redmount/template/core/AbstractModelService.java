@@ -258,10 +258,10 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                     continue;
                 }
                 if (((RelationData) currentFieldRelationDataAnnotation).isOneToMany()) {
-                    javaMainFieldName = ((RelationData) currentFieldRelationDataAnnotation).foreignProperty();
+                    javaMainFieldName = ((RelationData) currentFieldRelationDataAnnotation).mainProperty();
                     mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName() + "Mapper"));
                     condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName()));
-                    condition.createCriteria().andEqualTo(((RelationData) currentFieldRelationDataAnnotation).foreignProperty(), mainPk);
+                    condition.createCriteria().andEqualTo(javaMainFieldName, mainPk);
                     Object childDOWithoutMainPk = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName()).newInstance();
                     ReflectUtil.setFieldValue(childDOWithoutMainPk, javaMainFieldName, "");
                     mapper.updateByConditionSelective(childDOWithoutMainPk, condition);
