@@ -19,6 +19,8 @@ public class TestClazz extends BaseDO {
     @Column(name = "nick_name")
     private String nickName;
 
+    private Boolean deleted;
+
     /**
      * 获取班级名称
      *
@@ -67,5 +69,19 @@ public class TestClazz extends BaseDO {
      */
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    /**
+     * @return deleted
+     */
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    /**
+     * @param deleted
+     */
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }

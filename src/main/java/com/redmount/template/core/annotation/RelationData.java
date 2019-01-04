@@ -13,11 +13,11 @@ import java.lang.annotation.Target;
 public @interface RelationData {
     String baseDOTypeName();
 
-    String foreignProperty() default "";
-
     String relationDOTypeName() default "";
 
     String mainProperty() default "";
+
+    String foreignProperty() default "";
 
     boolean isOneToMany() default false;
 

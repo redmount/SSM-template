@@ -11,7 +11,7 @@
  Target Server Version : 80013
  File Encoding         : 65001
 
- Date: 28/12/2018 16:21:16
+ Date: 03/01/2019 13:10:14
 */
 
 SET NAMES utf8mb4;
@@ -23,8 +23,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `r_test_teacher_t_test_clazz`;
 CREATE TABLE `r_test_teacher_t_test_clazz`  (
   `pk` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `test_teacher_pk` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `test_clazz_pk` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `teacher_pk` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `clazz_pk` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `course` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `count` int(11) NULL DEFAULT NULL,
   `created` datetime(0) NULL DEFAULT NULL,
@@ -35,12 +35,12 @@ CREATE TABLE `r_test_teacher_t_test_clazz`  (
 -- ----------------------------
 -- Records of r_test_teacher_t_test_clazz
 -- ----------------------------
-INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('1', 't1', 'c1', '语文课', 310, NULL, NULL);
-INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('2', 't2', 'c1', '体育老师教的语文课', 1, NULL, NULL);
-INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('3', 't3', 'c1', '数学课', 210, NULL, NULL);
-INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('4', 't2', 'c2', '体育老师教的英语课', 2, NULL, NULL);
+INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('27aa9828-95ff-41d5-be7a-c571207ba0b2', 't2', 'c1', '体育老师教的语文课', 1, '2018-12-30 03:07:41', NULL);
+INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('4', 't2', 'c2', '体育老师教的英语课', 0, NULL, NULL);
 INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('5', 't3', 'c2', '数学课', 210, NULL, NULL);
 INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('6', 't4', 'c2', '英语课', 310, NULL, NULL);
+INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('cd7f4ef3-4dce-44ed-8d86-d02e531b9ed9', 't1', 'c1', '语文课', 310, '2018-12-30 03:07:41', NULL);
+INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('e1a623a5-309a-472d-a204-c13592276f06', 't3', 'c1', '数学课', 210, '2018-12-30 03:07:41', NULL);
 
 -- ----------------------------
 -- Table structure for sys_service_exception
@@ -73,15 +73,16 @@ CREATE TABLE `test_clazz`  (
   `adviser_pk` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '班主任pk',
   `updated` datetime(0) NULL DEFAULT NULL,
   `created` datetime(0) NULL DEFAULT NULL,
+  `nick_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`pk`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of test_clazz
 -- ----------------------------
-INSERT INTO `test_clazz` VALUES ('c1', '班级1', 't1', NULL, NULL);
-INSERT INTO `test_clazz` VALUES ('c2', '班级2', 't4',  NULL, NULL);
-INSERT INTO `test_clazz` VALUES ('c3', '班级3', '',  NULL, NULL);
+INSERT INTO `test_clazz` VALUES ('c1', '班级1', 't1', '2018-12-30 03:07:41', '2018-12-25 15:03:47', '一年一班');
+INSERT INTO `test_clazz` VALUES ('c2', '班级2', 't4', '2018-12-25 15:03:43', '2018-12-25 15:03:47', '二年二班');
+INSERT INTO `test_clazz` VALUES ('c3', '班级3', '', '2018-12-24 10:21:05', '2018-12-24 10:20:37', '三年一班');
 
 -- ----------------------------
 -- Table structure for test_student
@@ -90,7 +91,7 @@ DROP TABLE IF EXISTS `test_student`;
 CREATE TABLE `test_student`  (
   `pk` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '学生名称',
-  `test_clazz_pk` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '所属班级pk',
+  `clazz_pk` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '所属班级pk',
   `updated` datetime(0) NULL DEFAULT NULL,
   `created` datetime(0) NULL DEFAULT NULL
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
@@ -98,9 +99,9 @@ CREATE TABLE `test_student`  (
 -- ----------------------------
 -- Records of test_student
 -- ----------------------------
-INSERT INTO `test_student` VALUES ('s101', '一班学生1', 'c1', NULL, NULL);
-INSERT INTO `test_student` VALUES ('s102', '一班学生2', 'c1', NULL, NULL);
-INSERT INTO `test_student` VALUES ('s201', '二班学生1', 'c2', NULL, NULL);
+INSERT INTO `test_student` VALUES ('s1', '一班学生1', 'c1', '2018-12-30 03:07:41', NULL);
+INSERT INTO `test_student` VALUES ('s2', '一班学生2', 'c1', '2018-12-30 03:07:41', NULL);
+INSERT INTO `test_student` VALUES ('s01', '二班学生1', 'c2', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for test_teacher

@@ -2,8 +2,8 @@ package com.redmount.template.base.controller;
 
 import com.redmount.template.core.Result;
 import com.redmount.template.core.ResultGenerator;
-import com.redmount.template.base.model.TestStudent;
-import com.redmount.template.base.service.TestStudentBaseService;
+import com.redmount.template.base.model.TestClazzInfo;
+import com.redmount.template.base.service.TestClazzInfoBaseService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.*;
@@ -15,39 +15,39 @@ import java.util.List;
 * Created by CodeGenerator on 2019/01/04.
 */
 @RestController
-@RequestMapping("/testStudent")
-public class TestStudentController {
+@RequestMapping("/testClazzInfo")
+public class TestClazzInfoController {
     @Resource
-    private TestStudentBaseService testStudentBaseService;
+    private TestClazzInfoBaseService testClazzInfoBaseService;
 
     @PostMapping
-    public Result add(@RequestBody TestStudent testStudent) {
-        testStudentBaseService.save(testStudent);
-        return ResultGenerator.genSuccessResult(testStudent);
+    public Result add(@RequestBody TestClazzInfo testClazzInfo) {
+        testClazzInfoBaseService.save(testClazzInfo);
+        return ResultGenerator.genSuccessResult(testClazzInfo);
     }
 
     @DeleteMapping("/{pk}")
     public Result delete(@PathVariable String pk) {
-        testStudentBaseService.deleteById(pk);
+        testClazzInfoBaseService.deleteById(pk);
         return ResultGenerator.genSuccessResult(true);
     }
 
     @PutMapping
-    public Result update(@RequestBody TestStudent testStudent) {
-        testStudentBaseService.update(testStudent);
-        return ResultGenerator.genSuccessResult(testStudent);
+    public Result update(@RequestBody TestClazzInfo testClazzInfo) {
+        testClazzInfoBaseService.update(testClazzInfo);
+        return ResultGenerator.genSuccessResult(testClazzInfo);
     }
 
     @GetMapping("/{pk}")
     public Result detail(@PathVariable String pk) {
-        TestStudent testStudent = testStudentBaseService.findById(pk);
-        return ResultGenerator.genSuccessResult(testStudent);
+        TestClazzInfo testClazzInfo = testClazzInfoBaseService.findById(pk);
+        return ResultGenerator.genSuccessResult(testClazzInfo);
     }
 
     @GetMapping
     public Result list(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "0") Integer size) {
         PageHelper.startPage(page, size);
-        List<TestStudent> list = testStudentBaseService.findAll();
+        List<TestClazzInfo> list = testClazzInfoBaseService.findAll();
         PageInfo pageInfo = new PageInfo(list);
         return ResultGenerator.genSuccessResult(pageInfo);
     }
