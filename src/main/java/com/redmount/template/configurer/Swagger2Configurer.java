@@ -23,7 +23,7 @@ public class Swagger2Configurer {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.cfioter.msp.endpoint.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.redmount.template.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }

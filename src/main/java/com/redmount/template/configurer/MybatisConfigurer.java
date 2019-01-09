@@ -2,6 +2,7 @@ package com.redmount.template.configurer;
 
 import com.redmount.template.core.ProjectConstant;
 import com.github.pagehelper.PageInterceptor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -51,7 +52,8 @@ public class MybatisConfigurer {
     public MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
         mapperScannerConfigurer.setSqlSessionFactoryBeanName("sqlSessionFactoryBean");
-        mapperScannerConfigurer.setBasePackage(ProjectConstant.MAPPER_PACKAGE + "," + ProjectConstant.BASE_PACKAGE + "/base/repo" + "," + ProjectConstant.BASE_PACKAGE + "/core/exception");
+        String[] strings = {ProjectConstant.MAPPER_PACKAGE, ProjectConstant.BASE_PACKAGE + "/core/exception", ProjectConstant.BASE_PACKAGE + "/dao"};
+        mapperScannerConfigurer.setBasePackage(StringUtils.join(strings, ","));
         // 配置通用Mapper，详情请查阅官方文档
         Properties properties = new Properties();
         properties.setProperty("mappers", ProjectConstant.MAPPER_INTERFACE_REFERENCE);
