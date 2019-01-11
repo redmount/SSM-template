@@ -5,15 +5,23 @@ import com.github.pagehelper.PageInfo;
 import com.redmount.template.model.ClazzModel;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-public abstract class AbstractController implements Controller {
+public abstract class AbstractController<T> implements Controller<T> {
 
     protected ModelService service;
 
+    private Class<T> modelClass;
+
+    public AbstractController(){
+        ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
+        modelClass = (Class<T>) pt.getActualTypeArguments()[0];
+    }
+
     @PostMapping
     @Override
-    public Result saveAutomatic(@RequestBody Object model) {
+    public Result saveAutomatic(@RequestBody T model) {
         if (service == null) {
             init();
         }
