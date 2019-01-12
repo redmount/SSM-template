@@ -215,7 +215,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     }
 
     @Override
-    public T saveAutomatic(T model) {
+    public T saveAutomatic(T model, boolean forceSaveNull) {
         String mainPk = model.getPk();
         Annotation mainClassRelationDataAnnotation = modelClass.getAnnotation(RelationData.class);
         if (mainClassRelationDataAnnotation != null) {
@@ -238,7 +238,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 model.setCreated(new Date());
                 mapper.insert(model);
             } else {
-                mapper.updateByPrimaryKeySelective(model);
+                if (forceSaveNull) {
+                    mapper.updateByPrimaryKey(model);
+                } else {
+                    mapper.updateByPrimaryKeySelective(model);
+                }
             }
             relationFields = ReflectUtil.getRelationFields(model);
             for (Field currentField : relationFields) {
