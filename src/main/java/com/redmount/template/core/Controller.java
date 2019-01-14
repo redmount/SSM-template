@@ -22,10 +22,11 @@ public interface Controller<T> {
     /**
      * 强制修改实体
      *
+     * @Param pk 待更新的实体pk
      * @param model 待修改的资源实体
      * @return 修改后的资源实体
      */
-    Result modifyAutomatic(T model);
+    Result modifyAutomatic(String pk,T model);
 
     /**
      * 取资源列表

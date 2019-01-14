@@ -87,9 +87,9 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
      */
     @DeleteMapping
     @Override
-    public Result delByConditionAutomatic(@RequestParam(defaultValue = "") String condition) {
+    public Result delByConditionAutomatic(@RequestParam("condition") String condition) {
         if (StringUtils.isBlank(condition)) {
-            return ResultGenerator.genSuccessResult(0);
+            throw new ServiceException(999902);
         }
         initService();
         return ResultGenerator.genSuccessResult(service.delByConditionAudomatic(condition));
@@ -115,13 +115,11 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
      * @param model 待修改的资源实体
      * @return 修改后的资源实体
      */
-    @PatchMapping
+    @PatchMapping("/{pk}")
     @Override
-    public Result modifyAutomatic(@RequestBody T model) {
+    public Result modifyAutomatic(@PathVariable("pk") String pk, @RequestBody T model) {
         initService();
-        if (StringUtils.isBlank(model.getPk())) {
-            throw new ServiceException(999901);
-        }
+        model.setPk(pk);
         return ResultGenerator.genSuccessResult(service.saveAutomatic(model, false));
     }
 

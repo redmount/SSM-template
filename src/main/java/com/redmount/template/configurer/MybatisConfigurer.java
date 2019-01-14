@@ -31,10 +31,10 @@ public class MybatisConfigurer {
         factory.setDataSource(dataSource);
         factory.setTypeAliasesPackage(ProjectConstant.MODEL_PACKAGE);
 
-        // 配置分页插件，详情请查阅官方文档
+        // 配置分页插件，详情请查阅官方文档 https://pagehelper.github.io/docs/howtouse/
         // 分页插件
         Properties properties = new Properties();
-        properties.setProperty("helperDialect", "mysql");
+        properties.setProperty("pageSizeZero", "true");
         properties.setProperty("offsetAsPageNum", "true");
         properties.setProperty("rowBoundsWithCount", "true");
         properties.setProperty("reasonable", "true");
