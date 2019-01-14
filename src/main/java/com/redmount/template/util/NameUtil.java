@@ -38,4 +38,23 @@ public class NameUtil {
         }
         return retList;
     }
+
+    public static String transToDBCondition(String condition) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String[] arr = condition.split("'");
+        if (arr.length == 1) {
+            return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, condition);
+        }
+        for (int i = 0; i < arr.length; i++) {
+            if (i % 2 == 0) {
+                arr[i] = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, arr[i]);
+                stringBuilder.append(arr[i]);
+            } else {
+                stringBuilder.append('\'');
+                stringBuilder.append(arr[i]);
+                stringBuilder.append('\'');
+            }
+        }
+        return stringBuilder.toString();
+    }
 }

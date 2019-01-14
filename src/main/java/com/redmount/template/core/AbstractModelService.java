@@ -192,7 +192,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 }
             }
             if (StringUtils.isNotBlank(condition)) {
-                criteriaCondition.andCondition(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, condition));
+                criteriaCondition.andCondition(NameUtil.transToDBCondition(condition));
                 example.and(criteriaCondition);
             }
             example.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));
