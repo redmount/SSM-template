@@ -28,12 +28,15 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      */
     private Class<T> modelClass;
 
-    private String modelClassShortName;
+    /**
+     * 主体Model对应的DO名称
+     */
+    private String modelClassDOSimpleName;
 
     public AbstractModelService() {
         ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
         modelClass = (Class<T>) pt.getActualTypeArguments()[0];
-        modelClassShortName = modelClass.getAnnotation(RelationData.class).baseDOTypeName();
+        modelClassDOSimpleName = modelClass.getAnnotation(RelationData.class).baseDOTypeName();
     }
 
     /**
@@ -178,7 +181,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         List<Field> fields = ReflectUtil.getKeywordsFields(modelClass);
         List<Object> results;
         try {
-            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassShortName + "Mapper"));
+            mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassDOSimpleName + "Mapper"));
             Example example = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + modelClass.getAnnotation(RelationData.class).baseDOTypeName()));
             Condition.Criteria criteriaKeywords = example.createCriteria();
             Condition.Criteria criteriaCondition = example.createCriteria();
@@ -214,12 +217,18 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return retList;
     }
 
+    /**
+     * 自动保存
+     *
+     * @param model 需要保存的数据,目前的限制是只保存表现层中的两层,带关系数据的,保存关系数据.再往下就不管了.
+     * @return 保存之后的结果
+     */
     @Override
     public T saveAutomatic(T model, boolean forceSaveNull) {
         String mainPk = model.getPk();
         Annotation mainClassRelationDataAnnotation = modelClass.getAnnotation(RelationData.class);
         if (mainClassRelationDataAnnotation != null) {
-            modelClassShortName = ((RelationData) mainClassRelationDataAnnotation).baseDOTypeName();
+            modelClassDOSimpleName = ((RelationData) mainClassRelationDataAnnotation).baseDOTypeName();
         }
         List<Field> relationFields;
         String realFieldClassFullName;
@@ -341,6 +350,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return model;
     }
 
+    /**
+     * 真实删除单条数据
+     * @param pk
+     * @return
+     */
     @Override
     public int delAutomaticByPk(String pk) {
         Annotation annotation = modelClass.getAnnotation(RelationData.class);
@@ -351,6 +365,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return mapper.deleteByPrimaryKey(pk);
     }
 
+    /**
+     * 按条件删除
+     * @param condition
+     * @return
+     */
     @Override
     public int delByConditionAudomatic(String condition) {
         Annotation annotation = modelClass.getAnnotation(RelationData.class);
@@ -363,6 +382,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return mapper.deleteByCondition(delCondition);
     }
 
+    /**
+     * 按DO的名称创建Condition条件对象
+     * @param simpleNameOfDO DO类短名称
+     * @return 对应此DO的条件对象
+     */
     private Condition getConditionBySimpleDOName(String simpleNameOfDO) {
         Condition condition = null;
         try {
@@ -373,10 +397,19 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return condition;
     }
 
+    /**
+     * 将小驼峰条件转化为数据库格式条件
+     * 此方法不影响单引号以内的内容
+     * @param condition 小驼峰的条件
+     * @return 数据库中的下划线条件
+     */
     private String getDBConditionString(String condition) {
         return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, condition);
     }
 
+    /**
+     * 初始化本类的mapper对象
+     */
     private Mapper initMainMapper() {
         Annotation annotation = modelClass.getAnnotation(RelationData.class);
         if (annotation == null) {
@@ -385,6 +418,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return initMapperByDOSimpleName(((RelationData) annotation).baseDOTypeName());
     }
 
+    /**
+     * 根据DO的短名称取对应的mapper
+     * @param simpleNameOfDO DO短名称
+     * @return 对应的单表mapper对象
+     */
     private Mapper initMapperByDOSimpleName(String simpleNameOfDO) {
         Mapper ret = null;
         try {
@@ -395,6 +433,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return ret;
     }
 
+    /**
+     * 根据DO短名称取对应的类型
+     * @param simpleNameOfDO DO短名称
+     * @return DO对应的类型
+     */
     private Class getClassByDOSimpleName(String simpleNameOfDO) {
         try {
             return Class.forName(ProjectConstant.MODEL_PACKAGE + "." + simpleNameOfDO);
