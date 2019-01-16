@@ -309,31 +309,25 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      */
     @Override
     public T loadOneToOneRelation(T model, Field field) {
-        return loadOneToOneRelation(model, field, null);
+        return loadOneToOneRelation(model, field, (Condition) null);
     }
 
     /**
-     * 加载一对多关系
+     * 按条件加载一对一关系
+     * 主供后台使用
      *
-     * @param model 主实体对象
-     * @param field 要取的属性
-     * @return 增加了要取的属性的主实体对象
+     * @param model           主实体对象
+     * @param field           要加载的属性
+     * @param conditionString 子属性的条件(小驼峰字符串形式)
+     * @return 按条件加载的一对多关系之后的主实体对象
      */
     @Override
-    public T loadOneToManyRelation(T model, Field field) {
-        return loadOneToManyRelation(model, field, null);
-    }
-
-    /**
-     * 加载多对多关系
-     *
-     * @param model 主实体对象
-     * @param field 要加载的属性
-     * @return 增加了要加载的属性的主实体对象
-     */
-    @Override
-    public T loadManyToManyRelation(T model, Field field) {
-        return loadManyToManyRelation(model, field, null);
+    public T loadOneToOneRelation(T model, Field field, String conditionString) {
+        Condition condition = getConditionByFieldAndConditionString(field, conditionString);
+        if (condition == null) {
+            return model;
+        }
+        return loadOneToOneRelation(model, field, condition);
     }
 
     /**
@@ -373,6 +367,92 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             ReflectUtil.setFieldValue(model, field.getName(), result);
         }
         return model;
+    }
+
+    /**
+     * 加载一对多关系
+     *
+     * @param model 主实体对象
+     * @param field 要取的属性
+     * @return 增加了要取的属性的主实体对象
+     */
+    @Override
+    public T loadOneToManyRelation(T model, Field field) {
+        return loadOneToManyRelation(model, field, (Condition) null);
+    }
+
+    /**
+     * 按条件加载一对多关系数据
+     * 主供后台使用
+     *
+     * @param model           主实体对象
+     * @param field           需要加载的属性
+     * @param conditionString 针对子实体的条件(小驼峰字符串形式)
+     * @return 增加了子实体列表的主实体对象
+     */
+    @Override
+    public T loadOneToManyRelation(T model, Field field, String conditionString) {
+        Condition condition = getConditionByFieldAndConditionString(field, conditionString);
+        if (condition == null) {
+            return model;
+        }
+        return loadOneToManyRelation(model, field, condition);
+    }
+
+    /**
+     * 按条件加载一对多关系数据
+     * 主供后台使用
+     *
+     * @param model     主实体对象
+     * @param field     需要加载的属性
+     * @param condition 针对子实体的条件
+     * @return 增加了子实体列表的主实体对象
+     */
+    @Override
+    public T loadOneToManyRelation(T model, Field field, Condition condition) {
+        Annotation fieldAnnotation = field.getAnnotation(RelationData.class);
+        String fieldBaseDOTypeName = ((RelationData) fieldAnnotation).baseDOTypeName();
+        mapper = initMapperByDOSimpleName(fieldBaseDOTypeName);
+        Class realSlaveDOClass = getClassByDOSimpleName(fieldBaseDOTypeName);
+        String javaMainFieldName = ((RelationData) fieldAnnotation).mainProperty();
+        if (condition == null) {
+            condition = new Condition(realSlaveDOClass);
+            condition.createCriteria();
+        }
+        condition.and().andEqualTo(javaMainFieldName, model.getPk());
+        Object result = mapper.selectByCondition(condition);
+        ReflectUtil.setFieldValue(model, field.getName(), result);
+        return model;
+    }
+
+    /**
+     * 加载多对多关系
+     *
+     * @param model 主实体对象
+     * @param field 要加载的属性
+     * @return 增加了要加载的属性的主实体对象
+     */
+    @Override
+    public T loadManyToManyRelation(T model, Field field) {
+        return loadManyToManyRelation(model, field, (Condition) null);
+    }
+
+    /**
+     * 按条件加载多对多关系
+     * 主供后台使用
+     *
+     * @param model           主实体对象
+     * @param field           要加载的属性
+     * @param conditionString 子属性的条件(小驼峰字符串形式)
+     * @return 按条件加载的多对多关系之后的主实体对象
+     */
+    @Override
+    public T loadManyToManyRelation(T model, Field field, String conditionString) {
+        Condition condition = getConditionByFieldAndConditionString(field, conditionString);
+        if (condition == null) {
+            return model;
+        }
+        return loadManyToManyRelation(model, field, condition);
     }
 
     /**
@@ -423,32 +503,6 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     }
 
     /**
-     * 按条件加载一对多关系数据
-     * 主供后台使用
-     *
-     * @param model     主实体对象
-     * @param field     需要加载的属性
-     * @param condition 针对子实体的条件
-     * @return 增加了子实体列表的主实体对象
-     */
-    @Override
-    public T loadOneToManyRelation(T model, Field field, Condition condition) {
-        Annotation fieldAnnotation = field.getAnnotation(RelationData.class);
-        String fieldBaseDOTypeName = ((RelationData) fieldAnnotation).baseDOTypeName();
-        mapper = initMapperByDOSimpleName(fieldBaseDOTypeName);
-        Class realSlaveDOClass = getClassByDOSimpleName(fieldBaseDOTypeName);
-        String javaMainFieldName = ((RelationData) fieldAnnotation).mainProperty();
-        if (condition == null) {
-            condition = new Condition(realSlaveDOClass);
-            condition.createCriteria();
-        }
-        condition.and().andEqualTo(javaMainFieldName, model.getPk());
-        Object result = mapper.selectByCondition(condition);
-        ReflectUtil.setFieldValue(model, field.getName(), result);
-        return model;
-    }
-
-    /**
      * 根据DO短名称取对应的类型
      *
      * @param simpleNameOfDO DO短名称
@@ -475,6 +529,19 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + simpleNameOfDO));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        }
+        return condition;
+    }
+
+    private Condition getConditionByFieldAndConditionString(Field field, String conditionString) {
+        Annotation annotation = field.getAnnotation(RelationData.class);
+        if (annotation == null) {
+            return null;
+        }
+        Condition condition = getConditionBySimpleDOName(((RelationData) annotation).baseDOTypeName());
+        condition.createCriteria();
+        if (StringUtils.isNotBlank(conditionString)) {
+            condition.and().andCondition(conditionString);
         }
         return condition;
     }

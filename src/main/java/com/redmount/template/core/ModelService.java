@@ -59,22 +59,15 @@ public interface ModelService<T> {
     T loadOneToOneRelation(T model, Field field);
 
     /**
-     * 加载一对多关系
+     * 按条件加载一对一关系
+     * 主供后台使用
      *
-     * @param model 主实体对象
-     * @param field 要取的属性
-     * @return 增加了要取的属性的主实体对象
+     * @param model           主实体对象
+     * @param field           要加载的属性
+     * @param conditionString 子属性的条件(小驼峰字符串形式)
+     * @return 按条件加载的一对多关系之后的主实体对象
      */
-    T loadOneToManyRelation(T model, Field field);
-
-    /**
-     * 加载多对多关系
-     *
-     * @param model 主实体对象
-     * @param field 要加载的属性
-     * @return 增加了要加载的属性的主实体对象
-     */
-    T loadManyToManyRelation(T model, Field field);
+    T loadOneToOneRelation(T model, Field field, String conditionString);
 
     /**
      * 按条件加载一对一关系
@@ -88,15 +81,24 @@ public interface ModelService<T> {
     T loadOneToOneRelation(T model, Field field, Condition condition);
 
     /**
-     * 按条件加载多对多关系
+     * 加载一对多关系
+     *
+     * @param model 主实体对象
+     * @param field 要取的属性
+     * @return 增加了要取的属性的主实体对象
+     */
+    T loadOneToManyRelation(T model, Field field);
+
+    /**
+     * 按条件加载一对多关系数据
      * 主供后台使用
      *
-     * @param model     主实体对象
-     * @param field     要加载的属性
-     * @param condition 子属性的条件(小驼峰形式)
-     * @return 按条件加载的多对多关系之后的主实体对象
+     * @param model           主实体对象
+     * @param field           需要加载的属性
+     * @param conditionString 针对子实体的条件(小驼峰字符串形式)
+     * @return 增加了子实体列表的主实体对象
      */
-    T loadManyToManyRelation(T model, Field field, Condition condition);
+    T loadOneToManyRelation(T model, Field field, String conditionString);
 
     /**
      * 按条件加载一对多关系数据
@@ -108,4 +110,37 @@ public interface ModelService<T> {
      * @return 增加了子实体列表的主实体对象
      */
     T loadOneToManyRelation(T model, Field field, Condition condition);
+
+    /**
+     * 加载多对多关系
+     *
+     * @param model 主实体对象
+     * @param field 要加载的属性
+     * @return 增加了要加载的属性的主实体对象
+     */
+    T loadManyToManyRelation(T model, Field field);
+
+    /**
+     * 按条件加载多对多关系
+     * 主供后台使用
+     *
+     * @param model           主实体对象
+     * @param field           要加载的属性
+     * @param conditionString 子属性的条件(小驼峰字符串形式)
+     * @return 按条件加载的多对多关系之后的主实体对象
+     */
+    T loadManyToManyRelation(T model, Field field, String conditionString);
+
+    /**
+     * 按条件加载多对多关系
+     * 主供后台使用
+     *
+     * @param model     主实体对象
+     * @param field     要加载的属性
+     * @param condition 子属性的条件(小驼峰形式)
+     * @return 按条件加载的多对多关系之后的主实体对象
+     */
+    T loadManyToManyRelation(T model, Field field, Condition condition);
+
+
 }
