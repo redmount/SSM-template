@@ -61,106 +61,23 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         if (StringUtils.isBlank(relations)) {
             return model;
         }
-        String mainPk = model.getPk();
         List<String> relationList = ReflectUtil.getFieldList(modelClass, relations);
         Field field;
-        String fieldBaseDOTypeName;
-        Object result;
-        String javaTargetFieldName;
-        String javaMainFieldName;
-        Map<String, Object> relationMap;
-        Object relationResults;
-        Class realSlaveDOClass;
         for (String relation : relationList) {
-            result = null;
             try {
                 field = modelClass.getDeclaredField(relation);
                 Annotation fieldRelationDataAnnotation = field.getDeclaredAnnotation(RelationData.class);
-                if (fieldRelationDataAnnotation != null) {
-                    fieldBaseDOTypeName = ((RelationData) fieldRelationDataAnnotation).baseDOTypeName();
-                } else {
+                if (fieldRelationDataAnnotation == null) {
                     continue;
                 }
                 if (((RelationData) fieldRelationDataAnnotation).isOneToMany()) {
-                    mapper = initMapperByDOSimpleName(fieldBaseDOTypeName);
-                    realSlaveDOClass = getClassByDOSimpleName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
-                    javaMainFieldName = ((RelationData) fieldRelationDataAnnotation).mainProperty();
-                    Condition condition = new Condition(realSlaveDOClass);
-                    condition.createCriteria().andEqualTo(javaMainFieldName, mainPk);
-                    result = mapper.selectByCondition(condition);
-                    ReflectUtil.setFieldValue(model, relation, result);
+                    model = loadOneToManyRelation(model, field);
                 } else if (((RelationData) fieldRelationDataAnnotation).isManyToMany()) {
-                    mapper = initMapperByDOSimpleName(((RelationData) fieldRelationDataAnnotation).relationDOTypeName());
-                    if (StringUtils.isNotBlank(((RelationData) fieldRelationDataAnnotation).mainProperty())) {
-                        javaMainFieldName = ((RelationData) fieldRelationDataAnnotation).mainProperty();
-                    } else {
-                        javaMainFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, modelClass.getAnnotation(RelationData.class).baseDOTypeName() + "Pk");
-                    }
-                    Condition condition = getConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).relationDOTypeName());
-                    condition.createCriteria().andEqualTo(javaMainFieldName, mainPk);
-                    relationResults = mapper.selectByCondition(condition);
-                    if (((List) relationResults).size() > 0) {
-                        List<String> targetPkList = new ArrayList<>();
-                        if (StringUtils.isNotBlank(((RelationData) fieldRelationDataAnnotation).foreignProperty())) {
-                            javaTargetFieldName = ((RelationData) fieldRelationDataAnnotation).foreignProperty();
-                        } else {
-                            javaTargetFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, fieldBaseDOTypeName) + "Pk";
-                        }
-                        for (Object target : (List) relationResults) {
-                            targetPkList.add(ReflectUtil.getFieldValue(target, javaTargetFieldName).toString());
-                        }
-                        mapper = initMapperByDOSimpleName(fieldBaseDOTypeName);
-                        realSlaveDOClass = Class.forName(((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName());
-                        condition = getConditionBySimpleDOName(fieldBaseDOTypeName);
-                        condition.createCriteria().andIn("pk", targetPkList);
-                        result = mapper.selectByCondition(condition);
-                        Field relationDataField = ReflectUtil.getRelationDataField(realSlaveDOClass);
-                        if (relationDataField != null) {
-                            List<Object> resultListContainsRelation = new ArrayList<>();
-                            for (Object relationResult : (List) relationResults) {
-                                for (Object sourceResult : (List) result) {
-                                    Object relationTarget = ReflectUtil.cloneObj(sourceResult, realSlaveDOClass);
-                                    if (ReflectUtil.getFieldValue(relationResult, javaTargetFieldName).equals(ReflectUtil.getFieldValue(sourceResult, "pk"))) {
-                                        relationMap = new HashMap<>();
-                                        for (Field relationResultField : relationResult.getClass().getDeclaredFields()) {
-                                            if (!StringUtils.endsWith(relationResultField.getName(), "Pk") && !StringUtils.endsWith(relationResultField.getName(), "pk")) {
-                                                relationMap.put(relationResultField.getName(), ReflectUtil.getFieldValue(relationResult, relationResultField.getName()));
-                                            }
-                                        }
-                                        ReflectUtil.setFieldValue(relationTarget, relationDataField.getName(), relationMap);
-                                        resultListContainsRelation.add(relationTarget);
-                                    }
-                                }
-                            }
-                            result = resultListContainsRelation;
-                        }
-                    }
-                    ReflectUtil.setFieldValue(model, relation, result);
+                    model = loadManyToManyRelation(model, field);
                 } else {
-                    mapper = initMapperByDOSimpleName(fieldBaseDOTypeName);
-                    if (StringUtils.isNotBlank(((RelationData) fieldRelationDataAnnotation).mainProperty())) {
-                        javaMainFieldName = ((RelationData) fieldRelationDataAnnotation).mainProperty();
-                        Condition condition = getConditionBySimpleDOName(fieldBaseDOTypeName);
-                        condition.createCriteria().andEqualTo(javaMainFieldName, mainPk);
-                        result = mapper.selectByCondition(condition);
-                        if (((List) result).size() > 1) {
-                            throw new TooManyResultsException("查询出的结果过多:表:" + fieldBaseDOTypeName + ",字段:" + javaMainFieldName + ",值:" + mainPk);
-                        }
-                        if (((List) result).size() > 0) {
-                            ReflectUtil.setFieldValue(model, relation, ((List) result).get(0));
-                        } else {
-                            ReflectUtil.setFieldValue(model, relation, null);
-                        }
-                    } else if (StringUtils.isNotBlank(((RelationData) fieldRelationDataAnnotation).foreignProperty())) {
-                        javaMainFieldName = ((RelationData) fieldRelationDataAnnotation).foreignProperty();
-                        result = mapper.selectByPrimaryKey(ReflectUtil.getFieldValue(model, javaMainFieldName));
-                        result = ReflectUtil.cloneObj(result, field.getType());
-                        ReflectUtil.setFieldValue(model, relation, result);
-                    }
+                    loadOneToOneRelation(model, field);
                 }
             } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
@@ -186,7 +103,6 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             Condition.Criteria criteriaKeywords = example.createCriteria();
             Condition.Criteria criteriaCondition = example.createCriteria();
             if (StringUtils.isNotBlank(keywords)) {
-
                 for (Field field : fields) {
                     if (field.getType() != String.class) {
                         throw new IllegalArgumentException("@Keywords 注解只能标记在String类型的字段上:" + field.toString());
@@ -352,6 +268,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
 
     /**
      * 真实删除单条数据
+     *
      * @param pk
      * @return
      */
@@ -367,6 +284,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
 
     /**
      * 按条件删除
+     *
      * @param condition
      * @return
      */
@@ -383,7 +301,171 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     }
 
     /**
+     * 加载一对一关系数据
+     *
+     * @param model 主实体对象
+     * @param field 要取的属性
+     * @return 增加了要取的属性的主实体对象
+     */
+    @Override
+    public T loadOneToOneRelation(T model, Field field) {
+        return loadOneToOneRelation(model, field, null);
+    }
+
+    /**
+     * 加载一对多关系
+     *
+     * @param model 主实体对象
+     * @param field 要取的属性
+     * @return 增加了要取的属性的主实体对象
+     */
+    @Override
+    public T loadOneToManyRelation(T model, Field field) {
+        return loadOneToManyRelation(model, field, null);
+    }
+
+    /**
+     * 加载多对多关系
+     *
+     * @param model 主实体对象
+     * @param field 要加载的属性
+     * @return 增加了要加载的属性的主实体对象
+     */
+    @Override
+    public T loadManyToManyRelation(T model, Field field) {
+        return loadManyToManyRelation(model, field, null);
+    }
+
+    /**
+     * 按条件加载一对一关系
+     * 主供后台使用
+     *
+     * @param model     主实体对象
+     * @param field     要加载的属性
+     * @param condition 子属性的条件(小驼峰形式)
+     * @return 按条件加载的一对多关系之后的主实体对象
+     */
+    @Override
+    public T loadOneToOneRelation(T model, Field field, Condition condition) {
+        Annotation fieldRelationDataAnnotation = field.getAnnotation(RelationData.class);
+        mapper = initMapperByDOSimpleName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
+        Object result;
+        if (StringUtils.isNotBlank(((RelationData) fieldRelationDataAnnotation).mainProperty())) {
+            String javaMainFieldName = ((RelationData) fieldRelationDataAnnotation).mainProperty();
+            if (condition == null) {
+                condition = getConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
+                condition.createCriteria();
+            }
+            condition.and().andEqualTo(javaMainFieldName, model.getPk());
+            result = mapper.selectByCondition(condition);
+            if (((List) result).size() > 1) {
+                throw new TooManyResultsException("查询出的结果过多:表:" + ((RelationData) fieldRelationDataAnnotation).baseDOTypeName() + ",字段:" + javaMainFieldName + ",值:" + model.getPk());
+            }
+            if (((List) result).size() > 0) {
+                ReflectUtil.setFieldValue(model, field.getName(), ((List) result).get(0));
+            } else {
+                ReflectUtil.setFieldValue(model, field.getName(), null);
+            }
+        } else if (StringUtils.isNotBlank(((RelationData) fieldRelationDataAnnotation).foreignProperty())) {
+            String javaMainFieldName = ((RelationData) fieldRelationDataAnnotation).foreignProperty();
+            result = mapper.selectByPrimaryKey(ReflectUtil.getFieldValue(model, javaMainFieldName));
+            result = ReflectUtil.cloneObj(result, field.getType());
+            ReflectUtil.setFieldValue(model, field.getName(), result);
+        }
+        return model;
+    }
+
+    /**
+     * 按条件加载多对多关系
+     * 主供后台使用
+     *
+     * @param model     主实体对象
+     * @param field     要加载的属性
+     * @param condition 子属性的条件(小驼峰形式)
+     * @return 按条件加载的多对多关系之后的主实体对象
+     */
+    @Override
+    public T loadManyToManyRelation(T model, Field field, Condition condition) {
+        Annotation fieldRelationDataAnnotation = field.getDeclaredAnnotation(RelationData.class);
+        mapper = initMapperByDOSimpleName(((RelationData) fieldRelationDataAnnotation).relationDOTypeName());
+        String javaMainFieldName = ((RelationData) fieldRelationDataAnnotation).mainProperty();
+        Object result = null;
+        Condition relationCondition = getConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).relationDOTypeName());
+        relationCondition.createCriteria().andEqualTo(javaMainFieldName, model.getPk());
+        Object relationResults = mapper.selectByCondition(relationCondition);
+        if (((List) relationResults).size() > 0) {
+            List<String> targetPkList = new ArrayList<>();
+            String javaTargetFieldName = ((RelationData) fieldRelationDataAnnotation).foreignProperty();
+            for (Object target : (List) relationResults) {
+                targetPkList.add(ReflectUtil.getFieldValue(target, javaTargetFieldName).toString());
+            }
+            if (condition == null) {
+                condition = getConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
+                condition.createCriteria();
+            }
+            condition.and().andIn("pk", targetPkList);
+            mapper = initMapperByDOSimpleName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
+            Class realSlaveDOClass = null;
+            try {
+                realSlaveDOClass = Class.forName(((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName());
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            result = mapper.selectByCondition(condition);
+            Field relationDataField = ReflectUtil.getRelationDataField(realSlaveDOClass);
+            if (relationDataField != null) {
+                result = fillRelationData(field, relationDataField, realSlaveDOClass, (List) relationResults, (List) result);
+            }
+        }
+        ReflectUtil.setFieldValue(model, field.getName(), result);
+        return model;
+    }
+
+    /**
+     * 按条件加载一对多关系数据
+     * 主供后台使用
+     *
+     * @param model     主实体对象
+     * @param field     需要加载的属性
+     * @param condition 针对子实体的条件
+     * @return 增加了子实体列表的主实体对象
+     */
+    @Override
+    public T loadOneToManyRelation(T model, Field field, Condition condition) {
+        Annotation fieldAnnotation = field.getAnnotation(RelationData.class);
+        String fieldBaseDOTypeName = ((RelationData) fieldAnnotation).baseDOTypeName();
+        mapper = initMapperByDOSimpleName(fieldBaseDOTypeName);
+        Class realSlaveDOClass = getClassByDOSimpleName(fieldBaseDOTypeName);
+        String javaMainFieldName = ((RelationData) fieldAnnotation).mainProperty();
+        if (condition == null) {
+            condition = new Condition(realSlaveDOClass);
+            condition.createCriteria();
+        }
+        condition.and().andEqualTo(javaMainFieldName, model.getPk());
+        Object result = mapper.selectByCondition(condition);
+        ReflectUtil.setFieldValue(model, field.getName(), result);
+        return model;
+    }
+
+    /**
+     * 根据DO短名称取对应的类型
+     *
+     * @param simpleNameOfDO DO短名称
+     * @return DO对应的类型
+     */
+    private Class getClassByDOSimpleName(String simpleNameOfDO) {
+        try {
+            return Class.forName(ProjectConstant.MODEL_PACKAGE + "." + simpleNameOfDO);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * 按DO的名称创建Condition条件对象
+     *
      * @param simpleNameOfDO DO类短名称
      * @return 对应此DO的条件对象
      */
@@ -400,6 +482,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     /**
      * 将小驼峰条件转化为数据库格式条件
      * 此方法不影响单引号以内的内容
+     *
      * @param condition 小驼峰的条件
      * @return 数据库中的下划线条件
      */
@@ -420,6 +503,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
 
     /**
      * 根据DO的短名称取对应的mapper
+     *
      * @param simpleNameOfDO DO短名称
      * @return 对应的单表mapper对象
      */
@@ -434,16 +518,37 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     }
 
     /**
-     * 根据DO短名称取对应的类型
-     * @param simpleNameOfDO DO短名称
-     * @return DO对应的类型
+     * 灌入关系描述数据
+     *
+     * @param field             主实体中的关系数据属性
+     * @param relationDataField 子实体中存储关系描述数据的属性
+     * @param realSlaveDOClass  真实的关系实体类型(包含Map<String,Object>的真正的Model类
+     * @param relationResults   数据库中查询出来的关系表数据结果
+     * @param resultFromDB      数据库中查询出来的真正的子实体列表
+     * @return
      */
-    private Class getClassByDOSimpleName(String simpleNameOfDO) {
-        try {
-            return Class.forName(ProjectConstant.MODEL_PACKAGE + "." + simpleNameOfDO);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+    private Object fillRelationData(Field field, Field relationDataField, Class realSlaveDOClass, List relationResults, List resultFromDB) {
+        Map<String, Object> relationMap;
+        List<Object> resultListContainsRelation = new ArrayList<>();
+        Annotation fieldRelationDataAnnotation = field.getAnnotation(RelationData.class);
+        String javaTargetFieldName = ((RelationData) fieldRelationDataAnnotation).foreignProperty();
+
+        for (Object relationResult : relationResults) {
+            for (Object sourceResult : resultFromDB) {
+                Object relationTarget = ReflectUtil.cloneObj(sourceResult, realSlaveDOClass);
+                if (ReflectUtil.getFieldValue(relationResult, javaTargetFieldName).equals(ReflectUtil.getFieldValue(sourceResult, "pk"))) {
+                    relationMap = new HashMap<>();
+                    for (Field relationResultField : relationResult.getClass().getDeclaredFields()) {
+                        if (!StringUtils.endsWith(relationResultField.getName(), "Pk") && !StringUtils.endsWith(relationResultField.getName(), "pk")) {
+                            relationMap.put(relationResultField.getName(), ReflectUtil.getFieldValue(relationResult, relationResultField.getName()));
+                        }
+                    }
+                    ReflectUtil.setFieldValue(relationTarget, relationDataField.getName(), relationMap);
+                    resultListContainsRelation.add(relationTarget);
+                }
+            }
         }
-        return null;
+        return resultListContainsRelation;
     }
+
 }
