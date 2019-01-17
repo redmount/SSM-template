@@ -26,7 +26,7 @@ public class DocumentGenerator {
     private static final String PROJECT_PATH = System.getProperty("user.dir"); //项目在硬盘上的基础路径
 
     private static final String TABLE_QUERY = "SELECT table_name,table_COMMENT FROM information_schema.TABLES WHERE table_schema = '%s' ORDER BY table_name; ";
-    private static final String COLUMN_QUERY = "SELECT col.TABLE_NAME,col.COLUMN_NAME,col.COLUMN_TYPE,col.COLUMN_COMMENT FROM information_schema.`COLUMNS` AS col WHERE col.TABLE_SCHEMA = '%s' order by col.TABLE_NAME, col.ORDINAL_POSITION;";
+    private static final String COLUMN_QUERY = "SELECT col.TABLE_NAME,col.COLUMN_NAME,col.Data_type,col.COLLATION_NAME,col.IS_NULLABLE,col.COLUMN_KEY,col.CHARACTER_MAXIMUM_LENGTH,col.COLUMN_DEFAULT,col.COLUMN_COMMENT FROM information_schema.`COLUMNS` AS col WHERE col.TABLE_SCHEMA = '%s' order by col.TABLE_NAME, col.ORDINAL_POSITION;";
     private static final String line = "\r\n";
     private static final String tab = "    ";
     private static final String tab2 = "        ";
@@ -113,15 +113,23 @@ public class DocumentGenerator {
             stringBuilder.append("-------------------------------------------------" + line);
             stringBuilder.append("## " + tableComment.getTableName() + " : " + tableComment.getTableComment() + line);
             stringBuilder.append(line);
-            stringBuilder.append("|属性名|类型|说明|" + line);
-            stringBuilder.append("|-----|----|----|" + line);
+            stringBuilder.append("|属性名|类型|长度|键类型|是否可空|默认值|说明|" + line);
+            stringBuilder.append("|-----|----|----|----|----|----|----|" + line);
             for (ColumnComment columnComment : tableComment.getColumnCommentList()) {
                 stringBuilder.append('|');
-                stringBuilder.append(columnComment.getColName());
+                stringBuilder.append(columnComment.getColName() + ' ');
                 stringBuilder.append('|');
-                stringBuilder.append(columnComment.getTypeForDB());
+                stringBuilder.append(columnComment.getTypeForDB() + ' ');
                 stringBuilder.append('|');
-                stringBuilder.append(columnComment.getColComment());
+                stringBuilder.append(columnComment.getCharLength() + ' ');
+                stringBuilder.append('|');
+                stringBuilder.append(columnComment.getIsPrimaryKey() + ' ');
+                stringBuilder.append('|');
+                stringBuilder.append(columnComment.getIsNullable() + ' ');
+                stringBuilder.append('|');
+                stringBuilder.append(columnComment.getDefaultValue() + ' ');
+                stringBuilder.append('|');
+                stringBuilder.append(columnComment.getColComment() + ' ');
                 stringBuilder.append('|' + line);
             }
         }
@@ -194,8 +202,13 @@ public class DocumentGenerator {
                 columnComment.setModelName(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, rs.getString("table_name")));
                 columnComment.setColName(rs.getString("COLUMN_NAME"));
                 columnComment.setFieldName(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, rs.getString("COLUMN_NAME")));
-                columnComment.setTypeForDB(rs.getString("COLUMN_TYPE"));
+                columnComment.setTypeForDB(rs.getString("DATA_TYPE"));
                 columnComment.setColComment(rs.getString("COLUMN_COMMENT"));
+                columnComment.setCharCode(rs.getString("COLLATION_NAME"));
+                columnComment.setIsPrimaryKey(rs.getString("COLUMN_KEY"));
+                columnComment.setDefaultValue(rs.getString("COLUMN_DEFAULT"));
+                columnComment.setIsNullable(rs.getString("IS_NULLABLE"));
+                columnComment.setCharLength(rs.getString("CHARACTER_MAXIMUM_LENGTH"));
                 columnCommentList.add(columnComment);
             }
         } catch (SQLException e) {
@@ -216,13 +229,19 @@ class TableComment {
 @Data
 class ColumnComment {
     private String tableName;
-    private String modelName;
-    private String typeForJs;
-    private String typeForJava;
     private String typeForDB;
     private String colName;
-    private String fieldName;
+    private String isPrimaryKey;
+    private String defaultValue;
+    private String charLength;
+    private String charCode;
+    private String isNullable;
+
     private String colComment;
+    private String modelName;
+    private String fieldName;
+    private String typeForJs;
+    private String typeForJava;
 
     public static String getJsType(String typeForDB) {
         String[] typeOfString = {"VARCHAR", "CHAR", "TEXT"};

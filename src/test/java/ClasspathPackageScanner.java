@@ -21,8 +21,6 @@ public class ClasspathPackageScanner {
     private static final String PROJECT_PATH = System.getProperty("user.dir"); //项目在硬盘上的基础路径
     private String basePackage;
     private ClassLoader cl;
-    private static String line = "\r\n";
-    private static String tab = "    ";
 
     /**
      * For test purpose.
@@ -31,8 +29,6 @@ public class ClasspathPackageScanner {
         var scan = new ClasspathPackageScanner(ProjectConstant.MODEL_PACKAGE);
         List<String> classNameList = scan.getFullyQualifiedClassNameList();
     }
-
-
 
     /**
      * 初始化
@@ -116,7 +112,7 @@ public class ClasspathPackageScanner {
         }
         JarInputStream jarIn = new JarInputStream(new FileInputStream(jarPath));
         JarEntry entry = jarIn.getNextJarEntry();
-        List<String> nameList = new ArrayList<String>();
+        List<String> nameList = new ArrayList<>();
         while (null != entry) {
             String name = entry.getName();
             if (name.startsWith(splashedPackageName) && isClassFile(name)) {
