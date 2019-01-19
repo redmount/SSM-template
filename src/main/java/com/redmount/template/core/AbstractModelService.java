@@ -4,6 +4,8 @@ import com.google.common.base.CaseFormat;
 import com.redmount.template.core.annotation.RelationData;
 import com.redmount.template.util.NameUtil;
 import com.redmount.template.util.ReflectUtil;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.exceptions.TooManyResultsException;
 import org.apache.ibatis.session.SqlSession;
@@ -503,8 +505,32 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     }
 
     @Override
-    public String getSchema() {
-        return modelClass.getName();
+    public SortedMap getSchema() {
+        SortedMap<String, Object> mainMap = new TreeMap<>();
+        Annotation ann = modelClass.getAnnotation(ApiModel.class);
+        if (ann == null) {
+            return mainMap;
+        }
+        mainMap.put(modelClassDOSimpleName, genExample(modelClass));
+        return mainMap;
+    }
+
+    private Map genExample(Class cls) {
+        Annotation ann;
+        Map<String, Object> map = new HashMap<>();
+        StringBuilder description;
+        List<Field> fieldList = ReflectUtil.getFieldList(cls);
+        for (Field field : fieldList) {
+            description = new StringBuilder();
+            ann = field.getAnnotation(ApiModelProperty.class);
+            {
+                if (ann != null) {
+                    description.append(((ApiModelProperty) ann).value());
+                    map.put(field.getName(), description.toString());
+                }
+            }
+        }
+        return map;
     }
 
     /**

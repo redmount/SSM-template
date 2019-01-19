@@ -4,6 +4,7 @@ import tk.mybatis.mapper.entity.Condition;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.SortedMap;
 
 public interface ModelService<T> {
     /**
@@ -147,5 +148,5 @@ public interface ModelService<T> {
      *
      * @return 带注释的实体说明
      */
-    String getSchema();
+    SortedMap getSchema();
 }
