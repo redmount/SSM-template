@@ -22,11 +22,11 @@ public interface Controller<T> {
     /**
      * 强制修改实体
      *
-     * @Param pk 待更新的实体pk
      * @param model 待修改的资源实体
      * @return 修改后的资源实体
+     * @Param pk 待更新的实体pk
      */
-    Result modifyAutomatic(String pk,T model);
+    Result modifyAutomatic(String pk, T model);
 
     /**
      * 取资源列表
@@ -65,6 +65,13 @@ public interface Controller<T> {
      * @return 删除了多少条数据
      */
     Result delByConditionAutomatic(String condition);
+
+    /**
+     * 取实体说明
+     *
+     * @return 带注释的实体说明
+     */
+    Result getSchema();
 
     /**
      * 初始化(目前主要用于初始化service,使之不为空)

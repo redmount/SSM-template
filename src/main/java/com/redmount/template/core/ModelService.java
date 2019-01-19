@@ -142,5 +142,10 @@ public interface ModelService<T> {
      */
     T loadManyToManyRelation(T model, Field field, Condition condition);
 
-
+    /**
+     * 取实体说明
+     *
+     * @return 带注释的实体说明
+     */
+    String getSchema();
 }

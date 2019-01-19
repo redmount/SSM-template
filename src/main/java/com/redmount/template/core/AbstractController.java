@@ -5,11 +5,18 @@ import com.github.pagehelper.PageInfo;
 import com.redmount.template.core.exception.ServiceException;
 import com.redmount.template.model.ClazzModel;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 public abstract class AbstractController<T extends BaseDO> implements Controller<T> {
+
+    /**
+     * 当前的运行模式
+     */
+    @Value("${spring.profiles.active}")
+    private String env;
 
     protected ModelService service;
 
@@ -127,5 +134,23 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
         if (service == null) {
             init();
         }
+    }
+
+    /**
+     * 取本实体的结构说明
+     *
+     * @return 实体结构说明
+     */
+    @GetMapping("/schema")
+    public Result getSchema() {
+        if (!"dev".equalsIgnoreCase(env)) {
+            try {
+                throw new Exception("禁止访问");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        initService();
+        return ResultGenerator.genSuccessResult(service.getSchema());
     }
 }

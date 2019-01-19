@@ -1,87 +1,76 @@
 package com.redmount.template.base.model;
 
 import com.redmount.template.core.BaseDO;
-import javax.persistence.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import org.apache.ibatis.type.JdbcType;
+import tk.mybatis.mapper.annotation.ColumnType;
 
+import javax.persistence.Column;
+import javax.persistence.Table;
+import java.io.Serializable;
+
+/**
+ * @author Mybatis Generator
+ * @date 2019-01-19 16:16:48
+ */
 @Table(name = "test_clazz")
-public class TestClazz extends BaseDO {
+@ApiModel("TestClazz（）")
+@Data
+@Accessors(chain = true)
+public class TestClazz extends BaseDO implements Serializable {
     /**
      * 班级名称
      */
+    @ApiModelProperty(value = "班级名称", required = false)
+    @ColumnType(jdbcType = JdbcType.VARCHAR)
     private String name;
 
     /**
      * 班主任pk
      */
     @Column(name = "adviser_pk")
+    @ApiModelProperty(value = "班主任pk", required = false)
+    @ColumnType(jdbcType = JdbcType.CHAR)
     private String adviserPk;
 
     @Column(name = "nick_name")
+    @ApiModelProperty(value = "", required = false)
+    @ColumnType(jdbcType = JdbcType.VARCHAR)
     private String nickName;
 
+    @ApiModelProperty(value = "", required = false)
+    @ColumnType(jdbcType = JdbcType.BIT)
     private Boolean deleted;
 
-    /**
-     * 获取班级名称
-     *
-     * @return name - 班级名称
-     */
-    public String getName() {
-        return name;
-    }
+    private static final long serialVersionUID = 1263308691369888731L;
 
-    /**
-     * 设置班级名称
-     *
-     * @param name 班级名称
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
+    public enum FieldEnum {
+        PK("pk","pk"),
+		NAME("name","name"),
+		ADVISER_PK("adviserPk","adviser_pk"),
+		UPDATED("updated","updated"),
+		CREATED("created","created"),
+		NICK_NAME("nickName","nick_name"),
+		DELETED("deleted","deleted");
 
-    /**
-     * 获取班主任pk
-     *
-     * @return adviser_pk - 班主任pk
-     */
-    public String getAdviserPk() {
-        return adviserPk;
-    }
+        private String javaFieldName;
 
-    /**
-     * 设置班主任pk
-     *
-     * @param adviserPk 班主任pk
-     */
-    public void setAdviserPk(String adviserPk) {
-        this.adviserPk = adviserPk;
-    }
+        private String dbFieldName;
 
-    /**
-     * @return nick_name
-     */
-    public String getNickName() {
-        return nickName;
-    }
+        FieldEnum(String javaFieldName, String dbFieldName) {
+            this.javaFieldName = javaFieldName;
+            this.dbFieldName = dbFieldName;
+        }
 
-    /**
-     * @param nickName
-     */
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
+        public String javaFieldName() {
+            return javaFieldName;
+        }
 
-    /**
-     * @return deleted
-     */
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    /**
-     * @param deleted
-     */
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
+        public String dbFieldName() {
+            return dbFieldName;
+        }
     }
 }

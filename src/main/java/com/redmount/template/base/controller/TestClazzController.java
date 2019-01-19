@@ -12,8 +12,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
-* @author CodeGenerator
-* @date 2019/01/11.
+* Created by CodeGenerator on 2019/01/19.
 */
 @RestController
 @RequestMapping("/testClazz")

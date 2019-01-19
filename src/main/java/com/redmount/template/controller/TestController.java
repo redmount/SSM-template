@@ -1,5 +1,6 @@
 package com.redmount.template.controller;
 
+import com.redmount.template.base.model.TestClazz;
 import com.redmount.template.core.Result;
 import com.redmount.template.core.ResultGenerator;
 import com.redmount.template.service.TestService;
@@ -21,6 +22,9 @@ public class TestController {
 
     @GetMapping("/test/test")
     public Result test(){
-        return ResultGenerator.genSuccessResult(service.test());
+        for(Enum e: TestClazz.FieldEnum.values()){
+             ((TestClazz.FieldEnum)e).javaFieldName();
+        }
+        return ResultGenerator.genSuccessResult();
     }
 }

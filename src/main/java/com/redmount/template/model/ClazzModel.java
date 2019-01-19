@@ -6,11 +6,13 @@ import com.redmount.template.base.model.TestStudent;
 import com.redmount.template.core.annotation.Keywords;
 import com.redmount.template.core.annotation.RelationData;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 import java.util.Map;
 
 @Data // 引入Lombok,使代码更简洁
+@Accessors(chain = true)
 @RelationData(baseDOTypeName = "TestClazz") // 本类继承的DO类型
 public class ClazzModel extends TestClazz {
 

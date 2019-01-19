@@ -1,40 +1,57 @@
 package com.redmount.template.base.model;
 
 import com.redmount.template.core.BaseDO;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
 import javax.persistence.*;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import org.apache.ibatis.type.JdbcType;
+import tk.mybatis.mapper.annotation.ColumnType;
 
+/**
+ * @author Mybatis Generator
+ * @date 2019-01-19 16:16:48
+ */
 @Table(name = "test_clazz_info")
-public class TestClazzInfo extends BaseDO {
+@ApiModel("TestClazzInfo（）")
+@Data
+@Accessors(chain = true)
+public class TestClazzInfo extends BaseDO implements Serializable {
+    @ApiModelProperty(value = "", required = false)
+    @ColumnType(jdbcType = JdbcType.VARCHAR)
     private String detail;
 
     @Column(name = "clazz_pk")
+    @ApiModelProperty(value = "", required = false)
+    @ColumnType(jdbcType = JdbcType.CHAR)
     private String clazzPk;
 
-    /**
-     * @return detail
-     */
-    public String getDetail() {
-        return detail;
-    }
+    private static final long serialVersionUID = 8942153068935158363L;
 
-    /**
-     * @param detail
-     */
-    public void setDetail(String detail) {
-        this.detail = detail;
-    }
+    public enum FieldEnum {
+        PK("pk","pk"),
+		DETAIL("detail","detail"),
+		CLAZZ_PK("clazzPk","clazz_pk"),
+		CREATED("created","created"),
+		UPDATED("updated","updated");
 
-    /**
-     * @return clazz_pk
-     */
-    public String getClazzPk() {
-        return clazzPk;
-    }
+        private String javaFieldName;
 
-    /**
-     * @param clazzPk
-     */
-    public void setClazzPk(String clazzPk) {
-        this.clazzPk = clazzPk;
+        private String dbFieldName;
+
+        FieldEnum(String javaFieldName, String dbFieldName) {
+            this.javaFieldName = javaFieldName;
+            this.dbFieldName = dbFieldName;
+        }
+
+        public String javaFieldName() {
+            return javaFieldName;
+        }
+
+        public String dbFieldName() {
+            return dbFieldName;
+        }
     }
 }

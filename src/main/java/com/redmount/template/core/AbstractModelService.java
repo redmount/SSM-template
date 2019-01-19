@@ -502,6 +502,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return model;
     }
 
+    @Override
+    public String getSchema() {
+        return modelClass.getName();
+    }
+
     /**
      * 根据DO短名称取对应的类型
      *

@@ -1,73 +1,70 @@
 package com.redmount.template.base.model;
 
 import com.redmount.template.core.BaseDO;
-import javax.persistence.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import org.apache.ibatis.type.JdbcType;
+import tk.mybatis.mapper.annotation.ColumnType;
 
+import javax.persistence.Column;
+import javax.persistence.Table;
+import java.io.Serializable;
+
+/**
+ * @author Mybatis Generator
+ * @date 2019-01-19 16:16:49
+ */
 @Table(name = "r_test_teacher_t_test_clazz")
-public class RTestTeacherTTestClazz extends BaseDO {
+@ApiModel("RTestTeacherTTestClazz（）")
+@Data
+@Accessors(chain = true)
+public class RTestTeacherTTestClazz extends BaseDO implements Serializable {
     @Column(name = "teacher_pk")
+    @ApiModelProperty(value = "", required = false)
+    @ColumnType(jdbcType = JdbcType.CHAR)
     private String teacherPk;
 
     @Column(name = "clazz_pk")
+    @ApiModelProperty(value = "", required = false)
+    @ColumnType(jdbcType = JdbcType.CHAR)
     private String clazzPk;
 
+    @ApiModelProperty(value = "", required = false)
+    @ColumnType(jdbcType = JdbcType.VARCHAR)
     private String course;
 
+    @ApiModelProperty(value = "", required = false)
+    @ColumnType(jdbcType = JdbcType.INTEGER)
     private Integer count;
 
-    /**
-     * @return teacher_pk
-     */
-    public String getTeacherPk() {
-        return teacherPk;
-    }
+    private static final long serialVersionUID = -7141572085979370827L;
 
-    /**
-     * @param teacherPk
-     */
-    public void setTeacherPk(String teacherPk) {
-        this.teacherPk = teacherPk;
-    }
+    public enum FieldEnum {
+        PK("pk", "pk"),
+        TEACHER_PK("teacherPk", "teacher_pk"),
+        CLAZZ_PK("clazzPk", "clazz_pk"),
+        COURSE("course", "course"),
+        COUNT("count", "count"),
+        CREATED("created", "created"),
+        UPDATED("updated", "updated");
 
-    /**
-     * @return clazz_pk
-     */
-    public String getClazzPk() {
-        return clazzPk;
-    }
+        private String javaFieldName;
 
-    /**
-     * @param clazzPk
-     */
-    public void setClazzPk(String clazzPk) {
-        this.clazzPk = clazzPk;
-    }
+        private String dbFieldName;
 
-    /**
-     * @return course
-     */
-    public String getCourse() {
-        return course;
-    }
+        FieldEnum(String javaFieldName, String dbFieldName) {
+            this.javaFieldName = javaFieldName;
+            this.dbFieldName = dbFieldName;
+        }
 
-    /**
-     * @param course
-     */
-    public void setCourse(String course) {
-        this.course = course;
-    }
+        public String javaFieldName() {
+            return javaFieldName;
+        }
 
-    /**
-     * @return count
-     */
-    public Integer getCount() {
-        return count;
-    }
-
-    /**
-     * @param count
-     */
-    public void setCount(Integer count) {
-        this.count = count;
+        public String dbFieldName() {
+            return dbFieldName;
+        }
     }
 }
