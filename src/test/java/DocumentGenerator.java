@@ -1,12 +1,12 @@
 import com.google.common.base.CaseFormat;
 import com.redmount.template.core.ProjectConstant;
 import com.redmount.template.util.ReflectUtil;
-import lombok.Data;
 import lombok.var;
-import org.apache.commons.lang3.StringUtils;
+import model.ColumnComment;
+import model.TableComment;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.*;
@@ -72,12 +72,7 @@ public class DocumentGenerator {
             }
             sb.append("}");
             File file = new File(PROJECT_PATH + "/baseModel.js");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            FileWriter fw = new FileWriter(file);
-            fw.write(sb.toString());//将字符串写入到指定的路径下的文件中
-            fw.close();
+            FileUtils.write(file, sb.toString());
         } catch (Exception ex) {
 
         }
@@ -134,14 +129,8 @@ public class DocumentGenerator {
             }
         }
         File file = new File(PROJECT_PATH + "/数据库说明文档.md");
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-        FileWriter fw;
         try {
-            fw = new FileWriter(file);
-            fw.write(stringBuilder.toString());//将字符串写入到指定的路径下的文件中
-            fw.close();
+            FileUtils.write(file,stringBuilder.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -218,56 +207,3 @@ public class DocumentGenerator {
     }
 }
 
-@Data
-class TableComment {
-    private String tableName;
-    private String modelName;
-    private String tableComment;
-    List<ColumnComment> columnCommentList = new ArrayList<>();
-}
-
-@Data
-class ColumnComment {
-    private String tableName;
-    private String typeForDB;
-    private String colName;
-    private String isPrimaryKey;
-    private String defaultValue;
-    private String charLength;
-    private String charCode;
-    private String isNullable;
-
-    private String colComment;
-    private String modelName;
-    private String fieldName;
-    private String typeForJs;
-    private String typeForJava;
-
-    public static String getJsType(String typeForDB) {
-        String[] typeOfString = {"VARCHAR", "CHAR", "TEXT"};
-        String[] typeOfNumber = {"INT", "INTEGER", "TINYINT", "SMALLINT", "MEDIUMINT", "BIGINT", "FLOAT", "DOUBLE", "DECIMAL"};
-        String[] typeOfDate = {"DATE", "TIME", "DATETIME", "TIMESTAMP", "YEAR"};
-        String[] typeOfBool = {"BIT"};
-        for (String str : typeOfString) {
-            if (StringUtils.startsWithIgnoreCase(typeForDB, str)) {
-                return "String";
-            }
-        }
-        for (String str : typeOfNumber) {
-            if (StringUtils.startsWithIgnoreCase(typeForDB, str)) {
-                return "Number";
-            }
-        }
-        for (String str : typeOfDate) {
-            if (StringUtils.startsWithIgnoreCase(typeForDB, str)) {
-                return "Date";
-            }
-        }
-        for (String str : typeOfBool) {
-            if (StringUtils.startsWithIgnoreCase(typeForDB, str)) {
-                return "Boolean";
-            }
-        }
-        return "Object/Unknown";
-    }
-}

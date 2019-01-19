@@ -1,4 +1,4 @@
-/// Generated on 2019/01/17 14:56:36
+/// Generated on 2019/01/17 15:51:13
 
 const baseModel = {
     RTestTeacherTTestClazz(args) {
