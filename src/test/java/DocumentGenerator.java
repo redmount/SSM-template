@@ -17,11 +17,9 @@ import java.util.List;
 
 public class DocumentGenerator {
     //JDBC配置，请修改为你项目的实际配置
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/%s?serverTimezone=UTC";
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/test?serverTimezone=UTC";
     private static final String JDBC_USERNAME = "root";
     private static final String JDBC_PASSWORD = "root";
-    private static final String DB_NAME = "test";
-    private static final String JDBC_DIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
 
     private static final String PROJECT_PATH = System.getProperty("user.dir"); //项目在硬盘上的基础路径
 
@@ -37,6 +35,12 @@ public class DocumentGenerator {
         List<TableComment> tableCommentList = getTables(connection);
         genDBDocument(tableCommentList);
         genBaseModelJsCode(tableCommentList);
+    }
+
+    private static String getDbNameFromURL(String url) {
+        String[] arr = url.split("/");
+        String[] arr2 = arr[arr.length - 1].split("\\?");
+        return arr2[0];
     }
 
     private static void genBaseModelJsCode(List<TableComment> tableCommentList) {
@@ -62,7 +66,7 @@ public class DocumentGenerator {
                         for (ColumnComment columnComment : tableComment.getColumnCommentList()) {
                             for (Field field : fieldList) {
                                 if (field.getName().equals(columnComment.getFieldName())) {
-                                    sb.append(tab2 + "this." + field.getName() + " = arg." + field.getName() + " || null  ///" + columnComment.getColComment() + line);
+                                    sb.append(tab2 + "this." + field.getName() + " = arg." + field.getName() + " || null  ///" + columnComment.getColComment().replaceAll("\r", " ").replaceAll("\n", " ") + line);
                                 }
                             }
                         }
@@ -93,11 +97,11 @@ public class DocumentGenerator {
         stringBuilder.append("|表名|说明|" + line);
         stringBuilder.append("|----|----|" + line);
         for (TableComment tableComment : tableCommentList) {
-            stringBuilder.append('|');
+            stringBuilder.append(" |");
             stringBuilder.append(tableComment.getTableName());
-            stringBuilder.append('|');
-            stringBuilder.append(tableComment.getTableComment());
-            stringBuilder.append('|');
+            stringBuilder.append(" |");
+            stringBuilder.append(tableComment.getTableComment().replaceAll("\r", " ").replaceAll("\n", " "));
+            stringBuilder.append(" |");
             stringBuilder.append(line);
         }
 
@@ -111,26 +115,26 @@ public class DocumentGenerator {
             stringBuilder.append("|属性名|类型|长度|键类型|是否可空|默认值|说明|" + line);
             stringBuilder.append("|-----|----|----|----|----|----|----|" + line);
             for (ColumnComment columnComment : tableComment.getColumnCommentList()) {
-                stringBuilder.append('|');
-                stringBuilder.append(columnComment.getColName() + ' ');
-                stringBuilder.append('|');
+                stringBuilder.append(" |");
+                stringBuilder.append(columnComment.getColName());
+                stringBuilder.append(" |");
                 stringBuilder.append(columnComment.getTypeForDB() + ' ');
-                stringBuilder.append('|');
+                stringBuilder.append(" |");
                 stringBuilder.append(columnComment.getCharLength() + ' ');
-                stringBuilder.append('|');
+                stringBuilder.append(" |");
                 stringBuilder.append(columnComment.getIsPrimaryKey() + ' ');
-                stringBuilder.append('|');
+                stringBuilder.append(" |");
                 stringBuilder.append(columnComment.getIsNullable() + ' ');
-                stringBuilder.append('|');
+                stringBuilder.append(" |");
                 stringBuilder.append(columnComment.getDefaultValue() + ' ');
-                stringBuilder.append('|');
-                stringBuilder.append(columnComment.getColComment() + ' ');
-                stringBuilder.append('|' + line);
+                stringBuilder.append(" |");
+                stringBuilder.append(columnComment.getColComment().replaceAll("\r", " ").replaceAll("\n", " ") + ' ');
+                stringBuilder.append(" |" + line);
             }
         }
         File file = new File(PROJECT_PATH + "/数据库说明文档.md");
         try {
-            FileUtils.write(file,stringBuilder.toString());
+            FileUtils.write(file, stringBuilder.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -139,7 +143,7 @@ public class DocumentGenerator {
     private static Connection getConnection(String connectionString, String userName, String password) {
         Connection connection = null;
         try {
-            connection = DriverManager.getConnection(String.format(JDBC_URL, DB_NAME), JDBC_USERNAME, JDBC_PASSWORD);
+            connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -151,7 +155,7 @@ public class DocumentGenerator {
         List<TableComment> tableCommentList = new ArrayList<>();
         try {
             connection.setAutoCommit(false);
-            PreparedStatement pstmt = connection.prepareStatement(String.format(TABLE_QUERY, DB_NAME));
+            PreparedStatement pstmt = connection.prepareStatement(String.format(TABLE_QUERY, getDbNameFromURL(JDBC_URL)));
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 tableComment = new TableComment();
@@ -181,7 +185,7 @@ public class DocumentGenerator {
         List<ColumnComment> columnCommentList = new ArrayList<>();
         try {
             connection.setAutoCommit(false);
-            PreparedStatement pstmt = connection.prepareStatement(String.format(COLUMN_QUERY, DB_NAME));
+            PreparedStatement pstmt = connection.prepareStatement(String.format(COLUMN_QUERY, getDbNameFromURL(JDBC_URL)));
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
