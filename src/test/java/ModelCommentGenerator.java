@@ -5,8 +5,10 @@ import org.mybatis.generator.internal.util.StringUtility;
 import tk.mybatis.mapper.generator.MapperPlugin;
 import tk.mybatis.mapper.util.StringUtil;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.Random;
 
 
 public class ModelCommentGenerator extends MapperPlugin {
@@ -81,7 +83,7 @@ public class ModelCommentGenerator extends MapperPlugin {
         }
         topLevelClass.addJavaDocLine("/**");
         topLevelClass.addJavaDocLine(String.format(" * @author Mybatis Generator"));
-        topLevelClass.addJavaDocLine(" * @date " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        // topLevelClass.addJavaDocLine(" * @date " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         topLevelClass.addJavaDocLine(" */");
         return true;
     }
@@ -158,6 +160,8 @@ public class ModelCommentGenerator extends MapperPlugin {
                 remarks = "";
             } else {
                 remarks = remarks.replaceAll("\n", " ");
+                remarks = remarks.replaceAll("\r", " ");
+                remarks = remarks.trim();
             }
             if (remarks.endsWith("表")) {
                 remarks = remarks.substring(0, remarks.length() - 1) + "对象";
@@ -175,8 +179,10 @@ public class ModelCommentGenerator extends MapperPlugin {
                             remark = "";
                         } else {
                             remark = remark.replaceAll("\n", " ");
+                            remark = remark.replaceAll("\r", " ");
+                            remark = remark.trim();
                         }
-                        field.addAnnotation("@ApiModelProperty(value = \"" + remark + "\", required = false)");
+                        field.addAnnotation("@ApiModelProperty(value = \"" + remark + "\")");
                     }
             }
         }
