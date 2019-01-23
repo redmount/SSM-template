@@ -499,10 +499,12 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     public SortedMap getSchema() {
         SortedMap<String, Object> mainMap = new TreeMap<>();
         Annotation ann = modelClass.getAnnotation(ApiModel.class);
-        if (ann == null) {
-            return mainMap;
+        if (ann != null) {
+            mainMap.put(modelClass.getSimpleName() + " (" + ((ApiModel) ann).value() + ")", genExample(modelClass, true));
+        } else {
+            mainMap.put(modelClass.getSimpleName(), genExample(modelClass, true));
         }
-        mainMap.put(modelClass.getSimpleName(), genExample(modelClass, true));
+
         return mainMap;
     }
 
@@ -532,15 +534,29 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             }
             if (ReflectUtil.isWrapType(field)) {
                 if (ann != null) {
-                    description.append("(" + field.getType().getSimpleName() + ")" + ((ApiModelProperty) ann).value());
-                    map.put(field.getName(), description.toString());
+                    if (field.getName().endsWith("Pk") || field.getName().equals("created") || field.getName().equals("updated")) {
+                        continue;
+                    }
+                    if (relationAnn != null && ((RelationData) relationAnn).isRelation() && field.getName().equals("pk")) {
+                        continue;
+                    }
+                    description.append(field.getType().getSimpleName());
+                    map.put(field.getName() + " (" + ((ApiModelProperty) ann).value() + ")", description.toString());
                 }
             } else if (relationAnn != null) {
                 if (((RelationData) relationAnn).isRelation() || isMainType) {
                     if (field.getType() == List.class) {
-                        map.put(field.getName(), genListExample((Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
+                        if (ann != null) {
+                            map.put(field.getName() + " (" + ((ApiModelProperty) ann).value() + ")", genListExample((Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
+                        } else {
+                            map.put(field.getName(), genListExample((Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
+                        }
                     } else {
-                        map.put(field.getName(), genExample(field.getType(), false));
+                        if (ann != null) {
+                            map.put(field.getName() + " (" + ((ApiModelProperty) ann).value() + ")", genExample(field.getType(), false));
+                        } else {
+                            map.put(field.getName(), genExample(field.getType(), false));
+                        }
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package com.redmount.template.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -17,8 +18,10 @@ public class BaseDO {
     @ApiModelProperty("主键")
     private String pk;
     @ApiModelProperty("数据创建时间")
+    @JsonIgnore
     private Date created;
     @ApiModelProperty("数据最后一次更新时间")
+    @JsonIgnore
     private Date updated;
 
 }
