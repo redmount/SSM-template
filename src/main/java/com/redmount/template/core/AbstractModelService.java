@@ -502,7 +502,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         if (ann == null) {
             return mainMap;
         }
-        mainMap.put(modelClassDOSimpleName, genExample(modelClass, true));
+        mainMap.put(modelClass.getSimpleName(), genExample(modelClass, true));
         return mainMap;
     }
 
@@ -525,19 +525,25 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             description = new StringBuilder();
             ann = field.getAnnotation(ApiModelProperty.class);
             relationAnn = field.getAnnotation(RelationData.class);
-            if (ReflectUtil.isWrapType(field)) {
-                if (ann != null) {
-                    description.append(field.getType().getSimpleName() + " // " + ((ApiModelProperty) ann).value());
-                    map.put(field.getName(), description.toString());
-                }
-            } else if (isMainType || ((RelationData) relationAnn).isRelation()) {
-                if (field.getType() == List.class) {
-                    map.put(field.getName(), genListExample((Class)((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
-                } else {
-                    map.put(field.getName(), genExample(field.getType(), false));
+            if (relationAnn != null) {
+                if (isMainType && ((RelationData) relationAnn).isRelation()) {
+                    continue;
                 }
             }
-
+            if (ReflectUtil.isWrapType(field)) {
+                if (ann != null) {
+                    description.append("(" + field.getType().getSimpleName() + ")" + ((ApiModelProperty) ann).value());
+                    map.put(field.getName(), description.toString());
+                }
+            } else if (relationAnn != null) {
+                if (((RelationData) relationAnn).isRelation() || isMainType) {
+                    if (field.getType() == List.class) {
+                        map.put(field.getName(), genListExample((Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
+                    } else {
+                        map.put(field.getName(), genExample(field.getType(), false));
+                    }
+                }
+            }
         }
         return map;
     }
