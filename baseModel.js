@@ -1,13 +1,13 @@
-/// Generated on 2019/01/17 15:51:13
+/// Generated on 2019/01/21 13:32:36
 
 const baseModel = {
     RTestTeacherTTestClazz(args) {
         const arg = args || {}
         this.pk = arg.pk || null  ///
-        this.teacherPk = arg.teacherPk || null  ///
-        this.clazzPk = arg.clazzPk || null  ///
-        this.course = arg.course || null  ///
-        this.count = arg.count || null  ///
+        this.teacherPk = arg.teacherPk || null  ///教师pk
+        this.clazzPk = arg.clazzPk || null  ///班级pk
+        this.course = arg.course || null  ///此教师在此班级所上的课程名称    没有外关联关系表
+        this.count = arg.count || null  ///此教师在此班级内的上课数量
         this.created = arg.created || null  ///
         this.updated = arg.updated || null  ///
     },
@@ -18,8 +18,8 @@ const baseModel = {
         this.adviserPk = arg.adviserPk || null  ///班主任pk
         this.updated = arg.updated || null  ///
         this.created = arg.created || null  ///
-        this.nickName = arg.nickName || null  ///
-        this.deleted = arg.deleted || null  ///
+        this.nickName = arg.nickName || null  ///班级昵称
+        this.deleted = arg.deleted || null  ///是否被删除
     },
     TestClazzInfo(args) {
         const arg = args || {}
@@ -45,3 +45,5 @@ const baseModel = {
         this.updated = arg.updated || null  ///
     },
 }
+
+export  default baseModel;

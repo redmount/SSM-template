@@ -8,7 +8,6 @@ import tk.mybatis.mapper.util.StringUtil;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 
 
 public class ModelCommentGenerator extends MapperPlugin {
@@ -142,13 +141,12 @@ public class ModelCommentGenerator extends MapperPlugin {
             serialVersionUID.setStatic(true);
             serialVersionUID.setFinal(true);
 
-            serialVersionUID.setInitializationString(new Random().nextLong() + "L");
+            serialVersionUID.setInitializationString("1L");
             topLevelClass.addField(serialVersionUID);
         }
     }
 
     private void swaggerApiAnnotation(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
-        List<String> annotations = topLevelClass.getAnnotations();
         Iterator i$ = null;
         if (this.swaggerApiEnabled) {
             String apiModel = "io.swagger.annotations.ApiModel";

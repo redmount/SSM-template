@@ -12,23 +12,22 @@ import tk.mybatis.mapper.annotation.ColumnType;
 
 /**
  * @author Mybatis Generator
- * @date 2019-01-19 16:16:48
  */
 @Table(name = "test_clazz_info")
 @ApiModel("TestClazzInfo（）")
 @Data
 @Accessors(chain = true)
 public class TestClazzInfo extends BaseDO implements Serializable {
-    @ApiModelProperty(value = "", required = false)
+    @ApiModelProperty(value = "")
     @ColumnType(jdbcType = JdbcType.VARCHAR)
     private String detail;
 
     @Column(name = "clazz_pk")
-    @ApiModelProperty(value = "", required = false)
+    @ApiModelProperty(value = "")
     @ColumnType(jdbcType = JdbcType.CHAR)
     private String clazzPk;
 
-    private static final long serialVersionUID = 8942153068935158363L;
+    private static final long serialVersionUID = 1L;
 
     public enum FieldEnum {
         PK("pk","pk"),

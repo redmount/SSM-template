@@ -13,11 +13,13 @@ import java.util.List;
 
 public class ReflectUtil {
 
-    public static Field getRelationDataField(Class clazz) {
+    public static Field getRelationDataField(Class clazz, String baseDOName) {
         Field[] fields = clazz.getDeclaredFields();
+        Annotation annotation;
         for (Field field : fields) {
-            if (field.getAnnotation(RelationData.class) != null) {
-                if (field.getAnnotation(RelationData.class).isRelation()) {
+            annotation = field.getAnnotation(RelationData.class);
+            if (annotation != null) {
+                if (((RelationData) annotation).isRelation() && ((RelationData) annotation).baseDOTypeName().equals(baseDOName)) {
                     return field;
                 }
             }
@@ -105,7 +107,7 @@ public class ReflectUtil {
     /**
      * 是否是基本类型、包装类型、String类型
      */
-    private static boolean isWrapType(Field field) {
+    public static boolean isWrapType(Field field) {
         String[] types = {"java.lang.Integer", "java.lang.Double", "java.lang.Float", "java.lang.Long",
                 "java.lang.Short", "java.lang.Byte", "java.lang.Boolean", "java.lang.Char", "java.lang.String", "int",
                 "double", "long", "short", "byte", "boolean", "char", "float", "java.util.Date"};

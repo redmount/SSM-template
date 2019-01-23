@@ -156,7 +156,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         String javaMainFieldName;
         Object currentRelatioinedDO;
         Condition condition;
-        Map<String, Object> relationDataMap;
+        Object relationData;
         try {
             mapper = initMainMapper();
             if (StringUtils.isBlank(mainPk)) {
@@ -216,29 +216,20 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                     condition = getConditionBySimpleDOName(currentField.getAnnotation(RelationData.class).relationDOTypeName());
                     condition.createCriteria().andEqualTo(javaMainFieldName, mainPk);
                     mapper.deleteByCondition(condition);
-                    Field relationDataField = ReflectUtil.getRelationDataField(Class.forName(((ParameterizedType) currentField.getGenericType()).getActualTypeArguments()[0].getTypeName()));
+                    Field relationDataField = ReflectUtil.getRelationDataField(Class.forName(((ParameterizedType) currentField.getGenericType()).getActualTypeArguments()[0].getTypeName()), ((RelationData) currentFieldRelationDataAnnotation).relationDOTypeName());
                     for (Object currentRelationedListItem : (List) currentFeildValue) {
-                        currentRelatioinedDO = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).relationDOTypeName()).newInstance();
+                        if (relationDataField != null) {
+                            currentRelatioinedDO = ReflectUtil.getFieldValue(currentRelationedListItem, relationDataField.getName());
+                        } else {
+                            currentRelatioinedDO = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).relationDOTypeName()).newInstance();
+                        }
                         ((BaseDO) currentRelatioinedDO).setPk(UUID.randomUUID().toString());
                         ReflectUtil.setFieldValue(currentRelatioinedDO, javaMainFieldName, mainPk);
                         ReflectUtil.setFieldValue(currentRelatioinedDO, javaTargetFieldName, ((BaseDO) currentRelationedListItem).getPk());
-                        if (relationDataField != null) {
-                            relationDataMap = (Map<String, Object>) ReflectUtil.getFieldValue(currentRelationedListItem, relationDataField.getName());
-                            if (relationDataMap != null) {
-                                List<String> fieldsListOfDO = ReflectUtil.getFieldListNamesList(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).relationDOTypeName()));
-                                List<String> fieldsListOfDataMap = new ArrayList<>();
-                                for (String key : relationDataMap.keySet()) {
-                                    fieldsListOfDataMap.add(key);
-                                }
-                                fieldsListOfDO = NameUtil.getRetain(fieldsListOfDO, fieldsListOfDataMap);
-
-                                for (String key : fieldsListOfDO) {
-                                    ReflectUtil.setFieldValue(currentRelatioinedDO, key, relationDataMap.get(key));
-                                }
-                            }
-                            ReflectUtil.setFieldValue(currentRelatioinedDO, "created", new Date());
-                            mapper.insert(currentRelatioinedDO);
-                        }
+                        ((BaseDO) currentRelatioinedDO).setCreated(new Date());
+                        ((BaseDO) currentRelatioinedDO).setUpdated(new Date());
+                        mapper.insert(currentRelatioinedDO);
+                        ((BaseDO) currentRelatioinedDO).setPk(null);
                     }
                 } else {
                     if (StringUtils.isNotBlank(((RelationData) currentFieldRelationDataAnnotation).foreignProperty())) {
@@ -495,7 +486,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             }
 
             result = mapper.selectByCondition(condition);
-            Field relationDataField = ReflectUtil.getRelationDataField(realSlaveDOClass);
+            Field relationDataField = ReflectUtil.getRelationDataField(realSlaveDOClass, ((RelationData) fieldRelationDataAnnotation).relationDOTypeName());
             if (relationDataField != null) {
                 result = fillRelationData(field, relationDataField, realSlaveDOClass, (List) relationResults, (List) result);
             }
@@ -516,19 +507,32 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     }
 
     private Map genExample(Class cls) {
+        if (cls == List.class) {
+            return null;
+        }
         Annotation ann;
         Map<String, Object> map = new HashMap<>();
         StringBuilder description;
+        if (cls == Map.class) {
+            return null;
+        }
         List<Field> fieldList = ReflectUtil.getFieldList(cls);
         for (Field field : fieldList) {
             description = new StringBuilder();
             ann = field.getAnnotation(ApiModelProperty.class);
-            {
+            if (ReflectUtil.isWrapType(field)) {
                 if (ann != null) {
-                    description.append(((ApiModelProperty) ann).value());
+                    description.append(field.getType().getSimpleName() + " //" + ((ApiModelProperty) ann).value());
                     map.put(field.getName(), description.toString());
                 }
+            } else {
+                if (field.getType() == List.class) {
+                    // map.put(field.getName(), genExample(field.getGenericType()));
+                } else {
+                    map.put(field.getName(), genExample(field.getType()));
+                }
             }
+
         }
         return map;
     }
@@ -626,22 +630,16 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @return
      */
     private Object fillRelationData(Field field, Field relationDataField, Class realSlaveDOClass, List relationResults, List resultFromDB) {
-        Map<String, Object> relationMap;
         List<Object> resultListContainsRelation = new ArrayList<>();
         Annotation fieldRelationDataAnnotation = field.getAnnotation(RelationData.class);
         String javaTargetFieldName = ((RelationData) fieldRelationDataAnnotation).foreignProperty();
 
         for (Object relationResult : relationResults) {
             for (Object sourceResult : resultFromDB) {
-                Object relationTarget = ReflectUtil.cloneObj(sourceResult, realSlaveDOClass);
-                if (ReflectUtil.getFieldValue(relationResult, javaTargetFieldName).equals(ReflectUtil.getFieldValue(sourceResult, "pk"))) {
-                    relationMap = new HashMap<>();
-                    for (Field relationResultField : relationResult.getClass().getDeclaredFields()) {
-                        if (!StringUtils.endsWith(relationResultField.getName(), "Pk") && !StringUtils.endsWith(relationResultField.getName(), "pk")) {
-                            relationMap.put(relationResultField.getName(), ReflectUtil.getFieldValue(relationResult, relationResultField.getName()));
-                        }
-                    }
-                    ReflectUtil.setFieldValue(relationTarget, relationDataField.getName(), relationMap);
+                if (ReflectUtil.getFieldValue(sourceResult, "pk").equals(ReflectUtil.getFieldValue(relationResult, javaTargetFieldName))) {
+                    Object relationTarget = ReflectUtil.cloneObj(sourceResult, realSlaveDOClass);
+                    ReflectUtil.setFieldValue(relationResult, "pk", null);
+                    ReflectUtil.setFieldValue(relationTarget, relationDataField.getName(), relationResult);
                     resultListContainsRelation.add(relationTarget);
                 }
             }

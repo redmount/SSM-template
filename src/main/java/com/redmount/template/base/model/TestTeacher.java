@@ -12,7 +12,6 @@ import tk.mybatis.mapper.annotation.ColumnType;
 
 /**
  * @author Mybatis Generator
- * @date 2019-01-19 16:16:48
  */
 @Table(name = "test_teacher")
 @ApiModel("TestTeacher（）")
@@ -22,11 +21,11 @@ public class TestTeacher extends BaseDO implements Serializable {
     /**
      * 教师名称
      */
-    @ApiModelProperty(value = "教师名称", required = false)
+    @ApiModelProperty(value = "教师名称")
     @ColumnType(jdbcType = JdbcType.VARCHAR)
     private String name;
 
-    private static final long serialVersionUID = 3740187666259360058L;
+    private static final long serialVersionUID = 1L;
 
     public enum FieldEnum {
         PK("pk","pk"),
