@@ -502,34 +502,39 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         if (ann == null) {
             return mainMap;
         }
-        mainMap.put(modelClassDOSimpleName, genExample(modelClass));
+        mainMap.put(modelClassDOSimpleName, genExample(modelClass, true));
         return mainMap;
     }
 
-    private Map genExample(Class cls) {
-        if (cls == List.class) {
-            return null;
-        }
+    private List genListExample(Class cls) {
+        List<Object> list = new ArrayList<>();
+        list.add(genExample(cls, false));
+        return list;
+    }
+
+    private Map genExample(Class cls, boolean isMainType) {
         Annotation ann;
+        Annotation relationAnn;
         Map<String, Object> map = new HashMap<>();
         StringBuilder description;
-        if (cls == Map.class) {
+        if (cls == List.class) {
             return null;
         }
         List<Field> fieldList = ReflectUtil.getFieldList(cls);
         for (Field field : fieldList) {
             description = new StringBuilder();
             ann = field.getAnnotation(ApiModelProperty.class);
+            relationAnn = field.getAnnotation(RelationData.class);
             if (ReflectUtil.isWrapType(field)) {
                 if (ann != null) {
-                    description.append(field.getType().getSimpleName() + " //" + ((ApiModelProperty) ann).value());
+                    description.append(field.getType().getSimpleName() + " // " + ((ApiModelProperty) ann).value());
                     map.put(field.getName(), description.toString());
                 }
-            } else {
+            } else if (isMainType || ((RelationData) relationAnn).isRelation()) {
                 if (field.getType() == List.class) {
-                    // map.put(field.getName(), genExample(field.getGenericType()));
+                    map.put(field.getName(), genListExample((Class)((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
                 } else {
-                    map.put(field.getName(), genExample(field.getType()));
+                    map.put(field.getName(), genExample(field.getType(), false));
                 }
             }
 
