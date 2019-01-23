@@ -1,5 +1,7 @@
 package com.redmount.template.core;
 
+import io.swagger.annotations.ApiOperation;
+
 import java.util.List;
 
 public interface Controller<T> {
@@ -9,6 +11,7 @@ public interface Controller<T> {
      * @param model 资源实体
      * @return 被影响的实体结果
      */
+    @ApiOperation(value="新增或修改资源")
     Result<T> saveAutomatic(T model);
 
     /**
@@ -17,6 +20,7 @@ public interface Controller<T> {
      * @param model 资源实体
      * @return 增加的实体
      */
+    @ApiOperation(value="强制添加资源")
     Result addAutomatic(T model);
 
     /**
@@ -26,6 +30,7 @@ public interface Controller<T> {
      * @return 修改后的资源实体
      * @Param pk 待更新的实体pk
      */
+    @ApiOperation(value="局部更新资源")
     Result modifyAutomatic(String pk, T model);
 
     /**
@@ -39,6 +44,7 @@ public interface Controller<T> {
      * @param size      每页第几条
      * @return 带分页信息的实体列表
      */
+    @ApiOperation(value="取资源列表(带分页信息)")
     Result<List<T>> listAutomatic(String keywords, String condition, String relations, String orderBy, int page, int size);
 
     /**
@@ -48,6 +54,7 @@ public interface Controller<T> {
      * @param relations 带的关系数据
      * @return 带关系数据的单一实体
      */
+    @ApiOperation(value="按pk取单个资源")
     Result<T> getAutomatic(String pk, String relations);
 
     /**
@@ -56,6 +63,7 @@ public interface Controller<T> {
      * @param pk 实体pk
      * @return 删除了多少条(1或0, 1代表删除成功, 0代表没有删除成功)
      */
+    @ApiOperation(value="按pk屋里删除资源")
     Result delAutomatic(String pk);
 
     /**
@@ -64,6 +72,7 @@ public interface Controller<T> {
      * @param condition 条件(小驼峰形式,SQL子语句)
      * @return 删除了多少条数据
      */
+    @ApiOperation(value="按条件物理删除资源")
     Result delByConditionAutomatic(String condition);
 
     /**
@@ -71,6 +80,7 @@ public interface Controller<T> {
      *
      * @return 带注释的实体说明
      */
+    @ApiOperation(value="取资源的全部可见结构")
     Result getSchema();
 
     /**

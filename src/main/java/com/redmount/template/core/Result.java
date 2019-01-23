@@ -2,6 +2,7 @@ package com.redmount.template.core;
 
 import com.alibaba.fastjson.JSON;
 import com.redmount.template.core.exception.SysServiceExceptionDO;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 统一API响应结果封装
@@ -10,9 +11,13 @@ import com.redmount.template.core.exception.SysServiceExceptionDO;
  * @date 2018年11月12日
  */
 public class Result<T> {
+    @ApiModelProperty("结果码")
     private int code;
+    @ApiModelProperty("结果简要信息")
     private String message;
+    @ApiModelProperty("真正的返回结果")
     private T data;
+    @ApiModelProperty("异常对象")
     private SysServiceExceptionDO exception;
 
     public static String fillResultString(Integer code, String message, Object data) {

@@ -1,5 +1,6 @@
 package com.redmount.template.core;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.Id;
@@ -13,10 +14,11 @@ import java.util.Date;
 public class BaseDO {
 
     @Id
+    @ApiModelProperty("主键")
     private String pk;
-
+    @ApiModelProperty("数据创建时间")
     private Date created;
-
+    @ApiModelProperty("数据最后一次更新时间")
     private Date updated;
 
 }
