@@ -6,6 +6,7 @@ import com.redmount.template.base.model.TestClazzInfo;
 import com.redmount.template.base.model.TestStudent;
 import com.redmount.template.core.annotation.Keywords;
 import com.redmount.template.core.annotation.RelationData;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -15,6 +16,7 @@ import java.util.List;
 @Data // 引入Lombok,使代码更简洁
 @Accessors(chain = true)
 @RelationData(baseDOTypeName = "TestClazz") // 本类继承的DO类型
+@ApiModel("班级实体")
 public class ClazzModel extends TestClazz {
 
     @RelationData(baseDOTypeName = "TestTeacher", // 这个属性对应的DO类型

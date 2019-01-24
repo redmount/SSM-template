@@ -2,7 +2,7 @@ package com.redmount.template.controller;
 
 import com.redmount.template.base.model.TestClazz;
 import com.redmount.template.core.Result;
-import com.redmount.template.core.ResultGenerator;
+import com.redmount.template.core.exception.ServiceException;
 import com.redmount.template.service.TestService;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +27,7 @@ public class TestController {
         for(Enum e: TestClazz.FieldEnum.values()){
              ((TestClazz.FieldEnum)e).javaFieldName();
         }
-        return ResultGenerator.genSuccessResult();
+        throw new ServiceException(10);
+        // return ResultGenerator.genSuccessResult();
     }
 }

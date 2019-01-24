@@ -25,8 +25,10 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -50,8 +52,10 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
     }
 
     private void registStaticResource(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+        if ("dev".equals(env)) {
+            registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+            registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+        }
         super.addResourceHandlers(registry);
     }
 
@@ -84,12 +88,20 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
     @Override
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
         exceptionResolvers.add((request, response, handler, e) -> {
+            logger.info("------------------------异常开始------------------------");
+            logger.info("地址:" + request.getRequestURI());
+            logger.info("地址栏参数:" + request.getQueryString());
+            logger.info("请求方式:" + request.getMethod());
+            logger.info("Header:" + getHeaderStringFromRequest(request));
+            logger.info("Body:" + getBodyStringFromRequest(request));
+            logger.info("请求IP:" + getIpAddress(request));
             Result result = new Result();
             if (e instanceof ServiceException) {
                 //业务失败的异常，如“账号或密码错误”
                 result.setCode(ResultCode.SERVICE_EXCEPTION)
                         .setException(((ServiceException) e).getException())
                         .setData(null);
+                logger.info(JSON.toJSONString(((ServiceException) e).getException()));
                 // 如果返回的业务异常有值,则在message里输入此值
                 if (((ServiceException) e).getException() != null) {
                     result.setMessage(((ServiceException) e).getException().getTitle());
@@ -118,6 +130,7 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
                 logger.error(message, e);
             }
             responseResult(response, result);
+            logger.info("------------------------异常结束------------------------");
             return new ModelAndView();
         });
     }
@@ -217,4 +230,49 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
 
         return ip;
     }
+    /**
+     * 将request中的Body数据以字符串形式取出
+     *
+     * @param request
+     * @return
+     */
+    public static String getBodyStringFromRequest(HttpServletRequest request) {
+
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+        try {
+            br = request.getReader();
+            String str;
+            while ((str = br.readLine()) != null) {
+                sb.append(str);
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (null != br) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String getHeaderStringFromRequest(HttpServletRequest request) {
+        StringBuilder sb = new StringBuilder();
+        Enumeration enu = request.getHeaderNames();
+        String headerName;
+        while (enu.hasMoreElements()) {//以此取出头信息
+            headerName = enu.nextElement().toString();
+            sb.append(headerName);
+            sb.append(":");
+            sb.append(request.getHeader(headerName));
+            sb.append(",");
+        }
+        return sb.toString();
+    }
+
 }
