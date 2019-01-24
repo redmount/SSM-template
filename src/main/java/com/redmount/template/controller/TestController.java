@@ -1,9 +1,9 @@
 package com.redmount.template.controller;
 
-import com.redmount.template.base.model.TestClazz;
 import com.redmount.template.core.Result;
-import com.redmount.template.core.exception.ServiceException;
+import com.redmount.template.core.ResultGenerator;
 import com.redmount.template.service.TestService;
+import com.redmount.template.util.RandomValidateCodeUtil;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,10 +24,7 @@ public class TestController {
 
     @GetMapping("/test/test")
     public Result test(){
-        for(Enum e: TestClazz.FieldEnum.values()){
-             ((TestClazz.FieldEnum)e).javaFieldName();
-        }
-        throw new ServiceException(10);
-        // return ResultGenerator.genSuccessResult();
+
+        return ResultGenerator.genSuccessResult(RandomValidateCodeUtil.getRandcode());
     }
 }
