@@ -4,8 +4,11 @@ import com.redmount.template.core.Result;
 import com.redmount.template.core.ResultGenerator;
 import com.redmount.template.service.TestService;
 import com.redmount.template.util.RandomValidateCodeUtil;
+import com.redmount.template.util.ValidateCodeModel;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -23,8 +26,12 @@ public class TestController {
     TestService service;
 
     @GetMapping("/test/test")
-    public Result test(){
-
+    public Result test() {
         return ResultGenerator.genSuccessResult(RandomValidateCodeUtil.getRandcode());
+    }
+
+    @PostMapping("/test/test")
+    public Result validate(@RequestBody ValidateCodeModel model) {
+        return ResultGenerator.genSuccessResult(model.isValidate());
     }
 }

@@ -14,9 +14,9 @@ public class RandomValidateCodeUtil {
 
 
     public static final String RANDOMCODEKEY = "RANDOMVALIDATECODEKEY";//放到session中的key
-    private static final String randString = "0123456789";//随机产生只有数字的字符串 private String
+    //private static final String randString = "0123456789";//随机产生只有数字的字符串 private String
     //private String randString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";//随机产生只有字母的字符串
-    //private String randString = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";//随机产生数字与字母组合的字符串
+    private static final String randString = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";//随机产生数字与字母组合的字符串
     private static final int width = 95;// 图片宽
     private static final int height = 25;// 图片高
     private static final int lineSize = 40;// 干扰线数量
@@ -50,7 +50,8 @@ public class RandomValidateCodeUtil {
     /**
      * 生成随机图片
      */
-    public static String getRandcode() {
+    public static ValidateCodeModel getRandcode() {
+        ValidateCodeModel model = new ValidateCodeModel();
         // BufferedImage类是具有缓冲区的Image类,Image类是用于描述图像信息的类
         String base64 = "";
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
@@ -76,12 +77,12 @@ public class RandomValidateCodeUtil {
             byte[] bytes = baos.toByteArray();
             BASE64Encoder encoder = new BASE64Encoder();
             base64 = encoder.encodeBuffer(bytes).trim();//转换成base64串
-            base64 = "data:image/jpeg;base64,"+base64.replaceAll("\n", "").replaceAll("\r", "");//删除 \r\n
-            return base64;
+            base64 = "data:image/jpeg;base64," + base64.replaceAll("\n", "").replaceAll("\r", "");//删除 \r\n
+            model.initCode(randomString).setImgBase64(base64);
         } catch (Exception e) {
             logger.error("将内存中的图片通过流动形式输出到客户端失败>>>>   ", e);
         }
-        return base64;
+        return model;
     }
 
     /**
