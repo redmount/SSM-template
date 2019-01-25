@@ -144,9 +144,36 @@ public interface ModelService<T> {
     T loadManyToManyRelation(T model, Field field, Condition condition);
 
     /**
-     * 取实体说明
+     * 保存实体中的一对一关系
      *
-     * @return 带注释的实体说明
+     * @param model 主实体
+     * @param field 需要保存的字段
+     * @return 保存后的主实体
+     */
+    T saveOneToOneRelation(T model, Field field);
+
+    /**
+     * 保存实体中的一对多关系(子实体中记录了主实体的pk)
+     *
+     * @param model 主实体
+     * @param field 需要保存的字段
+     * @return 保存后的主实体
+     */
+    T saveOneToManyRelation(T model, Field field);
+
+    /**
+     * 保存实体中的多对多关系(通过中间表连接的,并且关联数据记录在中间表的)
+     *
+     * @param model 主实体
+     * @param field 需要保存的字段
+     * @return 保存后的主实体
+     */
+    T saveManyToManyRelation(T model, Field field);
+
+    /**
+     * 取实体注释模型
+     *
+     * @return 带注释的实体模型
      */
     SortedMap getSchema();
 }

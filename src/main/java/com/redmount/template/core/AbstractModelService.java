@@ -149,113 +149,43 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             modelClassDOSimpleName = ((RelationData) mainClassRelationDataAnnotation).baseDOTypeName();
         }
         List<Field> relationFields;
-        String realFieldClassFullName;
-        String realFieldClassShortNameWithoutModel;
         Object currentFeildValue;
-        String javaTargetFieldName;
-        String javaMainFieldName;
-        Object currentRelatioinedDO;
-        Condition condition;
-        Object relationData;
-        try {
-            mapper = initMainMapper();
-            if (StringUtils.isBlank(mainPk)) {
-                mainPk = UUID.randomUUID().toString();
-                model.setPk(mainPk);
-                model.setCreated(new Date());
-                mapper.insert(model);
-            } else {
-                if (forceSaveNull) {
-                    mapper.updateByPrimaryKey(model);
-                } else {
-                    mapper.updateByPrimaryKeySelective(model);
-                }
-            }
-            relationFields = ReflectUtil.getRelationFields(model);
-            for (Field currentField : relationFields) {
-                currentFeildValue = ReflectUtil.getFieldValue(model, currentField.getName());
-                if (currentFeildValue == null) {
-                    continue;
-                }
-                Annotation currentFieldRelationDataAnnotation = currentField.getAnnotation(RelationData.class);
-                if (currentFieldRelationDataAnnotation == null) {
-                    continue;
-                }
-                if (((RelationData) currentFieldRelationDataAnnotation).isOneToMany()) {
-                    javaMainFieldName = ((RelationData) currentFieldRelationDataAnnotation).mainProperty();
-                    mapper = initMapperByDOSimpleName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName());
-                    condition = getConditionBySimpleDOName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName());
-                    condition.createCriteria().andEqualTo(javaMainFieldName, mainPk);
-                    Object childDOWithoutMainPk = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName()).newInstance();
-                    ReflectUtil.setFieldValue(childDOWithoutMainPk, javaMainFieldName, "");
-                    mapper.updateByConditionSelective(childDOWithoutMainPk, condition);
-                    for (Object currentItem : (List) currentFeildValue) {
-                        if (!StringUtils.isBlank(((BaseDO) currentItem).getPk())) {
-                            ReflectUtil.setFieldValue(currentItem, javaMainFieldName, mainPk);
-                            ReflectUtil.setFieldValue(currentItem, "updated", new Date());
-                            mapper.updateByPrimaryKeySelective(currentItem);
-                        } else {
-                            System.out.println("子表没有pk");
-                        }
-                    }
-                } else if (((RelationData) currentFieldRelationDataAnnotation).isManyToMany()) {
-                    mapper = initMapperByDOSimpleName(((RelationData) currentFieldRelationDataAnnotation).relationDOTypeName());
-                    realFieldClassFullName = ((ParameterizedType) currentField.getGenericType()).getActualTypeArguments()[0].getTypeName();
-                    realFieldClassShortNameWithoutModel = Class.forName(realFieldClassFullName).getAnnotation(RelationData.class).baseDOTypeName();
-                    if (StringUtils.isNotBlank(((RelationData) currentFieldRelationDataAnnotation).mainProperty())) {
-                        javaMainFieldName = ((RelationData) currentFieldRelationDataAnnotation).mainProperty();
-                    } else {
-                        javaMainFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, modelClass.getAnnotation(RelationData.class).baseDOTypeName() + "Pk");
-                    }
-                    if (StringUtils.isNotBlank(((RelationData) currentFieldRelationDataAnnotation).foreignProperty())) {
-                        javaTargetFieldName = ((RelationData) currentFieldRelationDataAnnotation).foreignProperty();
-                    } else {
-                        javaTargetFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, realFieldClassShortNameWithoutModel + "Pk");
-                    }
 
-                    condition = getConditionBySimpleDOName(currentField.getAnnotation(RelationData.class).relationDOTypeName());
-                    condition.createCriteria().andEqualTo(javaMainFieldName, mainPk);
-                    mapper.deleteByCondition(condition);
-                    Field relationDataField = ReflectUtil.getRelationDataField(Class.forName(((ParameterizedType) currentField.getGenericType()).getActualTypeArguments()[0].getTypeName()), ((RelationData) currentFieldRelationDataAnnotation).relationDOTypeName());
-                    for (Object currentRelationedListItem : (List) currentFeildValue) {
-                        if (relationDataField != null) {
-                            currentRelatioinedDO = ReflectUtil.getFieldValue(currentRelationedListItem, relationDataField.getName());
-                        } else {
-                            currentRelatioinedDO = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).relationDOTypeName()).newInstance();
-                        }
-                        ((BaseDO) currentRelatioinedDO).setPk(UUID.randomUUID().toString());
-                        ReflectUtil.setFieldValue(currentRelatioinedDO, javaMainFieldName, mainPk);
-                        ReflectUtil.setFieldValue(currentRelatioinedDO, javaTargetFieldName, ((BaseDO) currentRelationedListItem).getPk());
-                        ((BaseDO) currentRelatioinedDO).setCreated(new Date());
-                        ((BaseDO) currentRelatioinedDO).setUpdated(new Date());
-                        mapper.insert(currentRelatioinedDO);
-                        ((BaseDO) currentRelatioinedDO).setPk(null);
-                    }
-                } else {
-                    if (StringUtils.isNotBlank(((RelationData) currentFieldRelationDataAnnotation).foreignProperty())) {
-                        javaTargetFieldName = ((RelationData) currentFieldRelationDataAnnotation).foreignProperty();
-                        ReflectUtil.setFieldValue(model, javaTargetFieldName, ((BaseDO) currentFeildValue).getPk());
-                    }
-                    if (StringUtils.isNotBlank(((RelationData) currentFieldRelationDataAnnotation).mainProperty())) {
-                        mapper = initMapperByDOSimpleName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName());
-                        Object targetObject = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName()).newInstance();
-                        ReflectUtil.setFieldValue(targetObject, "pk", ReflectUtil.getFieldValue(currentFeildValue, "pk"));
-                        ReflectUtil.setFieldValue(targetObject, ((RelationData) currentFieldRelationDataAnnotation).mainProperty(), mainPk);
-                        ReflectUtil.setFieldValue(targetObject, "updated", new Date());
-                        mapper.updateByPrimaryKeySelective(targetObject);
-                    }
-                }
+        mapper = initMainMapper();
+        if (StringUtils.isBlank(mainPk)) {
+            mainPk = UUID.randomUUID().toString();
+            model.setPk(mainPk);
+            model.setCreated(new Date());
+            mapper.insert(model);
+        } else {
+            if (forceSaveNull) {
+                mapper.updateByPrimaryKey(model);
+            } else {
+                mapper.updateByPrimaryKeySelective(model);
             }
-            mapper = initMainMapper();
-            model.setUpdated(new Date());
-            mapper.updateByPrimaryKeySelective(model);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
         }
+        relationFields = ReflectUtil.getRelationFields(model);
+        for (Field currentField : relationFields) {
+            currentFeildValue = ReflectUtil.getFieldValue(model, currentField.getName());
+            if (currentFeildValue == null) {
+                continue;
+            }
+            Annotation currentFieldRelationDataAnnotation = currentField.getAnnotation(RelationData.class);
+            if (currentFieldRelationDataAnnotation == null) {
+                continue;
+            }
+            if (((RelationData) currentFieldRelationDataAnnotation).isOneToMany()) {
+                saveOneToManyRelation(model, currentField);
+            } else if (((RelationData) currentFieldRelationDataAnnotation).isManyToMany()) {
+                saveManyToManyRelation(model, currentField);
+            } else {
+                saveOneToOneRelation(model, currentField);
+            }
+        }
+        mapper = initMainMapper();
+        model.setUpdated(new Date());
+        mapper.updateByPrimaryKeySelective(model);
+
         return model;
     }
 
@@ -449,6 +379,144 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     }
 
     /**
+     * 保存实体中的一对一关系
+     *
+     * @param model 主实体
+     * @param field 需要保存的字段
+     * @return 保存后的主实体
+     */
+    @Override
+    public T saveOneToOneRelation(T model, Field field) {
+        Annotation currentFieldRelationDataAnnotation = field.getAnnotation(RelationData.class);
+        Object currentFeildValue = ReflectUtil.getFieldValue(model, field.getName());
+        if (StringUtils.isNotBlank(((RelationData) currentFieldRelationDataAnnotation).foreignProperty())) {
+            String javaTargetFieldName = ((RelationData) currentFieldRelationDataAnnotation).foreignProperty();
+            ReflectUtil.setFieldValue(model, javaTargetFieldName, ((BaseDO) currentFeildValue).getPk());
+        }
+        if (StringUtils.isNotBlank(((RelationData) currentFieldRelationDataAnnotation).mainProperty())) {
+            mapper = initMapperByDOSimpleName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName());
+            Object targetObject = null;
+            try {
+                targetObject = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName()).newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            ReflectUtil.setFieldValue(targetObject, "pk", ReflectUtil.getFieldValue(currentFeildValue, "pk"));
+            ReflectUtil.setFieldValue(targetObject, ((RelationData) currentFieldRelationDataAnnotation).mainProperty(), model.getPk());
+            ReflectUtil.setFieldValue(targetObject, "updated", new Date());
+            mapper.updateByPrimaryKeySelective(targetObject);
+        }
+        return model;
+    }
+
+    /**
+     * 保存实体中的一对多关系(子实体中记录了主实体的pk)
+     *
+     * @param model 主实体
+     * @param field 需要保存的字段
+     * @return 保存后的主实体
+     */
+    @Override
+    public T saveOneToManyRelation(T model, Field field) {
+        List currentFeildValue = (List) ReflectUtil.getFieldValue(model, field.getName());
+        Annotation currentFieldRelationDataAnnotation = field.getAnnotation(RelationData.class);
+        String javaMainFieldName = ((RelationData) currentFieldRelationDataAnnotation).mainProperty();
+        mapper = initMapperByDOSimpleName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName());
+        Condition condition = getConditionBySimpleDOName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName());
+        condition.createCriteria().andEqualTo(javaMainFieldName, model.getPk());
+        Object childDOWithoutMainPk = null;
+        try {
+            childDOWithoutMainPk = getClassByDOSimpleName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName()).newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        ReflectUtil.setFieldValue(childDOWithoutMainPk, javaMainFieldName, "");
+        mapper.updateByConditionSelective(childDOWithoutMainPk, condition);
+        for (Object currentItem : currentFeildValue) {
+            if (!StringUtils.isBlank(((BaseDO) currentItem).getPk())) {
+                ReflectUtil.setFieldValue(currentItem, javaMainFieldName, model.getPk());
+                ReflectUtil.setFieldValue(currentItem, "updated", new Date());
+                mapper.updateByPrimaryKeySelective(currentItem);
+            } else {
+                System.out.println("子表没有pk");
+            }
+        }
+        return model;
+    }
+
+    /**
+     * 保存实体中的多对多关系(通过中间表连接的,并且关联数据记录在中间表的)
+     *
+     * @param model 主实体
+     * @param field 需要保存的字段
+     * @return 保存后的主实体
+     */
+    @Override
+    public T saveManyToManyRelation(T model, Field field) {
+        String javaMainFieldName, javaTargetFieldName;
+        Annotation currentFieldRelationDataAnnotation = field.getAnnotation(RelationData.class);
+        mapper = initMapperByDOSimpleName(((RelationData) currentFieldRelationDataAnnotation).relationDOTypeName());
+        String realFieldClassFullName = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName();
+        String realFieldClassShortNameWithoutModel = null;
+        try {
+            realFieldClassShortNameWithoutModel = Class.forName(realFieldClassFullName).getAnnotation(RelationData.class).baseDOTypeName();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (StringUtils.isNotBlank(((RelationData) currentFieldRelationDataAnnotation).mainProperty())) {
+            javaMainFieldName = ((RelationData) currentFieldRelationDataAnnotation).mainProperty();
+        } else {
+            javaMainFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, modelClass.getAnnotation(RelationData.class).baseDOTypeName() + "Pk");
+        }
+        if (StringUtils.isNotBlank(((RelationData) currentFieldRelationDataAnnotation).foreignProperty())) {
+            javaTargetFieldName = ((RelationData) currentFieldRelationDataAnnotation).foreignProperty();
+        } else {
+            javaTargetFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, realFieldClassShortNameWithoutModel + "Pk");
+        }
+
+        Condition condition = getConditionBySimpleDOName(field.getAnnotation(RelationData.class).relationDOTypeName());
+        condition.createCriteria().andEqualTo(javaMainFieldName, model.getPk());
+        mapper.deleteByCondition(condition);
+        Field relationDataField = null;
+        try {
+            relationDataField = ReflectUtil.getRelationDataField(Class.forName(((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName()), ((RelationData) currentFieldRelationDataAnnotation).relationDOTypeName());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        List currentFeildValue = (List) ReflectUtil.getFieldValue(model, field.getName());
+        Object currentRelatioinedDO = new BaseDO();
+        for (Object currentRelationedListItem : (List) currentFeildValue) {
+            if (relationDataField != null) {
+                currentRelatioinedDO = ReflectUtil.getFieldValue(currentRelationedListItem, relationDataField.getName());
+            } else {
+                try {
+                    currentRelatioinedDO = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).relationDOTypeName()).newInstance();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+            ((BaseDO) currentRelatioinedDO).setPk(UUID.randomUUID().toString());
+            ReflectUtil.setFieldValue(currentRelatioinedDO, javaMainFieldName, model.getPk());
+            ReflectUtil.setFieldValue(currentRelatioinedDO, javaTargetFieldName, ((BaseDO) currentRelationedListItem).getPk());
+            ((BaseDO) currentRelatioinedDO).setCreated(new Date());
+            ((BaseDO) currentRelatioinedDO).setUpdated(new Date());
+            mapper.insert(currentRelatioinedDO);
+            ((BaseDO) currentRelatioinedDO).setPk(null);
+        }
+        return model;
+    }
+
+    /**
      * 按条件加载多对多关系
      * 主供后台使用
      *
@@ -495,6 +563,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return model;
     }
 
+    /**
+     * 取实体注释模型
+     *
+     * @return 带注释的实体模型
+     */
     @Override
     public SortedMap getSchema() {
         SortedMap<String, Object> mainMap = new TreeMap<>();
@@ -508,12 +581,25 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return mainMap;
     }
 
+    /**
+     * 生成List类型的实体注释实例
+     *
+     * @param cls 主类型
+     * @return 包含一个实体注释实例的List
+     */
     private List genListExample(Class cls) {
         List<Object> list = new ArrayList<>();
         list.add(genExample(cls, false));
         return list;
     }
 
+    /**
+     * 创建实体的注释实例
+     *
+     * @param cls        实体类型
+     * @param isMainType 是否是主实体.如果是主实体,则不产生关系数据的数据模型
+     * @return 带注释的实体模型Map
+     */
     private Map genExample(Class cls, boolean isMainType) {
         Annotation ann;
         Annotation relationAnn;
