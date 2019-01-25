@@ -11,19 +11,14 @@ import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
 public class RandomValidateCodeUtil {
-
-
-    public static final String RANDOMCODEKEY = "RANDOMVALIDATECODEKEY";//放到session中的key
-    //private static final String randString = "0123456789";//随机产生只有数字的字符串 private String
-    //private String randString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";//随机产生只有字母的字符串
-    private static final String randString = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";//随机产生数字与字母组合的字符串
+    //private static final String randString = "0123456789";//随机产生只有数字的字符串
+    //private static final String randString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";//随机产生只有字母的字符串
+    private static final String randString = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";//随机产生数字与字母组合的字符串
     private static final int width = 95;// 图片宽
     private static final int height = 25;// 图片高
     private static final int lineSize = 40;// 干扰线数量
     private static final int stringNum = 4;// 随机产生字符数量
-
     private static final Logger logger = LoggerFactory.getLogger(RandomValidateCodeUtil.class);
-
     private static final Random random = new Random();
 
     /**
@@ -57,7 +52,7 @@ public class RandomValidateCodeUtil {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
         Graphics g = image.getGraphics();// 产生Image对象的Graphics对象,改对象可以在图像上进行各种绘制操作
         g.fillRect(0, 0, width, height);//图片大小
-        g.setFont(new Font("Times New Roman", Font.ROMAN_BASELINE, 18));//字体大小
+        g.setFont(getFont());//字体大小
         g.setColor(getRandColor(110, 133));//字体颜色
         // 绘制干扰线
         for (int i = 0; i <= lineSize; i++) {
