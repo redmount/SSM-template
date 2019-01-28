@@ -1,4 +1,4 @@
-/// Generated on 2019/01/21 13:32:36
+/// Generated on 2019/01/28 09:33:42
 
 const baseModel = {
     RTestTeacherTTestClazz(args) {
@@ -45,5 +45,4 @@ const baseModel = {
         this.updated = arg.updated || null  ///
     },
 }
-
-export  default baseModel;
+export default baseModel

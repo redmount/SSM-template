@@ -74,7 +74,8 @@ public class DocumentGenerator {
                     }
                 }
             }
-            sb.append("}");
+            sb.append("}" + line);
+            sb.append("export default baseModel");
             File file = new File(PROJECT_PATH + "/baseModel.js");
             FileUtils.write(file, sb.toString());
         } catch (Exception ex) {
