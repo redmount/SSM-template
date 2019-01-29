@@ -11,6 +11,9 @@ spring:
   resources:
     add-mappings: false
 
+configuration:
+  key: abc
+
 # logback配置
 debug: true
 logging:

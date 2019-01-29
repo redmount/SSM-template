@@ -6,10 +6,12 @@ import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.redmount.template.core.Result;
 import com.redmount.template.core.ResultCode;
+import com.redmount.template.core.exception.AuthorizationException;
 import com.redmount.template.core.exception.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.method.HandlerMethod;
@@ -20,7 +22,6 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -69,12 +70,8 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
         FastJsonHttpMessageConverter converter = new FastJsonHttpMessageConverter();
         FastJsonConfig config = new FastJsonConfig();
         config.setSerializeFilters(new FastJsonPropertyPreFilter());
-        config.setSerializerFeatures(// SerializerFeature.NotWriteDefaultValue, //保留空的字段
-                // SerializerFeature.WriteNullStringAsEmpty, //String null -> ""
-                // SerializerFeature.WriteNullNumberAsZero, //Number null -> 0
-                SerializerFeature.DisableCircularReferenceDetect); // 禁用循环引用特性
+        config.setSerializerFeatures(SerializerFeature.DisableCircularReferenceDetect); // 禁用循环引用特性
         // 按需配置，更多参考FastJson文档哈
-
         converter.setFastJsonConfig(config);
         converter.setDefaultCharset(Charset.forName("UTF-8"));
         converters.add(converter);
@@ -109,6 +106,8 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
                     result.setMessage("未知异常");
                 }
                 logger.info(e.getMessage());
+            } else if (e instanceof AuthorizationException) {
+                result.setCode(ResultCode.UNAUTHORIZED).setMessage("登录失效");
             } else if (e instanceof NoHandlerFoundException) {
                 result.setCode(ResultCode.NOT_FOUND).setMessage("接口 [" + request.getRequestURI() + "] 不存在");
             } else if (e instanceof ServletException) {
@@ -155,27 +154,13 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        //接口签名认证拦截器，该签名认证比较简单，实际项目中可以使用Json Web Token或其他更好的方式替代。
-        if ("dev".equals(env)) { //开发环境忽略签名认证
-            registry.addInterceptor(new HandlerInterceptorAdapter() {
-                @Override
-                public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-                    //验证签名
-                    boolean pass = validateToken(request);
-                    if (pass) {
-                        return true;
-                    } else {
-                        logger.warn("签名认证失败，请求接口：{}，请求IP：{}，请求参数：{}",
-                                request.getRequestURI(), getIpAddress(request), JSON.toJSONString(request.getParameterMap()));
+        registry.addInterceptor(authenticationInterceptor())
+                .addPathPatterns("/**");    // 拦截所有请求，通过判断是否有 @LoginRequired 注解 决定是否需要登录
+    }
 
-                        Result result = new Result();
-                        result.setCode(ResultCode.UNAUTHORIZED).setMessage("签名认证失败");
-                        responseResult(response, result);
-                        return false;
-                    }
-                }
-            });
-        }
+    @Bean
+    public AuthenticationInterceptor authenticationInterceptor() {
+        return new AuthenticationInterceptor();
     }
 
     private void responseResult(HttpServletResponse response, Result result) {
@@ -187,17 +172,6 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
         } catch (IOException ex) {
             logger.error(ex.getMessage());
         }
-    }
-
-    /**
-     * 一个简单的签名认证，规则：
-     * 1. 将请求参数按ascii码排序
-     * 2. 拼接为a=value&b=value...这样的字符串（不包含sign）
-     * 3. 混合密钥（secret）进行md5获得签名，与请求的签名进行比较
-     */
-    private boolean validateToken(HttpServletRequest request) {
-        String token = request.getHeader("token");
-        return true;
     }
 
     /**
@@ -230,6 +204,7 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
 
         return ip;
     }
+
     /**
      * 将request中的Body数据以字符串形式取出
      *

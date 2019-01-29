@@ -24,7 +24,7 @@ public class ServiceException extends RuntimeException {
     }
 
     public ServiceException(int code) {
-        super("业务异常:"+code);
+        super("业务异常:" + code);
         this.exception = ERROR_MAP.get(code);
     }
 

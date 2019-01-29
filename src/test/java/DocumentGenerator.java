@@ -84,10 +84,6 @@ public class DocumentGenerator {
         System.out.println(sb.toString());
     }
 
-    private static void genJsDocument(List<TableComment> tableCommentList) {
-
-    }
-
     private static void genDBDocument(List<TableComment> tableCommentList) {
 
         StringBuilder stringBuilder = new StringBuilder("# 基本实体说明" + line);
