@@ -11,8 +11,9 @@ spring:
   resources:
     add-mappings: false
 
-configuration:
-  key: abc
+token:
+  key: YWJj
+  expireTime: 3600000
 
 # logback配置
 debug: true

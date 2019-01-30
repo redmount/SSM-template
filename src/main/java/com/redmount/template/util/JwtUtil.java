@@ -5,7 +5,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -17,19 +19,38 @@ import java.util.UUID;
  * author:  朱峰
  * date:    2019年1月28日
  */
+@Component
 public class JwtUtil {
 
-    @Value("{configuration.key}")
     private static String key;
+
+    @Value("${token.key}")
+    public void setKey(String key) {
+        JwtUtil.key = key;
+    }
+
+    public static String getKey() {
+        return key;
+    }
+
+    private static Long expireTime;
+
+    @Value("${token.expireTime}")
+    public void setExpireTime(Long expireTime) {
+        JwtUtil.expireTime = expireTime;
+    }
+
+    public static Long getExpireTime() {
+        return expireTime;
+    }
 
     /**
      * 用户登录成功后生成Jwt
-     * 使用Hs256算法  私匙使用用户密码
+     * 使用Hs256算法
      *
-     * @param ttlMillis jwt过期时间
      * @return
      */
-    public static String createJWT(long ttlMillis, String userPk, String userName, String userRoles) {
+    public static String createJWT(String userPk, String userName, String userRoles) {
         //指定签名的时候使用的签名算法，也就是header那部分，jjwt已经将这部分内容封装好了。
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
@@ -38,13 +59,13 @@ public class JwtUtil {
         Date now = new Date(nowMillis);
 
         //创建payload的私有声明（根据特定的业务需要添加，如果要拿这个做验证，一般是需要和jwt的接收方提前沟通好验证方式的）
-        Map<String, Object> claims = new HashMap<String, Object>();
+        Map<String, Object> claims = new HashMap<>();
         claims.put("userPk", userPk);
         claims.put("userName", userName);
+        claims.put("userRoles", userRoles);
 
         //生成签发人
         String subject = ProjectConstant.PROJECT_NAME;
-
 
         //下面就是在为payload添加各种标准声明和私有声明了
         //这里其实就是new一个JwtBuilder，设置jwt的body
@@ -58,9 +79,9 @@ public class JwtUtil {
                 //代表这个JWT的主体，即它的所有人，这个是一个json格式的字符串，可以存放什么userid，roldid之类的，作为什么用户的唯一标志。
                 .setSubject(subject)
                 //设置签名使用的签名算法和签名使用的秘钥
-                .signWith(signatureAlgorithm, key);
-        if (ttlMillis >= 0) {
-            long expMillis = nowMillis + ttlMillis;
+                .signWith(signatureAlgorithm, getKey());
+        if (getExpireTime() >= 0) {
+            long expMillis = nowMillis + getExpireTime();
             Date exp = new Date(expMillis);
             //设置过期时间
             builder.setExpiration(exp);
@@ -78,7 +99,7 @@ public class JwtUtil {
         //得到DefaultJwtParser
         Claims claims = Jwts.parser()
                 //设置签名的秘钥
-                .setSigningKey(key)
+                .setSigningKey(getKey())
                 //设置需要解析的jwt
                 .parseClaimsJws(token).getBody();
         return claims;
@@ -93,12 +114,21 @@ public class JwtUtil {
      * @return
      */
     public static Boolean isVerify(String token) {
-        //得到DefaultJwtParser
-        Claims claims = Jwts.parser()
-                //设置签名的秘钥
-                .setSigningKey(key)
-                //设置需要解析的jwt
-                .parseClaimsJws(token).getBody();
-        return false;
+        if (StringUtils.isBlank(token)) {
+            return false;
+        }
+        try {
+            //得到DefaultJwtParser
+            Claims claims = Jwts.parser()
+                    //设置签名的秘钥
+                    .setSigningKey(getKey())
+                    //设置需要解析的jwt
+                    .parseClaimsJws(token).getBody();
+            claims.getSubject();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }

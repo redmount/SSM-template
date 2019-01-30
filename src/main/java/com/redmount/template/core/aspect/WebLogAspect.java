@@ -1,5 +1,6 @@
 package com.redmount.template.core.aspect;
 
+import com.redmount.template.util.RequestUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -46,6 +47,7 @@ public class WebLogAspect {
         HttpServletRequest request = attributes.getRequest();
         logger.info("请求地址 : " + request.getRequestURL().toString());
         logger.info("请求方式 : " + request.getMethod());
+        logger.info("Header:" + RequestUtil.getHeaderStringFromRequest(request));
         logger.info("IP : " + request.getRemoteAddr());
         logger.info("对应处理方法 : " + joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
         logger.info("参数 : \r\n" + Arrays.toString(joinPoint.getArgs()));

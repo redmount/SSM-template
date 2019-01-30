@@ -2,8 +2,9 @@ package com.redmount.template.controller;
 
 import com.redmount.template.core.Result;
 import com.redmount.template.core.ResultGenerator;
+import com.redmount.template.core.annotation.Token;
 import com.redmount.template.service.TestService;
-import com.redmount.template.util.RandomValidateCodeUtil;
+import com.redmount.template.util.JwtUtil;
 import com.redmount.template.util.ValidateCodeModel;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,9 +28,10 @@ public class TestController {
 
     @GetMapping("/test/test")
     public Result test() {
-        return ResultGenerator.genSuccessResult(RandomValidateCodeUtil.getRandcode());
+        return ResultGenerator.genSuccessResult(JwtUtil.createJWT("pk","userName","role1,role2"));
     }
 
+    @Token
     @PostMapping("/test/test")
     public Result validate(@RequestBody ValidateCodeModel model) {
         return ResultGenerator.genSuccessResult(model.isValidate());

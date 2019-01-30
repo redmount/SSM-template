@@ -8,6 +8,7 @@ import com.redmount.template.core.Result;
 import com.redmount.template.core.ResultCode;
 import com.redmount.template.core.exception.AuthorizationException;
 import com.redmount.template.core.exception.ServiceException;
+import com.redmount.template.util.RequestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -89,7 +89,7 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
             logger.info("地址:" + request.getRequestURI());
             logger.info("地址栏参数:" + request.getQueryString());
             logger.info("请求方式:" + request.getMethod());
-            logger.info("Header:" + getHeaderStringFromRequest(request));
+            logger.info("Header:" + RequestUtil.getHeaderStringFromRequest(request));
             logger.info("Body:" + getBodyStringFromRequest(request));
             logger.info("请求IP:" + getIpAddress(request));
             Result result = new Result();
@@ -154,8 +154,11 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authenticationInterceptor())
-                .addPathPatterns("/**");    // 拦截所有请求，通过判断是否有 @LoginRequired 注解 决定是否需要登录
+        if(!"dev".equals(env)){
+            // 非dev模式下,绕过token验证
+            registry.addInterceptor(authenticationInterceptor())
+                    .addPathPatterns("/**");    // 拦截所有请求，通过判断是否有 @LoginRequired 注解 决定是否需要登录
+        }
     }
 
     @Bean
@@ -235,19 +238,4 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
         }
         return sb.toString();
     }
-
-    public static String getHeaderStringFromRequest(HttpServletRequest request) {
-        StringBuilder sb = new StringBuilder();
-        Enumeration enu = request.getHeaderNames();
-        String headerName;
-        while (enu.hasMoreElements()) {//以此取出头信息
-            headerName = enu.nextElement().toString();
-            sb.append(headerName);
-            sb.append(":");
-            sb.append(request.getHeader(headerName));
-            sb.append(",");
-        }
-        return sb.toString();
-    }
-
 }

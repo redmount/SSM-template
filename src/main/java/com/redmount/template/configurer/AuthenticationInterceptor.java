@@ -19,24 +19,25 @@ import java.lang.reflect.Method;
 public class AuthenticationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object object) throws Exception {
-        // 从 http 请求头中取出 token
-        String token = httpServletRequest.getHeader("token");
-        if (!JwtUtil.isVerify(token)) {
-            throw new AuthorizationException();
-        }
         // 如果不是映射到方法直接通过
         if (!(object instanceof HandlerMethod)) {
             return true;
         }
-
         HandlerMethod handlerMethod = (HandlerMethod) object;
         Method method = handlerMethod.getMethod();
-        //检查是否有LoginToken注释，有则跳过认证
+        //检查是否有Token注解，没有则跳过认证
         if (method.isAnnotationPresent(Token.class)) {
             Token loginToken = method.getAnnotation(Token.class);
             if (!loginToken.value()) {
                 return true;
             }
+        } else {
+            return true;
+        }
+        // 从 http 请求头中取出 token
+        String token = httpServletRequest.getHeader("token");
+        if (!JwtUtil.isVerify(token)) {
+            throw new AuthorizationException();
         }
         return true;
     }
