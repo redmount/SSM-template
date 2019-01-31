@@ -1,6 +1,7 @@
 package com.redmount.template.base.model;
 
 import com.redmount.template.core.BaseDO;
+import com.redmount.template.core.annotation.RelationData;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -17,6 +18,7 @@ import tk.mybatis.mapper.annotation.ColumnType;
 @ApiModel("TestClazzInfo（）")
 @Data
 @Accessors(chain = true)
+@RelationData(baseDOTypeName="TestClazzInfo")
 public class TestClazzInfo extends BaseDO implements Serializable {
     @ApiModelProperty(value = "")
     @ColumnType(jdbcType = JdbcType.VARCHAR)

@@ -1,3 +1,4 @@
+import com.redmount.template.core.ProjectConstant;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
@@ -80,6 +81,8 @@ public class ModelCommentGenerator extends MapperPlugin {
                 topLevelClass.addAnnotation("@Accessors(chain = true)");
             }
         }
+        topLevelClass.addImportedType(ProjectConstant.BASE_PACKAGE + ".core.annotation.RelationData");
+        topLevelClass.addAnnotation("@RelationData(baseDOTypeName = \"" + topLevelClass.getType().getShortName() + "\")");
         topLevelClass.addJavaDocLine("/**");
         topLevelClass.addJavaDocLine(String.format(" * @author Mybatis Generator"));
         // topLevelClass.addJavaDocLine(" * @date " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));

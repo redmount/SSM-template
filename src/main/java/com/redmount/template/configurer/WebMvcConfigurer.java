@@ -174,6 +174,4 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
             logger.error(ex.getMessage());
         }
     }
-
-
 }

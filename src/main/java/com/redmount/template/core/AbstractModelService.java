@@ -38,7 +38,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     public AbstractModelService() {
         ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
         modelClass = (Class<T>) pt.getActualTypeArguments()[0];
-        modelClassDOSimpleName = modelClass.getAnnotation(RelationData.class).baseDOTypeName();
+        if (modelClass.isAnnotationPresent(RelationData.class)) {
+            modelClassDOSimpleName = modelClass.getAnnotation(RelationData.class).baseDOTypeName();
+        } else {
+            throw new RuntimeException(modelClass.getName() + "没有RelationData注解,不能使用ModeService");
+        }
     }
 
     /**

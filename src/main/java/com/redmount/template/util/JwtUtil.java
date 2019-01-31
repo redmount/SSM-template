@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +51,7 @@ public class JwtUtil {
      *
      * @return
      */
-    public static String createJWT(String userPk, String userName, String userRoles) {
+    public static String createJWT(Object user) {
         //指定签名的时候使用的签名算法，也就是header那部分，jjwt已经将这部分内容封装好了。
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
@@ -60,9 +61,14 @@ public class JwtUtil {
 
         //创建payload的私有声明（根据特定的业务需要添加，如果要拿这个做验证，一般是需要和jwt的接收方提前沟通好验证方式的）
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userPk", userPk);
-        claims.put("userName", userName);
-        claims.put("userRoles", userRoles);
+        Object value;
+        for (Field field : ReflectUtil.getFieldList(user.getClass())) {
+            field.setAccessible(true);
+            value = ReflectUtil.getFieldValue(user, field.getName());
+            if (value != null) {
+                claims.put(field.getName(), value);
+            }
+        }
 
         //生成签发人
         String subject = ProjectConstant.PROJECT_NAME;
@@ -130,5 +136,29 @@ public class JwtUtil {
             return false;
         }
         return true;
+    }
+
+    public static Object getUserByToken(String token, Class userClass) {
+        Object user = null;
+        try {
+            user = userClass.newInstance();
+            Claims claims = Jwts.parser()
+                    //设置签名的秘钥
+                    .setSigningKey(getKey())
+                    //设置需要解析的jwt
+                    .parseClaimsJws(token).getBody();
+            for (Field field : ReflectUtil.getFieldList(userClass)) {
+                field.setAccessible(true);
+                if (claims.containsKey(field.getName())) {
+                    ReflectUtil.setFieldValue(user, field.getName(), claims.get(field.getName()));
+                }
+            }
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } finally {
+            return user;
+        }
     }
 }

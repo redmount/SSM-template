@@ -1,6 +1,7 @@
 package com.redmount.template.base.model;
 
 import com.redmount.template.core.BaseDO;
+import com.redmount.template.core.annotation.RelationData;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,6 +20,7 @@ import java.io.Serializable;
 @ApiModel("RTestTeacherTTestClazz（班级与教师的关系对象）")
 @Data
 @Accessors(chain = true)
+@RelationData(baseDOTypeName = "RTestTeacherTTestClazz")
 public class RTestTeacherTTestClazz extends BaseDO implements Serializable {
     /**
      * 教师pk
@@ -38,8 +40,8 @@ public class RTestTeacherTTestClazz extends BaseDO implements Serializable {
 
     /**
      * 此教师在此班级所上的课程名称
-
-没有外关联关系表
+     * <p>
+     * 没有外关联关系表
      */
     @ApiModelProperty(value = "此教师在此班级所上的课程名称    没有外关联关系表")
     @ColumnType(jdbcType = JdbcType.VARCHAR)
@@ -55,13 +57,13 @@ public class RTestTeacherTTestClazz extends BaseDO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum FieldEnum {
-        PK("pk","pk"),
-		TEACHER_PK("teacherPk","teacher_pk"),
-		CLAZZ_PK("clazzPk","clazz_pk"),
-		COURSE("course","course"),
-		COUNT("count","count"),
-		CREATED("created","created"),
-		UPDATED("updated","updated");
+        PK("pk", "pk"),
+        TEACHER_PK("teacherPk", "teacher_pk"),
+        CLAZZ_PK("clazzPk", "clazz_pk"),
+        COURSE("course", "course"),
+        COUNT("count", "count"),
+        CREATED("created", "created"),
+        UPDATED("updated", "updated");
 
         private String javaFieldName;
 
