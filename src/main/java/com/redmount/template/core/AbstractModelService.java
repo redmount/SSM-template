@@ -99,7 +99,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @return 带关系数据的排序的实体列表
      */
     @Override
-    public List list(String keywords, String condition, String relations, String orderBy) {
+    public List listAutomatic(String keywords, String condition, String relations, String orderBy) {
         List<T> retList = new ArrayList<>();
         List<Field> fields = ReflectUtil.getKeywordsFields(modelClass);
         List<Object> results;
@@ -221,7 +221,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         if (annotation == null) {
             throw new RuntimeException("没有找到" + modelClass.getName() + "对应的DO");
         }
-        Condition delCondition = getConditionBySimpleDOName(((RelationData) annotation).baseDOTypeName());
+        Condition delCondition = initConditionBySimpleDOName(((RelationData) annotation).baseDOTypeName());
         delCondition.createCriteria().andCondition(getDBConditionString(condition));
         mapper = initMapperByDOSimpleName(((RelationData) annotation).baseDOTypeName());
         return mapper.deleteByCondition(delCondition);
@@ -274,7 +274,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         if (StringUtils.isNotBlank(((RelationData) fieldRelationDataAnnotation).mainProperty())) {
             String javaMainFieldName = ((RelationData) fieldRelationDataAnnotation).mainProperty();
             if (condition == null) {
-                condition = getConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
+                condition = initConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
                 condition.createCriteria();
             }
             condition.and().andEqualTo(javaMainFieldName, model.getPk());
@@ -430,7 +430,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         Annotation currentFieldRelationDataAnnotation = field.getAnnotation(RelationData.class);
         String javaMainFieldName = ((RelationData) currentFieldRelationDataAnnotation).mainProperty();
         mapper = initMapperByDOSimpleName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName());
-        Condition condition = getConditionBySimpleDOName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName());
+        Condition condition = initConditionBySimpleDOName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName());
         condition.createCriteria().andEqualTo(javaMainFieldName, model.getPk());
         Object childDOWithoutMainPk = null;
         try {
@@ -484,7 +484,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             javaTargetFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, realFieldClassShortNameWithoutModel + "Pk");
         }
 
-        Condition condition = getConditionBySimpleDOName(field.getAnnotation(RelationData.class).relationDOTypeName());
+        Condition condition = initConditionBySimpleDOName(field.getAnnotation(RelationData.class).relationDOTypeName());
         condition.createCriteria().andEqualTo(javaMainFieldName, model.getPk());
         mapper.deleteByCondition(condition);
         Field relationDataField = null;
@@ -535,7 +535,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         mapper = initMapperByDOSimpleName(((RelationData) fieldRelationDataAnnotation).relationDOTypeName());
         String javaMainFieldName = ((RelationData) fieldRelationDataAnnotation).mainProperty();
         Object result = null;
-        Condition relationCondition = getConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).relationDOTypeName());
+        Condition relationCondition = initConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).relationDOTypeName());
         relationCondition.createCriteria().andEqualTo(javaMainFieldName, model.getPk());
         Object relationResults = mapper.selectByCondition(relationCondition);
         if (((List) relationResults).size() > 0) {
@@ -545,7 +545,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 targetPkList.add(ReflectUtil.getFieldValue(target, javaTargetFieldName).toString());
             }
             if (condition == null) {
-                condition = getConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
+                condition = initConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
                 condition.createCriteria();
             }
             condition.and().andIn("pk", targetPkList);
@@ -675,7 +675,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @param simpleNameOfDO DO类短名称
      * @return 对应此DO的条件对象
      */
-    private Condition getConditionBySimpleDOName(String simpleNameOfDO) {
+    private Condition initConditionBySimpleDOName(String simpleNameOfDO) {
         Condition condition = null;
         try {
             condition = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + simpleNameOfDO));
@@ -690,7 +690,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         if (annotation == null) {
             return null;
         }
-        Condition condition = getConditionBySimpleDOName(((RelationData) annotation).baseDOTypeName());
+        Condition condition = initConditionBySimpleDOName(((RelationData) annotation).baseDOTypeName());
         condition.createCriteria();
         if (StringUtils.isNotBlank(conditionString)) {
             condition.and().andCondition(conditionString);

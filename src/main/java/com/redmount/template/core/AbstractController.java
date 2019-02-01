@@ -54,7 +54,7 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
                                 @RequestParam(value = "size", defaultValue = "10") int size) {
         initService();
         PageHelper.startPage(page, size);
-        List<ClazzModel> list = service.list(keywords, condition, relations, orderBy);
+        List<ClazzModel> list = service.listAutomatic(keywords, condition, relations, orderBy);
         PageInfo pageInfo = new PageInfo(list);
         return ResultGenerator.genSuccessResult(pageInfo);
     }

@@ -2,6 +2,8 @@ package com.redmount.template.util;
 
 import com.google.common.base.CaseFormat;
 import com.redmount.template.core.ProjectConstant;
+import com.redmount.template.core.exception.AuthorizationException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.URL;
 import java.util.List;
@@ -40,7 +42,19 @@ public class NameUtil {
         return retList;
     }
 
+    public static void validateConditionString(String condition) {
+        // 单引号个数不匹配
+        if (StringUtils.countMatches(condition, "'") % 2 != 0) {
+            throw new AuthorizationException();
+        }
+        // 含注释
+        if (StringUtils.contains(condition, "--")) {
+            throw new AuthorizationException();
+        }
+    }
+
     public static String transToDBCondition(String condition) {
+        validateConditionString(condition);
         StringBuilder stringBuilder = new StringBuilder();
         String[] arr = condition.split("'");
         if (arr.length == 1) {
@@ -76,6 +90,7 @@ public class NameUtil {
 
     /**
      * "cn.fh.lightning" -> "cn/fh/lightning"
+     *
      * @param name
      * @return
      */
@@ -97,6 +112,7 @@ public class NameUtil {
 
     /**
      * /application/home -> /home
+     *
      * @param uri
      * @return
      */
