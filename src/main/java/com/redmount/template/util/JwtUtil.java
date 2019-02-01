@@ -1,6 +1,7 @@
 package com.redmount.template.util;
 
 import com.redmount.template.core.ProjectConstant;
+import com.redmount.template.core.exception.AuthorizationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -133,7 +134,7 @@ public class JwtUtil {
             claims.getSubject();
         } catch (Exception ex) {
             ex.printStackTrace();
-            return false;
+            throw new AuthorizationException();
         }
         return true;
     }
@@ -155,10 +156,11 @@ public class JwtUtil {
             }
         } catch (InstantiationException e) {
             e.printStackTrace();
+            throw new AuthorizationException();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-        } finally {
-            return user;
+            throw new AuthorizationException();
         }
+        return user;
     }
 }

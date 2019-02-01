@@ -89,7 +89,7 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
             logger.info("请求方式:" + request.getMethod());
             logger.info("Header:" + RequestUtil.getHeaderStringFromRequest(request));
             logger.info("Body:" + RequestUtil.getBodyStringFromRequest(request));
-            logger.info("请求IP:" +RequestUtil.getIpAddress(request));
+            logger.info("请求IP:" + RequestUtil.getIpAddress(request));
             Result result = new Result();
             if (e instanceof ServiceException) {
                 //业务失败的异常，如“账号或密码错误”
@@ -152,7 +152,7 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        if(!"dev".equals(env)){
+        if (!"dev".equals(env)) {
             // 非dev模式下,绕过token验证
             registry.addInterceptor(authenticationInterceptor())
                     .addPathPatterns("/**");    // 拦截所有请求，通过判断是否有 @LoginRequired 注解 决定是否需要登录
