@@ -38,21 +38,36 @@ public class CodeGenerator {
     private static final String DATE = new SimpleDateFormat("yyyy/MM/dd").format(new Date());//@date
 
     public static void main(String[] args) {
-        List<String> tableNames = new ArrayList<>();
-        tableNames.add("sys_service_exception");
-        tableNames.add("test_clazz");
-        tableNames.add("test_clazz_info");
-        tableNames.add("test_student");
-        tableNames.add("test_teacher");
+//        List<String> tableNames = new ArrayList<>();
+//        tableNames.add("sys_service_exception");
+//        tableNames.add("test_clazz");
+//        tableNames.add("test_clazz_info");
+//        tableNames.add("test_student");
+//        tableNames.add("test_teacher");
+//
+//        tableNames.add("r_test_teacher_t_test_clazz");
+//        /// tableNames.add("sys_service_exception"); 这个的实体已经被定义在项目内部,不允许生成,否则会由于类名相同而无法启动.
+//        for (String tableName : tableNames) {
+//            if (!"sys_service_exception".equalsIgnoreCase(tableName)) {
+//                genCode(tableName);
+//            }
+//        }
+        //genCodeByCustomModelName("输入表名","输入自定义Model名称");
+        Map<String, Boolean> tombstonedTableMap = new HashMap<>();
+        tombstonedTableMap.put("r_test_teacher_t_test_clazz", false);
+        tombstonedTableMap.put("sys_service_exception", false);
+        tombstonedTableMap.put("test_clazz", false);
+        tombstonedTableMap.put("test_student", false);
+        tombstonedTableMap.put("test_teacher", true);
+        genCode(tombstonedTableMap);
+    }
 
-        tableNames.add("r_test_teacher_t_test_clazz");
-        /// tableNames.add("sys_service_exception"); 这个的实体已经被定义在项目内部,不允许生成,否则会由于类名相同而无法启动.
-        for (String tableName : tableNames) {
+    public static void genCode(Map<String, Boolean> tombstonedTableMap) {
+        for (String tableName : tombstonedTableMap.keySet()) {
             if (!"sys_service_exception".equalsIgnoreCase(tableName)) {
-                genCode(tableName);
+                genCodeByCustomModelName(tableName, tableNameConvertUpperCamel(tableName), tombstonedTableMap.get(tableName));
             }
         }
-        //genCodeByCustomModelName("输入表名","输入自定义Model名称");
     }
 
     /**
@@ -63,7 +78,7 @@ public class CodeGenerator {
      */
     public static void genCode(String... tableNames) {
         for (String tableName : tableNames) {
-            genCodeByCustomModelName(tableName, tableNameConvertUpperCamel(tableName));
+            genCodeByCustomModelName(tableName, tableNameConvertUpperCamel(tableName), false);
         }
     }
 
@@ -74,14 +89,13 @@ public class CodeGenerator {
      * @param tableName 数据表名称
      * @param modelName 自定义的 Model 名称
      */
-    public static void genCodeByCustomModelName(String tableName, String modelName) {
-        genModelAndMapper(tableName, modelName);
+    public static void genCodeByCustomModelName(String tableName, String modelName, Boolean isTombstoned) {
+        genModelAndMapper(tableName, modelName, isTombstoned);
         genService(tableName, modelName);
         genController(tableName, modelName);
     }
 
-
-    public static void genModelAndMapper(String tableName, String modelName) {
+    public static void genModelAndMapper(String tableName, String modelName, boolean isTombstoned) {
         Context context = new Context(ModelType.FLAT);
         context.setId("Potato");
         context.setTargetRuntime("MyBatis3Simple");
@@ -103,7 +117,11 @@ public class CodeGenerator {
         JavaModelGeneratorConfiguration javaModelGeneratorConfiguration = new JavaModelGeneratorConfiguration();
         javaModelGeneratorConfiguration.setTargetProject(PROJECT_PATH + JAVA_PATH);
         javaModelGeneratorConfiguration.setTargetPackage(MODEL_PACKAGE);
-        javaModelGeneratorConfiguration.addProperty("rootClass", BASE_PACKAGE + ".core.BaseDO");
+        if (isTombstoned) {
+            javaModelGeneratorConfiguration.addProperty("rootClass", BASE_PACKAGE + ".core.BaseDOTombstoned");
+        } else {
+            javaModelGeneratorConfiguration.addProperty("rootClass", BASE_PACKAGE + ".core.BaseDO");
+        }
 
         context.setJavaModelGeneratorConfiguration(javaModelGeneratorConfiguration);
 
@@ -147,10 +165,16 @@ public class CodeGenerator {
         if (generator.getGeneratedJavaFiles().isEmpty() || generator.getGeneratedXmlFiles().isEmpty()) {
             throw new RuntimeException("生成Model和Mapper失败：" + warnings);
         }
-        if (StringUtils.isEmpty(modelName)) modelName = tableNameConvertUpperCamel(tableName);
+        if (StringUtils.isEmpty(modelName)) {
+            modelName = tableNameConvertUpperCamel(tableName);
+        }
         System.out.println(modelName + ".java 生成成功");
         System.out.println(modelName + "Mapper.java 生成成功");
         System.out.println(modelName + "Mapper.xml 生成成功");
+    }
+
+    public static void genModelAndMapper(String tableName, String modelName) {
+        genModelAndMapper(tableName, modelName, false);
     }
 
     public static void genService(String tableName, String modelName) {

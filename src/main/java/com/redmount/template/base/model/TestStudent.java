@@ -18,7 +18,7 @@ import tk.mybatis.mapper.annotation.ColumnType;
 @ApiModel("TestStudent（）")
 @Data
 @Accessors(chain = true)
-@RelationData(baseDOTypeName="TestStudent")
+@RelationData(baseDOTypeName = "TestStudent")
 public class TestStudent extends BaseDO implements Serializable {
     /**
      * 学生名称

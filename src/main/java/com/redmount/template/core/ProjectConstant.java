@@ -8,6 +8,14 @@ package com.redmount.template.core;
  */
 public final class ProjectConstant {
 
+    /**
+     * 逻辑删除的标记
+     */
+    public static final String TOMSTONED_FIELD = "deleted";
+
+    /**
+     * 项目名称,会作为JWT token的签发者
+     */
     public static final String PROJECT_NAME = "SSM-Template";
     /**
      * 生成代码所在的基础包名称，可根据自己公司的项目修改（注意：这个配置修改之后需要手工修改src目录项目默认的包路径，使其保持一致，不然会找不到类）

@@ -3,7 +3,7 @@ package com.redmount.template.controller;
 import com.redmount.template.core.Result;
 import com.redmount.template.core.ResultGenerator;
 import com.redmount.template.core.annotation.Token;
-import com.redmount.template.model.ClazzModel;
+import com.redmount.template.model.User;
 import com.redmount.template.service.ClazzService;
 import com.redmount.template.service.TestService;
 import com.redmount.template.util.JwtUtil;
@@ -30,13 +30,18 @@ public class TestController {
 
     @GetMapping("/test/test")
     public Result test() {
-        ClazzModel clazz = clazzService.getAutomatic("c1", null);
-        return ResultGenerator.genSuccessResult(JwtUtil.createJWT(clazz));
+        User user = new User();
+        user.setId(10);
+        user.setPassword("abc");
+        user.setUserName("username");
+        user.setPk("pk");
+        return ResultGenerator.genSuccessResult(JwtUtil.createJWT(user));
     }
 
     @Token
     @PostMapping("/test/test")
     public Result validate(@RequestBody ValidateCodeModel model, @RequestHeader(value = "token", defaultValue = "") String token) {
-        return ResultGenerator.genSuccessResult(JwtUtil.getUserByToken(token, ClazzModel.class));
+        User user = (User) JwtUtil.getUserByToken(token, User.class);
+        return ResultGenerator.genSuccessResult(user);
     }
 }

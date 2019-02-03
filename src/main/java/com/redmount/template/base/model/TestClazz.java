@@ -2,6 +2,7 @@ package com.redmount.template.base.model;
 
 import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
+import com.redmount.template.core.annotation.Tombstoned;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -15,10 +16,11 @@ import tk.mybatis.mapper.annotation.ColumnType;
  * @author Mybatis Generator
  */
 @Table(name = "test_clazz")
-@ApiModel("TestClazz（班级对象）")
+@ApiModel("TestClazz（测试班级对象）")
 @Data
 @Accessors(chain = true)
-@RelationData(baseDOTypeName="TestClazz")
+@Tombstoned
+@RelationData(baseDOTypeName = "TestClazz")
 public class TestClazz extends BaseDO implements Serializable {
     /**
      * 班级名称

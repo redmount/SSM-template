@@ -4,12 +4,14 @@ import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import javax.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.ibatis.type.JdbcType;
 import tk.mybatis.mapper.annotation.ColumnType;
+
+import javax.persistence.Column;
+import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * @author Mybatis Generator
@@ -18,7 +20,7 @@ import tk.mybatis.mapper.annotation.ColumnType;
 @ApiModel("TestClazzInfo（）")
 @Data
 @Accessors(chain = true)
-@RelationData(baseDOTypeName="TestClazzInfo")
+@RelationData(baseDOTypeName = "TestClazzInfo")
 public class TestClazzInfo extends BaseDO implements Serializable {
     @ApiModelProperty(value = "")
     @ColumnType(jdbcType = JdbcType.VARCHAR)

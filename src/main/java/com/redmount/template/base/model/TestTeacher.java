@@ -1,15 +1,17 @@
 package com.redmount.template.base.model;
 
-import com.redmount.template.core.BaseDO;
+import com.redmount.template.core.BaseDOTombstoned;
 import com.redmount.template.core.annotation.RelationData;
+import com.redmount.template.core.annotation.Tombstoned;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import javax.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.ibatis.type.JdbcType;
 import tk.mybatis.mapper.annotation.ColumnType;
+
+import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * @author Mybatis Generator
@@ -18,8 +20,9 @@ import tk.mybatis.mapper.annotation.ColumnType;
 @ApiModel("TestTeacher（）")
 @Data
 @Accessors(chain = true)
-@RelationData(baseDOTypeName="TestTeacher")
-public class TestTeacher extends BaseDO implements Serializable {
+@Tombstoned
+@RelationData(baseDOTypeName = "TestTeacher")
+public class TestTeacher extends BaseDOTombstoned implements Serializable {
     /**
      * 教师名称
      */
@@ -33,7 +36,8 @@ public class TestTeacher extends BaseDO implements Serializable {
         PK("pk","pk"),
 		NAME("name","name"),
 		CREATED("created","created"),
-		UPDATED("updated","updated");
+		UPDATED("updated","updated"),
+		DELETED("deleted","deleted");
 
         private String javaFieldName;
 

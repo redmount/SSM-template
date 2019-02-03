@@ -9,5 +9,6 @@
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="created" jdbcType="TIMESTAMP" property="created" />
     <result column="updated" jdbcType="TIMESTAMP" property="updated" />
+    <result column="deleted" jdbcType="BIT" property="deleted" />
   </resultMap>
 </mapper>

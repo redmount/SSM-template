@@ -81,6 +81,13 @@ public class ModelCommentGenerator extends MapperPlugin {
                 topLevelClass.addAnnotation("@Accessors(chain = true)");
             }
         }
+        List<IntrospectedColumn> allColumns = introspectedTable.getAllColumns();
+        for (IntrospectedColumn column : allColumns) {
+            if (ProjectConstant.TOMSTONED_FIELD.equals(column.getActualColumnName())) {
+                topLevelClass.addImportedType(ProjectConstant.BASE_PACKAGE+".core.annotation.Tombstoned");
+                topLevelClass.addAnnotation("@Tombstoned");
+            }
+        }
         topLevelClass.addImportedType(ProjectConstant.BASE_PACKAGE + ".core.annotation.RelationData");
         topLevelClass.addAnnotation("@RelationData(baseDOTypeName = \"" + topLevelClass.getType().getShortName() + "\")");
         topLevelClass.addJavaDocLine("/**");

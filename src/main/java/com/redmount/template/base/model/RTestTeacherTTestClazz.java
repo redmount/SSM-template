@@ -4,14 +4,12 @@ import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
+import javax.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.ibatis.type.JdbcType;
 import tk.mybatis.mapper.annotation.ColumnType;
-
-import javax.persistence.Column;
-import javax.persistence.Table;
-import java.io.Serializable;
 
 /**
  * @author Mybatis Generator
@@ -40,8 +38,8 @@ public class RTestTeacherTTestClazz extends BaseDO implements Serializable {
 
     /**
      * 此教师在此班级所上的课程名称
-     * <p>
-     * 没有外关联关系表
+
+没有外关联关系表
      */
     @ApiModelProperty(value = "此教师在此班级所上的课程名称    没有外关联关系表")
     @ColumnType(jdbcType = JdbcType.VARCHAR)
@@ -57,13 +55,13 @@ public class RTestTeacherTTestClazz extends BaseDO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum FieldEnum {
-        PK("pk", "pk"),
-        TEACHER_PK("teacherPk", "teacher_pk"),
-        CLAZZ_PK("clazzPk", "clazz_pk"),
-        COURSE("course", "course"),
-        COUNT("count", "count"),
-        CREATED("created", "created"),
-        UPDATED("updated", "updated");
+        PK("pk","pk"),
+		TEACHER_PK("teacherPk","teacher_pk"),
+		CLAZZ_PK("clazzPk","clazz_pk"),
+		COURSE("course","course"),
+		COUNT("count","count"),
+		CREATED("created","created"),
+		UPDATED("updated","updated");
 
         private String javaFieldName;
 
