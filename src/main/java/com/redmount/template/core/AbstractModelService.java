@@ -2,6 +2,7 @@ package com.redmount.template.core;
 
 import com.google.common.base.CaseFormat;
 import com.redmount.template.core.annotation.RelationData;
+import com.redmount.template.core.annotation.Tombstoned;
 import com.redmount.template.util.NameUtil;
 import com.redmount.template.util.ReflectUtil;
 import io.swagger.annotations.ApiModel;
@@ -206,6 +207,14 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             throw new RuntimeException("没有找到" + modelClass.getName() + "对应的DO");
         }
         mapper = initMapperByDOSimpleName(((RelationData) annotation).baseDOTypeName());
+        if (modelClass.isAnnotationPresent(Tombstoned.class)) {
+            if (modelClass.getAnnotation(Tombstoned.class).value()) {
+                BaseDOTombstoned example = new BaseDOTombstoned();
+                example.setDeleted(true);
+                example.setPk(pk);
+                return mapper.updateByPrimaryKeySelective(example);
+            }
+        }
         return mapper.deleteByPrimaryKey(pk);
     }
 
@@ -223,6 +232,13 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         }
         Condition delCondition = initConditionBySimpleDOName(((RelationData) annotation).baseDOTypeName());
         delCondition.createCriteria().andCondition(getDBConditionString(condition));
+        if (modelClass.isAnnotationPresent(Tombstoned.class)) {
+            if (modelClass.getAnnotation(Tombstoned.class).value()) {
+                BaseDOTombstoned example = new BaseDOTombstoned();
+                example.setDeleted(true);
+                return mapper.updateByConditionSelective(example, delCondition);
+            }
+        }
         mapper = initMapperByDOSimpleName(((RelationData) annotation).baseDOTypeName());
         return mapper.deleteByCondition(delCondition);
     }
@@ -278,6 +294,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 condition.createCriteria();
             }
             condition.and().andEqualTo(javaMainFieldName, model.getPk());
+            if (field.getType().isAnnotationPresent(Tombstoned.class)) {
+                condition.and().andEqualTo("deleted", false);
+            }
             result = mapper.selectByCondition(condition);
             if (((List) result).size() > 1) {
                 throw new TooManyResultsException("查询出的结果过多:表:" + ((RelationData) fieldRelationDataAnnotation).baseDOTypeName() + ",字段:" + javaMainFieldName + ",值:" + model.getPk());
@@ -347,6 +366,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             condition.createCriteria();
         }
         condition.and().andEqualTo(javaMainFieldName, model.getPk());
+        if (field.getType().isAnnotationPresent(Tombstoned.class)) {
+            condition.and().andEqualTo("deleted", false);
+        }
         Object result = mapper.selectByCondition(condition);
         ReflectUtil.setFieldValue(model, field.getName(), result);
         return model;
@@ -549,6 +571,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 condition.createCriteria();
             }
             condition.and().andIn("pk", targetPkList);
+            if (field.getType().isAnnotationPresent(Tombstoned.class)) {
+                condition.and().andEqualTo("deleted", false);
+            }
             mapper = initMapperByDOSimpleName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
             Class realSlaveDOClass = null;
             try {

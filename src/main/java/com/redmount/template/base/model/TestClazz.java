@@ -5,12 +5,14 @@ import com.redmount.template.core.annotation.RelationData;
 import com.redmount.template.core.annotation.Tombstoned;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import javax.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.ibatis.type.JdbcType;
 import tk.mybatis.mapper.annotation.ColumnType;
+
+import javax.persistence.Column;
+import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * @author Mybatis Generator
@@ -40,6 +42,7 @@ public class TestClazz extends BaseDO implements Serializable {
     /**
      * 班级昵称
      */
+
     @Column(name = "nick_name")
     @ApiModelProperty(value = "班级昵称")
     @ColumnType(jdbcType = JdbcType.VARCHAR)
