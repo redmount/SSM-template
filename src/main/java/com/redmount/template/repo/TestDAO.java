@@ -1,4 +1,4 @@
-package com.redmount.template.dao;
+package com.redmount.template.repo;
 
 public interface TestDAO {
     /**
