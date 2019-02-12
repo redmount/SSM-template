@@ -121,6 +121,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 criteriaCondition.andCondition(NameUtil.transToDBCondition(condition));
                 example.and(criteriaCondition);
             }
+            if (modelClass.isAnnotationPresent(Tombstoned.class)) {
+                example.and().andNotEqualTo("deleted", true).orIsNull("deleted");
+            }
             example.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));
             results = mapper.selectByCondition(example);
             if (StringUtils.isNotBlank(relations)) {
@@ -208,12 +211,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         }
         mapper = initMapperByDOSimpleName(((RelationData) annotation).baseDOTypeName());
         if (modelClass.isAnnotationPresent(Tombstoned.class)) {
-            if (modelClass.getAnnotation(Tombstoned.class).value()) {
-                BaseDOTombstoned example = new BaseDOTombstoned();
-                example.setDeleted(true);
-                example.setPk(pk);
-                return mapper.updateByPrimaryKeySelective(example);
-            }
+            BaseDOTombstoned example = new BaseDOTombstoned();
+            example.setDeleted(true);
+            example.setPk(pk);
+            Object obj = ReflectUtil.cloneObj(example, modelClass);
+            return mapper.updateByPrimaryKeySelective(obj);
         }
         return mapper.deleteByPrimaryKey(pk);
     }
@@ -233,11 +235,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         Condition delCondition = initConditionBySimpleDOName(((RelationData) annotation).baseDOTypeName());
         delCondition.createCriteria().andCondition(getDBConditionString(condition));
         if (modelClass.isAnnotationPresent(Tombstoned.class)) {
-            if (modelClass.getAnnotation(Tombstoned.class).value()) {
-                BaseDOTombstoned example = new BaseDOTombstoned();
-                example.setDeleted(true);
-                return mapper.updateByConditionSelective(example, delCondition);
-            }
+            BaseDOTombstoned example = new BaseDOTombstoned();
+            example.setDeleted(true);
+            return mapper.updateByConditionSelective(example, delCondition);
         }
         mapper = initMapperByDOSimpleName(((RelationData) annotation).baseDOTypeName());
         return mapper.deleteByCondition(delCondition);
@@ -286,6 +286,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     public T loadOneToOneRelation(T model, Field field, Condition condition) {
         Annotation fieldRelationDataAnnotation = field.getAnnotation(RelationData.class);
         mapper = initMapperByDOSimpleName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
+
         Object result;
         if (StringUtils.isNotBlank(((RelationData) fieldRelationDataAnnotation).mainProperty())) {
             String javaMainFieldName = ((RelationData) fieldRelationDataAnnotation).mainProperty();
@@ -293,10 +294,10 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 condition = initConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
                 condition.createCriteria();
             }
-            condition.and().andEqualTo(javaMainFieldName, model.getPk());
             if (field.getType().isAnnotationPresent(Tombstoned.class)) {
-                condition.and().andEqualTo("deleted", false);
+                condition.and().andNotEqualTo("deleted", true).orIsNull("deleted");
             }
+            condition.and().andEqualTo(javaMainFieldName, model.getPk());
             result = mapper.selectByCondition(condition);
             if (((List) result).size() > 1) {
                 throw new TooManyResultsException("查询出的结果过多:表:" + ((RelationData) fieldRelationDataAnnotation).baseDOTypeName() + ",字段:" + javaMainFieldName + ",值:" + model.getPk());
@@ -308,9 +309,28 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             }
         } else if (StringUtils.isNotBlank(((RelationData) fieldRelationDataAnnotation).foreignProperty())) {
             String javaMainFieldName = ((RelationData) fieldRelationDataAnnotation).foreignProperty();
-            result = mapper.selectByPrimaryKey(ReflectUtil.getFieldValue(model, javaMainFieldName));
-            result = ReflectUtil.cloneObj(result, field.getType());
-            ReflectUtil.setFieldValue(model, field.getName(), result);
+            String pk = (String) ReflectUtil.getFieldValue(model, javaMainFieldName);
+            if (pk == null) {
+                pk = "";
+            }
+            if (condition == null) {
+                condition = initConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
+                condition.createCriteria();
+            }
+            if (field.getType().isAnnotationPresent(Tombstoned.class)) {
+                condition.and().andNotEqualTo("deleted", true).orIsNull("deleted");
+            }
+            condition.and().andEqualTo("pk", pk);
+            result = mapper.selectByCondition(condition);
+            if (((List) result).size() > 0) {
+                if (((List) result).size() > 1) {
+                    throw new TooManyResultsException();
+                }
+                result = ((List) result).get(0);
+                result = ReflectUtil.cloneObj(result, field.getType());
+                ReflectUtil.setFieldValue(model, field.getName(), result);
+            }
+
         }
         return model;
     }
@@ -367,7 +387,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         }
         condition.and().andEqualTo(javaMainFieldName, model.getPk());
         if (field.getType().isAnnotationPresent(Tombstoned.class)) {
-            condition.and().andEqualTo("deleted", false);
+            condition.and().andNotEqualTo("deleted", true).orIsNull("deleted");
         }
         Object result = mapper.selectByCondition(condition);
         ReflectUtil.setFieldValue(model, field.getName(), result);
@@ -571,16 +591,17 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 condition.createCriteria();
             }
             condition.and().andIn("pk", targetPkList);
-            if (field.getType().isAnnotationPresent(Tombstoned.class)) {
-                condition.and().andEqualTo("deleted", false);
-            }
-            mapper = initMapperByDOSimpleName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
             Class realSlaveDOClass = null;
             try {
                 realSlaveDOClass = Class.forName(((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName());
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
+            if (realSlaveDOClass.isAnnotationPresent(Tombstoned.class)) {
+                condition.and().andNotEqualTo("deleted", true).orIsNull("deleted");
+            }
+            mapper = initMapperByDOSimpleName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
+
 
             result = mapper.selectByCondition(condition);
             Field relationDataField = ReflectUtil.getRelationDataField(realSlaveDOClass, ((RelationData) fieldRelationDataAnnotation).relationDOTypeName());

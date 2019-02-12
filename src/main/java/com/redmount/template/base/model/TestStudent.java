@@ -2,14 +2,17 @@ package com.redmount.template.base.model;
 
 import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
+import com.redmount.template.core.annotation.Tombstoned;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import javax.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.ibatis.type.JdbcType;
 import tk.mybatis.mapper.annotation.ColumnType;
+
+import javax.persistence.Column;
+import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * @author Mybatis Generator
@@ -18,6 +21,7 @@ import tk.mybatis.mapper.annotation.ColumnType;
 @ApiModel("TestStudent（）")
 @Data
 @Accessors(chain = true)
+@Tombstoned
 @RelationData(baseDOTypeName = "TestStudent")
 public class TestStudent extends BaseDO implements Serializable {
     /**
@@ -35,6 +39,10 @@ public class TestStudent extends BaseDO implements Serializable {
     @ColumnType(jdbcType = JdbcType.CHAR)
     private String clazzPk;
 
+    @ApiModelProperty(value = "")
+    @ColumnType(jdbcType = JdbcType.BIT)
+    private Boolean deleted;
+
     private static final long serialVersionUID = 1L;
 
     public enum FieldEnum {
@@ -42,7 +50,8 @@ public class TestStudent extends BaseDO implements Serializable {
 		NAME("name","name"),
 		CLAZZ_PK("clazzPk","clazz_pk"),
 		UPDATED("updated","updated"),
-		CREATED("created","created");
+		CREATED("created","created"),
+		DELETED("deleted","deleted");
 
         private String javaFieldName;
 

@@ -2,6 +2,7 @@ package com.redmount.template.base.model;
 
 import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
+import com.redmount.template.core.annotation.Tombstoned;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,6 +21,7 @@ import java.io.Serializable;
 @ApiModel("TestClazzInfo（）")
 @Data
 @Accessors(chain = true)
+@Tombstoned
 @RelationData(baseDOTypeName = "TestClazzInfo")
 public class TestClazzInfo extends BaseDO implements Serializable {
     @ApiModelProperty(value = "")
@@ -31,6 +33,10 @@ public class TestClazzInfo extends BaseDO implements Serializable {
     @ColumnType(jdbcType = JdbcType.CHAR)
     private String clazzPk;
 
+    @ApiModelProperty(value = "")
+    @ColumnType(jdbcType = JdbcType.BIT)
+    private Boolean deleted;
+
     private static final long serialVersionUID = 1L;
 
     public enum FieldEnum {
@@ -38,7 +44,8 @@ public class TestClazzInfo extends BaseDO implements Serializable {
 		DETAIL("detail","detail"),
 		CLAZZ_PK("clazzPk","clazz_pk"),
 		CREATED("created","created"),
-		UPDATED("updated","updated");
+		UPDATED("updated","updated"),
+		DELETED("deleted","deleted");
 
         private String javaFieldName;
 

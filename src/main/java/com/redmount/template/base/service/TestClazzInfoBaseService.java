@@ -5,7 +5,7 @@ import com.redmount.template.core.Service;
 
 /**
  * @author CodeGenerator
- * @date 2019/02/02
+ * @date 2019/02/12
  */
 public interface TestClazzInfoBaseService extends Service<TestClazzInfo> {
 

@@ -42,7 +42,6 @@ public class TestClazz extends BaseDO implements Serializable {
     /**
      * 班级昵称
      */
-
     @Column(name = "nick_name")
     @ApiModelProperty(value = "班级昵称")
     @ColumnType(jdbcType = JdbcType.VARCHAR)
