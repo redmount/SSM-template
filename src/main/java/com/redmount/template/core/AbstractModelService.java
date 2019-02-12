@@ -441,9 +441,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         }
         if (StringUtils.isNotBlank(((RelationData) currentFieldRelationDataAnnotation).mainProperty())) {
             mapper = initMapperByDOSimpleName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName());
-            Object targetObject = null;
+            BaseDO targetObject = null;
             try {
-                targetObject = Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName()).newInstance();
+                targetObject = (BaseDO) Class.forName(ProjectConstant.MODEL_PACKAGE + "." + ((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName()).newInstance();
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -451,9 +451,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            ReflectUtil.setFieldValue(targetObject, "pk", ReflectUtil.getFieldValue(currentFeildValue, "pk"));
+            // ReflectUtil.setFieldValue(targetObject, "pk", ReflectUtil.getFieldValue(currentFeildValue, "pk"));
+            targetObject.setPk((String) ReflectUtil.getFieldValue(currentFeildValue, "pk"));
             ReflectUtil.setFieldValue(targetObject, ((RelationData) currentFieldRelationDataAnnotation).mainProperty(), model.getPk());
-            ReflectUtil.setFieldValue(targetObject, "updated", new Date());
+            // ReflectUtil.setFieldValue(targetObject, "updated", new Date());
+            targetObject.setUpdated(new Date());
             mapper.updateByPrimaryKeySelective(targetObject);
         }
         return model;
@@ -474,9 +476,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         mapper = initMapperByDOSimpleName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName());
         Condition condition = initConditionBySimpleDOName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName());
         condition.createCriteria().andEqualTo(javaMainFieldName, model.getPk());
-        Object childDOWithoutMainPk = null;
+        BaseDO childDOWithoutMainPk = null;
         try {
-            childDOWithoutMainPk = getClassByDOSimpleName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName()).newInstance();
+            childDOWithoutMainPk = (BaseDO) getClassByDOSimpleName(((RelationData) currentFieldRelationDataAnnotation).baseDOTypeName()).newInstance();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -487,7 +489,8 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         for (Object currentItem : currentFeildValue) {
             if (!StringUtils.isBlank(((BaseDO) currentItem).getPk())) {
                 ReflectUtil.setFieldValue(currentItem, javaMainFieldName, model.getPk());
-                ReflectUtil.setFieldValue(currentItem, "updated", new Date());
+                // ReflectUtil.setFieldValue(currentItem, "updated", new Date());
+                ((BaseDO) currentItem).setUpdated(new Date());
                 mapper.updateByPrimaryKeySelective(currentItem);
             } else {
                 System.out.println("子表没有pk");
