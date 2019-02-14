@@ -1,4 +1,5 @@
 import com.redmount.template.core.ProjectConstant;
+import org.apache.commons.lang3.StringUtils;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
@@ -6,6 +7,7 @@ import org.mybatis.generator.internal.util.StringUtility;
 import tk.mybatis.mapper.generator.MapperPlugin;
 import tk.mybatis.mapper.util.StringUtil;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -81,10 +83,11 @@ public class ModelCommentGenerator extends MapperPlugin {
                 topLevelClass.addAnnotation("@Accessors(chain = true)");
             }
         }
+
         List<IntrospectedColumn> allColumns = introspectedTable.getAllColumns();
         for (IntrospectedColumn column : allColumns) {
             if (ProjectConstant.TOMSTONED_FIELD.equals(column.getActualColumnName())) {
-                topLevelClass.addImportedType(ProjectConstant.BASE_PACKAGE+".core.annotation.Tombstoned");
+                topLevelClass.addImportedType(ProjectConstant.BASE_PACKAGE + ".core.annotation.Tombstoned");
                 topLevelClass.addAnnotation("@Tombstoned");
             }
         }
@@ -163,6 +166,7 @@ public class ModelCommentGenerator extends MapperPlugin {
             String apiModelProperty = "io.swagger.annotations.ApiModelProperty";
             topLevelClass.addImportedType(apiModel);
             topLevelClass.addImportedType(apiModelProperty);
+            topLevelClass.addImportedType(ProjectConstant.BASE_PACKAGE + ".core.annotation.Validate");
             String remarks = introspectedTable.getRemarks();
             if (StringUtil.isEmpty(remarks)) {
                 remarks = "";
@@ -191,6 +195,17 @@ public class ModelCommentGenerator extends MapperPlugin {
                             remark = remark.trim();
                         }
                         field.addAnnotation("@ApiModelProperty(value = \"" + remark + "\")");
+                        /// 验证相关注解
+                        List<String> validateAnnoatationValues = new ArrayList<>();
+                        if (!introspectedColumn.isNullable()) {
+                            validateAnnoatationValues.add("nullable = false");
+                            if ("java.lang.String".equals(field.getType().getFullyQualifiedName())) {
+                                validateAnnoatationValues.add("stringMaxLength = " + introspectedColumn.getLength());
+                            }
+                        }
+                        if (validateAnnoatationValues.size() > 0) {
+                            field.addAnnotation("@Validate("+ StringUtils.join(validateAnnoatationValues.toArray(),", ")+")");
+                        }
                     }
             }
         }

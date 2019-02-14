@@ -28,6 +28,11 @@ public class ServiceException extends RuntimeException {
         this.exception = ERROR_MAP.get(code);
     }
 
+    public ServiceException(SysServiceExceptionDO serviceExceptionDO) {
+        super("业务异常:" + serviceExceptionDO.getCode());
+        this.exception = serviceExceptionDO;
+    }
+
     public ServiceException(String message) {
         super(message);
     }

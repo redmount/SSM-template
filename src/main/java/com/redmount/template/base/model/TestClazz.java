@@ -3,6 +3,7 @@ package com.redmount.template.base.model;
 import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
 import com.redmount.template.core.annotation.Tombstoned;
+import com.redmount.template.core.annotation.Validate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class TestClazz extends BaseDO implements Serializable {
      * 班级名称
      */
     @ApiModelProperty(value = "班级名称")
+    @Validate(nullable = false, stringMaxLength = 255)
     @ColumnType(jdbcType = JdbcType.VARCHAR)
     private String name;
 

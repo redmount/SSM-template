@@ -2,6 +2,7 @@ package com.redmount.template.base.model;
 
 import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
+import com.redmount.template.core.annotation.Validate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
