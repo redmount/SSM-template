@@ -3,6 +3,9 @@ package com.redmount.template.core;
 import com.google.common.base.CaseFormat;
 import com.redmount.template.core.annotation.RelationData;
 import com.redmount.template.core.annotation.Tombstoned;
+import com.redmount.template.core.annotation.Validate;
+import com.redmount.template.core.exception.ServiceException;
+import com.redmount.template.core.exception.SysServiceExceptionDO;
 import com.redmount.template.util.NameUtil;
 import com.redmount.template.util.ReflectUtil;
 import io.swagger.annotations.ApiModel;
@@ -151,6 +154,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      */
     @Override
     public T saveAutomatic(T model, boolean forceSaveNull) {
+        validateModelToSave(model);
         String mainPk = model.getPk();
         Annotation mainClassRelationDataAnnotation = modelClass.getAnnotation(RelationData.class);
         if (mainClassRelationDataAnnotation != null) {
@@ -813,4 +817,37 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return resultListContainsRelation;
     }
 
+    /**
+     * 验证Model
+     *
+     * @param model
+     */
+    private void validateModelToSave(T model) {
+        Class cls = getClassByDOSimpleName(modelClassDOSimpleName);
+        for (Field field : cls.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Validate.class)) {
+                if (field.getType() == String.class) {
+                    validateStringField(model, field);
+                }
+            }
+        }
+    }
+
+    /**
+     * 验证字符串长度
+     * @param model
+     * @param field
+     */
+    private void validateStringField(T model, Field field) {
+        Annotation validateAnnotation = field.getAnnotation(Validate.class);
+        String value = (String) ReflectUtil.getFieldValue(model, field.getName());
+        if (value.length() > ((Validate) validateAnnotation).stringMaxLength()) {
+            SysServiceExceptionDO exceptionDO = new SysServiceExceptionDO();
+            exceptionDO.setMessage("信息长度超过限制：" + ((Validate) validateAnnotation).stringMaxLength());
+            exceptionDO.setCode(500);
+            exceptionDO.setTitle("提交信息失败");
+            exceptionDO.setReason(exceptionDO.getMessage());
+            throw new ServiceException(exceptionDO);
+        }
+    }
 }

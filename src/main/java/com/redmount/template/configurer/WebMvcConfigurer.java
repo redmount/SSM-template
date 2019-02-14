@@ -88,7 +88,7 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
             logger.info("地址栏参数:" + request.getQueryString());
             logger.info("请求方式:" + request.getMethod());
             logger.info("Header:" + RequestUtil.getHeaderStringFromRequest(request));
-            logger.info("Body:" + RequestUtil.getBodyStringFromRequest(request));
+            // logger.info("Body:" + RequestUtil.getBodyStringFromRequest(request));
             logger.info("请求IP:" + RequestUtil.getIpAddress(request));
             Result result = new Result();
             if (e instanceof ServiceException) {
