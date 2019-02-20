@@ -125,7 +125,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 example.and(criteriaCondition);
             }
             if (modelClass.isAnnotationPresent(Tombstoned.class)) {
-                example.and().andNotEqualTo("deleted", true).orIsNull("deleted");
+                example.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
             }
             example.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));
             results = mapper.selectByCondition(example);
@@ -299,7 +299,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 condition.createCriteria();
             }
             if (field.getType().isAnnotationPresent(Tombstoned.class)) {
-                condition.and().andNotEqualTo("deleted", true).orIsNull("deleted");
+                condition.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
             }
             condition.and().andEqualTo(javaMainFieldName, model.getPk());
             result = mapper.selectByCondition(condition);
@@ -322,9 +322,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 condition.createCriteria();
             }
             if (field.getType().isAnnotationPresent(Tombstoned.class)) {
-                condition.and().andNotEqualTo("deleted", true).orIsNull("deleted");
+                condition.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
             }
-            condition.and().andEqualTo("pk", pk);
+            condition.and().andEqualTo(ProjectConstant.PRIMARY_KEY_FIELD_NAME, pk);
             result = mapper.selectByCondition(condition);
             if (((List) result).size() > 0) {
                 if (((List) result).size() > 1) {
@@ -391,7 +391,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         }
         condition.and().andEqualTo(javaMainFieldName, model.getPk());
         if (field.getType().isAnnotationPresent(Tombstoned.class)) {
-            condition.and().andNotEqualTo("deleted", true).orIsNull("deleted");
+            condition.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
         }
         Object result = mapper.selectByCondition(condition);
         ReflectUtil.setFieldValue(model, field.getName(), result);
@@ -455,8 +455,8 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            // ReflectUtil.setFieldValue(targetObject, "pk", ReflectUtil.getFieldValue(currentFeildValue, "pk"));
-            targetObject.setPk((String) ReflectUtil.getFieldValue(currentFeildValue, "pk"));
+            // ReflectUtil.setFieldValue(targetObject, ProjectConstant.PRIMARY_KEY_FIELD_NAME, ReflectUtil.getFieldValue(currentFeildValue, ProjectConstant.PRIMARY_KEY_FIELD_NAME));
+            targetObject.setPk((String) ReflectUtil.getFieldValue(currentFeildValue, ProjectConstant.PRIMARY_KEY_FIELD_NAME));
             ReflectUtil.setFieldValue(targetObject, ((RelationData) currentFieldRelationDataAnnotation).mainProperty(), model.getPk());
             // ReflectUtil.setFieldValue(targetObject, "updated", new Date());
             targetObject.setUpdated(new Date());
@@ -525,12 +525,12 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         if (StringUtils.isNotBlank(((RelationData) currentFieldRelationDataAnnotation).mainProperty())) {
             javaMainFieldName = ((RelationData) currentFieldRelationDataAnnotation).mainProperty();
         } else {
-            javaMainFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, modelClass.getAnnotation(RelationData.class).baseDOTypeName() + "Pk");
+            javaMainFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, modelClass.getAnnotation(RelationData.class).baseDOTypeName() + ProjectConstant.PRIMARY_KEY_FIELD_NAME);
         }
         if (StringUtils.isNotBlank(((RelationData) currentFieldRelationDataAnnotation).foreignProperty())) {
             javaTargetFieldName = ((RelationData) currentFieldRelationDataAnnotation).foreignProperty();
         } else {
-            javaTargetFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, realFieldClassShortNameWithoutModel + "Pk");
+            javaTargetFieldName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, realFieldClassShortNameWithoutModel + ProjectConstant.PRIMARY_KEY_FIELD_NAME);
         }
 
         Condition condition = initConditionBySimpleDOName(field.getAnnotation(RelationData.class).relationDOTypeName());
@@ -597,7 +597,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 condition = initConditionBySimpleDOName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
                 condition.createCriteria();
             }
-            condition.and().andIn("pk", targetPkList);
+            condition.and().andIn(ProjectConstant.PRIMARY_KEY_FIELD_NAME, targetPkList);
             Class realSlaveDOClass = null;
             try {
                 realSlaveDOClass = Class.forName(((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName());
@@ -605,7 +605,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 e.printStackTrace();
             }
             if (realSlaveDOClass.isAnnotationPresent(Tombstoned.class)) {
-                condition.and().andNotEqualTo("deleted", true).orIsNull("deleted");
+                condition.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
             }
             mapper = initMapperByDOSimpleName(((RelationData) fieldRelationDataAnnotation).baseDOTypeName());
 
@@ -677,10 +677,10 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             }
             if (ReflectUtil.isWrapType(field)) {
                 if (ann != null) {
-                    if (field.getName().endsWith("Pk") || field.getName().equals("created") || field.getName().equals("updated")) {
+                    if (field.getName().endsWith(ProjectConstant.PRIMARY_KEY_FIELD_NAME) || field.getName().equals("created") || field.getName().equals("updated")) {
                         continue;
                     }
-                    if (relationAnn != null && ((RelationData) relationAnn).isRelation() && field.getName().equals("pk")) {
+                    if (relationAnn != null && ((RelationData) relationAnn).isRelation() && field.getName().equals(ProjectConstant.PRIMARY_KEY_FIELD_NAME)) {
                         continue;
                     }
                     description.append(field.getType().getSimpleName());
@@ -806,9 +806,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
 
         for (Object relationResult : relationResults) {
             for (Object sourceResult : resultFromDB) {
-                if (ReflectUtil.getFieldValue(sourceResult, "pk").equals(ReflectUtil.getFieldValue(relationResult, javaTargetFieldName))) {
+                if (ReflectUtil.getFieldValue(sourceResult, ProjectConstant.PRIMARY_KEY_FIELD_NAME).equals(ReflectUtil.getFieldValue(relationResult, javaTargetFieldName))) {
                     Object relationTarget = ReflectUtil.cloneObj(sourceResult, realSlaveDOClass);
-                    ReflectUtil.setFieldValue(relationResult, "pk", null);
+                    ReflectUtil.setFieldValue(relationResult, ProjectConstant.PRIMARY_KEY_FIELD_NAME, null);
                     ReflectUtil.setFieldValue(relationTarget, relationDataField.getName(), relationResult);
                     resultListContainsRelation.add(relationTarget);
                 }

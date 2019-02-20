@@ -13,6 +13,8 @@ public final class ProjectConstant {
      */
     public static final String TOMSTONED_FIELD = "deleted";
 
+    public static final String PRIMARY_KEY_FIELD_NAME = "pk";
+
     /**
      * 项目名称,会作为JWT token的签发者
      */
