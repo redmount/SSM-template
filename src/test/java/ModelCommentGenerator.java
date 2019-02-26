@@ -1,9 +1,7 @@
 import com.redmount.template.core.ProjectConstant;
 import org.apache.commons.lang3.StringUtils;
-import org.mybatis.generator.api.IntrospectedColumn;
-import org.mybatis.generator.api.IntrospectedTable;
+import org.mybatis.generator.api.*;
 import org.mybatis.generator.api.dom.java.*;
-import org.mybatis.generator.internal.util.StringUtility;
 import tk.mybatis.mapper.generator.MapperPlugin;
 import tk.mybatis.mapper.util.StringUtil;
 
@@ -11,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+
+import static org.mybatis.generator.internal.util.StringUtility.stringHasValue;
 
 
 public class ModelCommentGenerator extends MapperPlugin {
@@ -40,32 +40,39 @@ public class ModelCommentGenerator extends MapperPlugin {
     public void setProperties(Properties properties) {
         super.setProperties(properties);
         String sImplementSerializableInteface = this.properties.getProperty("implementSerializableInteface");
-        if (StringUtility.stringHasValue(sImplementSerializableInteface)) {
+        if (stringHasValue(sImplementSerializableInteface)) {
             this.implementSerializableInteface = Boolean.parseBoolean(sImplementSerializableInteface);
         }
 
         String sModelFieldEnum = this.properties.getProperty("modelFieldEnum");
-        if (StringUtility.stringHasValue(sModelFieldEnum)) {
+        if (stringHasValue(sModelFieldEnum)) {
             this.modelFieldEnum = Boolean.parseBoolean(sModelFieldEnum);
         }
         String swaggerApiEnabled = this.properties.getProperty("swaggerApiEnabled");
-        if (StringUtility.stringHasValue(swaggerApiEnabled)) {
+        if (stringHasValue(swaggerApiEnabled)) {
             this.swaggerApiEnabled = Boolean.parseBoolean(swaggerApiEnabled);
         }
 
         String columnTypeEnabled = this.properties.getProperty("columnTypeEnabled");
-        if (StringUtility.stringHasValue(columnTypeEnabled)) {
+        if (stringHasValue(columnTypeEnabled)) {
             this.columnTypeEnabled = Boolean.parseBoolean(columnTypeEnabled);
         }
 
         String setterMethodChainEnabled = this.properties.getProperty("setterMethodChainEnabled");
-        if (StringUtility.stringHasValue(setterMethodChainEnabled)) {
+        if (stringHasValue(setterMethodChainEnabled)) {
             this.setterMethodChainEnabled = Boolean.parseBoolean(setterMethodChainEnabled);
         }
         String lombokEnabled = this.properties.getProperty("lombokEnabled");
-        if (StringUtility.stringHasValue(lombokEnabled)) {
+        if (stringHasValue(lombokEnabled)) {
             this.lombokEnabled = Boolean.parseBoolean(lombokEnabled);
         }
+    }
+
+    public boolean clientGenerated(Interface interfaze, TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
+        super.clientGenerated(interfaze, topLevelClass, introspectedTable);
+        interfaze.addAnnotation("@CacheNamespace");
+        interfaze.addImportedType(new FullyQualifiedJavaType("org.apache.ibatis.annotations.CacheNamespace"));
+        return true;
     }
 
     public boolean modelBaseRecordClassGenerated(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
@@ -204,7 +211,7 @@ public class ModelCommentGenerator extends MapperPlugin {
                             }
                         }
                         if (validateAnnoatationValues.size() > 0) {
-                            field.addAnnotation("@Validate("+ StringUtils.join(validateAnnoatationValues.toArray(),", ")+")");
+                            field.addAnnotation("@Validate(" + StringUtils.join(validateAnnoatationValues.toArray(), ", ") + ")");
                         }
                     }
             }
