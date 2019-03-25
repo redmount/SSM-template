@@ -29,9 +29,9 @@ public class Swagger2Configurer {
     }
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("springboot利用swagger构建api文档")
-                .description("简单优雅的restfun风格，http://blog.csdn.net/forezp")
-                .termsOfServiceUrl("http://blog.csdn.net/forezp")
+                .title("Springboot利用Swagger构建API文档")
+                .description("简单优雅的RESTFul风格，http://github.com/redmount56/SSM-Template")
+                .termsOfServiceUrl("http://github.com/redmount56/SSM-Template")
                 .version("1.0")
                 .build();
     }
