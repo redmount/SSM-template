@@ -17,6 +17,24 @@ public interface ModelService<T> {
     T getAutomatic(String pk, String relations);
 
     /**
+     * 给单个实体挂关系
+     *
+     * @param model     原始实体
+     * @param relations 关系数据
+     * @return
+     */
+    T getAutomaticWithModel(T model, String relations);
+
+    /**
+     * 取带关系的列表
+     *
+     * @param list      主表列表
+     * @param relations 关系数据
+     * @return
+     */
+    List listAutomaticWithRelations(List<T> list, String relations);
+
+    /**
      * 取符合条件的实体列表
      *
      * @param keywords  关键字
@@ -24,7 +42,7 @@ public interface ModelService<T> {
      * @param orderBy   排序
      * @return 带关系数据的排序的实体列表
      */
-    List listAutomatic(String keywords, String condition, String relations, String orderBy);
+    List listAutomaticWithoutRelations(String keywords, String condition, String relations, String orderBy);
 
     /**
      * 自动保存

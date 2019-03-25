@@ -10,6 +10,7 @@ import com.redmount.template.util.NameUtil;
 import com.redmount.template.util.ReflectUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.exceptions.TooManyResultsException;
 import org.apache.ibatis.session.SqlSession;
@@ -71,6 +72,18 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         if (StringUtils.isBlank(relations)) {
             return model;
         }
+        return getAutomaticWithModel(model,relations);
+    }
+
+    /**
+     * 给单个实体挂关系
+     *
+     * @param model     原始实体
+     * @param relations 关系数据
+     * @return
+     */
+    @Override
+    public T getAutomaticWithModel(T model, String relations) {
         List<String> relationList = ReflectUtil.getFieldList(modelClass, relations);
         Field field;
         for (String relation : relationList) {
@@ -95,15 +108,31 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     }
 
     /**
-     * 取符合条件的实体列表
+     * 取带关系的列表
+     *
+     * @param list      主表列表
+     * @param relations 关系数据
+     * @return 带关系的实体列表
+     */
+    @Override
+    public List listAutomaticWithRelations(List<T> list, String relations) {
+        List<Object> resultWithRelations = new ArrayList<>();
+        for (T item : list) {
+            resultWithRelations.add(getAutomaticWithModel(item, relations));
+        }
+        return resultWithRelations;
+    }
+
+    /**
+     * 取符合条件的实体列表(不带关系)
      *
      * @param keywords  关键字
      * @param relations 关系数据
      * @param orderBy   排序
-     * @return 带关系数据的排序的实体列表
+     * @return 带排序和条件的数据实体列表
      */
     @Override
-    public List listAutomatic(String keywords, String condition, String relations, String orderBy) {
+    public List listAutomaticWithoutRelations(String keywords, String condition, String relations, String orderBy) {
         List<T> retList = new ArrayList<>();
         List<Field> fields = ReflectUtil.getKeywordsFields(modelClass);
         List<Object> results;
@@ -129,17 +158,16 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             }
             example.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));
             results = mapper.selectByCondition(example);
-            if (StringUtils.isNotBlank(relations)) {
-                List<Object> resultWithRelations = new ArrayList<>();
-                for (Object item : results) {
-                    resultWithRelations.add(getAutomatic(((BaseDO) item).getPk(), relations));
-                }
-                return resultWithRelations;
-            }
+//            if (StringUtils.isNotBlank(relations)) {
+//                List<Object> resultWithRelations = new ArrayList<>();
+//                for (Object item : results) {
+//                    resultWithRelations.add(getAutomatic(((BaseDO) item).getPk(), relations));
+//                }
+//                return resultWithRelations;
+//            }
             for (Object result : results) {
                 retList.add(ReflectUtil.cloneObj(result, modelClass));
             }
-
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -835,6 +863,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
 
     /**
      * 验证字符串长度
+     *
      * @param model
      * @param field
      */
