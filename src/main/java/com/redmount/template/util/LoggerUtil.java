@@ -6,9 +6,6 @@ import org.slf4j.LoggerFactory;
  * 日志工具类，使用静态方法打印日志  无需每个类中定义日志对象
  * Logback对每个Logger对象做了缓存，每次调用LoggerFactory.getLogger(String name)时如果已存在则从缓存中获取不会生成新的对象;
  * 同时也不会有对象的创建与销毁造成的性能损失
- *
- * @author zsc
- * @datetime 2017年12月12日 上午11:43:51
  */
 public class LoggerUtil {
 
