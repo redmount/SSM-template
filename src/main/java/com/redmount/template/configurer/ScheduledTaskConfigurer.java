@@ -1,15 +1,24 @@
 package com.redmount.template.configurer;
 
-import com.redmount.template.util.LoggerUtil;
+import com.redmount.template.job.DemoJob;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ScheduledTaskConfigurer {
-    @Scheduled(cron = "0 0/10 * * * ?")
+
+    @Autowired
+    DemoJob job;
+
+    @Scheduled(cron = "0 0/1 * * * ?")
     @Async
     public void scheduled() {
-        LoggerUtil.info("定时任务,每10分钟异步执行一次.");
+        String[] args = {"demo"};
+        job.setData("data");
+        job.beforeJob(args);
+        job.doJob(args);
+        job.afterJob(args);
     }
 }
