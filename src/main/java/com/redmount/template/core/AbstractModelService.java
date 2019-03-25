@@ -1,5 +1,7 @@
 package com.redmount.template.core;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.base.CaseFormat;
 import com.redmount.template.core.annotation.RelationData;
 import com.redmount.template.core.annotation.Tombstoned;
@@ -72,7 +74,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         if (StringUtils.isBlank(relations)) {
             return model;
         }
-        return getAutomaticWithModel(model,relations);
+        return getAutomaticWithModel(model, relations);
     }
 
     /**
@@ -110,17 +112,19 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     /**
      * 取带关系的列表
      *
-     * @param list      主表列表
+     * @param pageInfo  带分页信息的主表列表
      * @param relations 关系数据
      * @return 带关系的实体列表
      */
     @Override
-    public List listAutomaticWithRelations(List<T> list, String relations) {
+    public PageInfo listAutomaticWithRelations(PageInfo pageInfo, String relations) {
         List<Object> resultWithRelations = new ArrayList<>();
+        List<T> list = pageInfo.getList();
         for (T item : list) {
             resultWithRelations.add(getAutomaticWithModel(item, relations));
         }
-        return resultWithRelations;
+        pageInfo.setList(resultWithRelations);
+        return pageInfo;
     }
 
     /**
@@ -132,10 +136,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @return 带排序和条件的数据实体列表
      */
     @Override
-    public List listAutomaticWithoutRelations(String keywords, String condition, String relations, String orderBy) {
+    public PageInfo listAutomaticWithoutRelations(String keywords, String condition, String relations, String orderBy, int page, int size) {
         List<T> retList = new ArrayList<>();
         List<Field> fields = ReflectUtil.getKeywordsFields(modelClass);
         List<Object> results;
+        PageInfo pageInfo = null;
         try {
             mapper = (Mapper) sqlSession.getMapper(Class.forName(ProjectConstant.MAPPER_PACKAGE + "." + modelClassDOSimpleName + "Mapper"));
             Example example = new Condition(Class.forName(ProjectConstant.MODEL_PACKAGE + "." + modelClass.getAnnotation(RelationData.class).baseDOTypeName()));
@@ -157,21 +162,17 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 example.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
             }
             example.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));
+            PageHelper.startPage(page, size);
             results = mapper.selectByCondition(example);
-//            if (StringUtils.isNotBlank(relations)) {
-//                List<Object> resultWithRelations = new ArrayList<>();
-//                for (Object item : results) {
-//                    resultWithRelations.add(getAutomatic(((BaseDO) item).getPk(), relations));
-//                }
-//                return resultWithRelations;
-//            }
+            pageInfo = new PageInfo(results);
             for (Object result : results) {
                 retList.add(ReflectUtil.cloneObj(result, modelClass));
             }
+            pageInfo.setList(retList);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return retList;
+        return pageInfo;
     }
 
     /**

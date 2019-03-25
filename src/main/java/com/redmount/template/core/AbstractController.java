@@ -35,7 +35,8 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
 
     /**
      * 取资源列表
-     *4
+     * 4
+     *
      * @param keywords  关键字
      * @param condition 条件(小驼峰形式,SQL子语句)
      * @param relations 带的关系数据
@@ -53,11 +54,9 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
                                 @RequestParam(value = "page", defaultValue = "1") int page,
                                 @RequestParam(value = "size", defaultValue = "10") int size) {
         initService();
-        PageHelper.startPage(page, size);
-        List<ClazzModel> list = service.listAutomaticWithoutRelations(keywords, condition, relations, orderBy);
-        PageInfo pageInfo = new PageInfo(list);
-        if(StringUtils.isNotBlank(relations)){
-            pageInfo.setList(service.listAutomaticWithRelations(list,relations));
+        PageInfo pageInfo = service.listAutomaticWithoutRelations(keywords, condition, relations, orderBy, page, size);
+        if (StringUtils.isNotBlank(relations)) {
+            pageInfo = service.listAutomaticWithRelations(pageInfo, relations);
         }
         return ResultGenerator.genSuccessResult(pageInfo);
     }

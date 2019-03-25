@@ -5,7 +5,7 @@
     <!--
       WARNING - @mbg.generated
     -->
-    <id column="pk" jdbcType="CHAR" property="pk" />
+    <result column="pk" jdbcType="CHAR" property="pk" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="adviser_pk" jdbcType="CHAR" property="adviserPk" />
     <result column="updated" jdbcType="TIMESTAMP" property="updated" />

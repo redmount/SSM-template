@@ -5,7 +5,7 @@
     <!--
       WARNING - @mbg.generated
     -->
-    <id column="pk" jdbcType="CHAR" property="pk" />
+    <result column="pk" jdbcType="CHAR" property="pk" />
     <result column="teacher_pk" jdbcType="CHAR" property="teacherPk" />
     <result column="clazz_pk" jdbcType="CHAR" property="clazzPk" />
     <result column="course" jdbcType="VARCHAR" property="course" />

@@ -23,18 +23,20 @@ import tk.mybatis.mapper.annotation.ColumnType;
 @Tombstoned
 @RelationData(baseDOTypeName = "TestTeacher")
 public class TestTeacher extends BaseDOTombstoned implements Serializable {
-    /**
-     * 教师名称
-     */
-    @ApiModelProperty(value = "教师名称")
+    @ApiModelProperty(value = "")
     @ColumnType(jdbcType = JdbcType.VARCHAR)
     private String name;
+
+    @ApiModelProperty(value = "")
+    @ColumnType(jdbcType = JdbcType.VARCHAR)
+    private String course;
 
     private static final long serialVersionUID = 1L;
 
     public enum FieldEnum {
         PK("pk","pk"),
 		NAME("name","name"),
+		COURSE("course","course"),
 		CREATED("created","created"),
 		UPDATED("updated","updated"),
 		DELETED("deleted","deleted");

@@ -1,9 +1,9 @@
 package com.redmount.template.core;
 
+import com.github.pagehelper.PageInfo;
 import tk.mybatis.mapper.entity.Condition;
 
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.SortedMap;
 
 public interface ModelService<T> {
@@ -28,11 +28,11 @@ public interface ModelService<T> {
     /**
      * 取带关系的列表
      *
-     * @param list      主表列表
+     * @param pageInfo  带分页的主表数据
      * @param relations 关系数据
      * @return
      */
-    List listAutomaticWithRelations(List<T> list, String relations);
+    PageInfo listAutomaticWithRelations(PageInfo pageInfo, String relations);
 
     /**
      * 取符合条件的实体列表
@@ -42,7 +42,7 @@ public interface ModelService<T> {
      * @param orderBy   排序
      * @return 带关系数据的排序的实体列表
      */
-    List listAutomaticWithoutRelations(String keywords, String condition, String relations, String orderBy);
+    PageInfo listAutomaticWithoutRelations(String keywords, String condition, String relations, String orderBy, int page, int size);
 
     /**
      * 自动保存

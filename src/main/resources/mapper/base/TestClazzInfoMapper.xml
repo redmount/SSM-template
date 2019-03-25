@@ -5,11 +5,9 @@
     <!--
       WARNING - @mbg.generated
     -->
-    <id column="pk" jdbcType="CHAR" property="pk" />
-    <result column="detail" jdbcType="VARCHAR" property="detail" />
-    <result column="clazz_pk" jdbcType="CHAR" property="clazzPk" />
+    <result column="pk" jdbcType="CHAR" property="pk" />
     <result column="created" jdbcType="TIMESTAMP" property="created" />
     <result column="updated" jdbcType="TIMESTAMP" property="updated" />
-    <result column="deleted" jdbcType="BIT" property="deleted" />
+    <result column="detail" jdbcType="VARCHAR" property="detail" />
   </resultMap>
 </mapper>

@@ -23,18 +23,12 @@ import tk.mybatis.mapper.annotation.ColumnType;
 @Tombstoned
 @RelationData(baseDOTypeName = "TestStudent")
 public class TestStudent extends BaseDO implements Serializable {
-    /**
-     * 学生名称
-     */
-    @ApiModelProperty(value = "学生名称")
+    @ApiModelProperty(value = "")
     @ColumnType(jdbcType = JdbcType.VARCHAR)
     private String name;
 
-    /**
-     * 所属班级pk
-     */
     @Column(name = "clazz_pk")
-    @ApiModelProperty(value = "所属班级pk")
+    @ApiModelProperty(value = "")
     @ColumnType(jdbcType = JdbcType.CHAR)
     private String clazzPk;
 
