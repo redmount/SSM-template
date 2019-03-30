@@ -30,10 +30,10 @@ public class ModelCommentGenerator extends MapperPlugin {
 
     public ModelCommentGenerator() {
         this.implementSerializableInteface = true;
-        this.modelFieldEnum = true;
+        this.modelFieldEnum = false;
         this.swaggerApiEnabled = true;
-        this.columnTypeEnabled = true;
-        this.setterMethodChainEnabled = true;
+        this.columnTypeEnabled = false;
+        this.setterMethodChainEnabled = false;
         this.lombokEnabled = true;
     }
 
