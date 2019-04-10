@@ -53,6 +53,7 @@
 1. 生成数据库说明文档
 1. 生成数据模型说明(调用形式)
 1. 生成基础数据模型js文件
+1. 整合异步定时Job功能(支持CRON表达式)
 
 # 1. 表设计规则
 本规范中表分为两种:一种是实体表,一种是关系表.
@@ -676,3 +677,10 @@ Path:   /class/schema
 baseModel考虑到可能有些数据由于某些原因不公开给前端,所以采用从"base.model"文件夹中进行读取.
 
 baseModel.js在生成后可以根据需要自行进行修改.
+
+## 7.2. 定时Job功能
+Job的主业务代码,定义在```job/```下,推荐实现```job.base.JobImpl```抽象类.
+
+在```configurer/ScheduledTaskConfigurer.java```中,将```Job```通过@Autowired注解注入到变量中.
+
+通过```CRON```表达式,启动定时任务.(可依据样例代码进行实现)
