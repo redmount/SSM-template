@@ -10,6 +10,5 @@
     <result column="clazz_pk" jdbcType="CHAR" property="clazzPk" />
     <result column="updated" jdbcType="TIMESTAMP" property="updated" />
     <result column="created" jdbcType="TIMESTAMP" property="created" />
-    <result column="deleted" jdbcType="BIT" property="deleted" />
   </resultMap>
 </mapper>

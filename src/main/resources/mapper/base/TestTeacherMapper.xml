@@ -5,9 +5,8 @@
     <!--
       WARNING - @mbg.generated
     -->
-    <result column="pk" jdbcType="CHAR" property="pk" />
+    <id column="pk" jdbcType="CHAR" property="pk" />
     <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="course" jdbcType="VARCHAR" property="course" />
     <result column="created" jdbcType="TIMESTAMP" property="created" />
     <result column="updated" jdbcType="TIMESTAMP" property="updated" />
     <result column="deleted" jdbcType="BIT" property="deleted" />

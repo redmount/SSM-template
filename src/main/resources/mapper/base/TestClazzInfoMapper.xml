@@ -5,9 +5,8 @@
     <!--
       WARNING - @mbg.generated
     -->
-    <result column="pk" jdbcType="CHAR" property="pk" />
-    <result column="created" jdbcType="TIMESTAMP" property="created" />
-    <result column="updated" jdbcType="TIMESTAMP" property="updated" />
-    <result column="detail" jdbcType="VARCHAR" property="detail" />
+    <id column="pk" jdbcType="CHAR" property="pk" />
+    <result column="class_pk" jdbcType="CHAR" property="classPk" />
+    <result column="img" jdbcType="LONGVARBINARY" property="img" />
   </resultMap>
 </mapper>
