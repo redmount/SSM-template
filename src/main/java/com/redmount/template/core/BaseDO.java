@@ -4,14 +4,15 @@ import com.alibaba.fastjson.annotation.JSONField;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Id;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author 朱峰
  * @date 2018年11月19日
  */
-public class BaseDO {
-
+public class BaseDO implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
     @ApiModelProperty("主键")
     private String pk;

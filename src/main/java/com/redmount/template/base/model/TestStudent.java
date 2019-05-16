@@ -8,6 +8,9 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import javax.persistence.*;
 import lombok.Data;
+import lombok.experimental.Accessors;
+import org.apache.ibatis.type.JdbcType;
+import tk.mybatis.mapper.annotation.ColumnType;
 
 /**
  * @author Mybatis Generator
@@ -15,12 +18,14 @@ import lombok.Data;
 @Table(name = "test_student")
 @ApiModel("TestStudent（）")
 @Data
+@Accessors(chain = true)
 @RelationData(baseDOTypeName = "TestStudent")
 public class TestStudent extends BaseDO implements Serializable {
     /**
      * 学生名称
      */
     @ApiModelProperty(value = "学生名称")
+    @ColumnType(jdbcType = JdbcType.VARCHAR)
     private String name;
 
     /**
@@ -28,6 +33,7 @@ public class TestStudent extends BaseDO implements Serializable {
      */
     @Column(name = "clazz_pk")
     @ApiModelProperty(value = "所属班级pk")
+    @ColumnType(jdbcType = JdbcType.CHAR)
     private String clazzPk;
 
     private static final long serialVersionUID = 1L;

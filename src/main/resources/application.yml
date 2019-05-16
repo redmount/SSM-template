@@ -36,4 +36,6 @@ logging:
               dao: DEBUG
             core:
               exception: DEBUG
-
+mybatis:
+  configuration:
+    cache-enabled: true
