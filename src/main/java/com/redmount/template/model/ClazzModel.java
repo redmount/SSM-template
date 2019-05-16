@@ -16,6 +16,7 @@ import java.util.List;
 @Data // 引入Lombok,使代码更简洁
 @RelationData(baseDOTypeName = "TestClazz") // 本类继承的DO类型
 @ApiModel("班级sdfasfdsfsadfsaf实体")
+@Accessors(chain = true)
 public class ClazzModel extends TestClazz {
     public static final String BaseDOTypeName="TestClazz";
 

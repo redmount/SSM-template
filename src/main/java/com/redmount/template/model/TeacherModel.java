@@ -5,11 +5,13 @@ import com.redmount.template.base.model.TestTeacher;
 import com.redmount.template.core.annotation.RelationData;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
 @Data
 @RelationData(baseDOTypeName = "TestTeacher")
+@Accessors(chain = true)
 public class TeacherModel extends TestTeacher {
     @RelationData(baseDOTypeName = "TestClazz", isManyToMany = true, relationDOTypeName = "RTestTeacherTTestClazz",foreignProperty = "clazzPk",mainProperty = "teacherPk")
     private List<ClazzModel> clazzes;
