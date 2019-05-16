@@ -2,7 +2,6 @@ package com.redmount.template.base.model;
 
 import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
-import com.redmount.template.core.annotation.Tombstoned;
 import com.redmount.template.core.annotation.Validate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -20,47 +19,16 @@ import tk.mybatis.mapper.annotation.ColumnType;
 @ApiModel("TestClazzInfo（）")
 @Data
 @Accessors(chain = true)
-@Tombstoned
 @RelationData(baseDOTypeName = "TestClazzInfo")
 public class TestClazzInfo extends BaseDO implements Serializable {
-    @ApiModelProperty(value = "")
-    @ColumnType(jdbcType = JdbcType.VARCHAR)
-    private String detail;
-
-    @Column(name = "clazz_pk")
+    @Column(name = "class_pk")
     @ApiModelProperty(value = "")
     @ColumnType(jdbcType = JdbcType.CHAR)
-    private String clazzPk;
+    private String classPk;
 
     @ApiModelProperty(value = "")
-    @ColumnType(jdbcType = JdbcType.BIT)
-    private Boolean deleted;
+    @ColumnType(jdbcType = JdbcType.LONGVARBINARY)
+    private byte[] img;
 
     private static final long serialVersionUID = 1L;
-
-    public enum FieldEnum {
-        PK("pk","pk"),
-		DETAIL("detail","detail"),
-		CLAZZ_PK("clazzPk","clazz_pk"),
-		CREATED("created","created"),
-		UPDATED("updated","updated"),
-		DELETED("deleted","deleted");
-
-        private String javaFieldName;
-
-        private String dbFieldName;
-
-        FieldEnum(String javaFieldName, String dbFieldName) {
-            this.javaFieldName = javaFieldName;
-            this.dbFieldName = dbFieldName;
-        }
-
-        public String javaFieldName() {
-            return javaFieldName;
-        }
-
-        public String dbFieldName() {
-            return dbFieldName;
-        }
-    }
 }

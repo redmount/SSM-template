@@ -31,29 +31,4 @@ public class TestTeacher extends BaseDOTombstoned implements Serializable {
     private String name;
 
     private static final long serialVersionUID = 1L;
-
-    public enum FieldEnum {
-        PK("pk","pk"),
-		NAME("name","name"),
-		CREATED("created","created"),
-		UPDATED("updated","updated"),
-		DELETED("deleted","deleted");
-
-        private String javaFieldName;
-
-        private String dbFieldName;
-
-        FieldEnum(String javaFieldName, String dbFieldName) {
-            this.javaFieldName = javaFieldName;
-            this.dbFieldName = dbFieldName;
-        }
-
-        public String javaFieldName() {
-            return javaFieldName;
-        }
-
-        public String dbFieldName() {
-            return dbFieldName;
-        }
-    }
 }

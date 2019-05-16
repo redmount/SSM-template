@@ -11,6 +11,6 @@
     <result column="updated" jdbcType="TIMESTAMP" property="updated" />
     <result column="created" jdbcType="TIMESTAMP" property="created" />
     <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
-    <result column="deleted" jdbcType="BIT" property="deleted" />
+    <result column="detail" jdbcType="LONGVARCHAR" property="detail" />
   </resultMap>
 </mapper>
