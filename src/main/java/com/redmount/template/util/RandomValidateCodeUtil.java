@@ -2,7 +2,7 @@ package com.redmount.template.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -72,8 +72,8 @@ public class RandomValidateCodeUtil {
             // 将内存中的图片通过流动形式输出到客户端
             ImageIO.write(image, "JPEG", baos);
             byte[] bytes = baos.toByteArray();
-            BASE64Encoder encoder = new BASE64Encoder();
-            base64 = encoder.encodeBuffer(bytes).trim();//转换成base64串
+            Base64 encoder = new Base64();
+            base64 = encoder.encodeToString(bytes).trim();//转换成base64串
             base64 = "data:image/jpeg;base64," + base64.replaceAll("\n", "").replaceAll("\r", "");//删除 \r\n
             model.initCode(randomString).setImgBase64(base64);
         } catch (Exception e) {
