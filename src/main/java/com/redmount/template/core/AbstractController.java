@@ -1,14 +1,10 @@
 package com.redmount.template.core;
 
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.redmount.template.core.exception.ServiceException;
-import com.redmount.template.model.ClazzModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 public abstract class AbstractController<T extends BaseDO> implements Controller<T> {
 
@@ -132,7 +128,7 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
         return ResultGenerator.genSuccessResult(service.saveAutomatic(model, false));
     }
 
-    protected void initService() {
+    private void initService() {
         if (service == null) {
             init();
         }

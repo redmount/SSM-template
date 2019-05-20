@@ -12,8 +12,8 @@ public class ResultProxy {
     /**
      * 取结果,并处理异常
      *
-     * @param result
-     * @return
+     * @param result 其他节点返回的结果
+     * @return 包装后的结果
      */
     public static Object getResult(Result result) {
         if (result.getCode() == ResultCode.SUCCESS.code()) {

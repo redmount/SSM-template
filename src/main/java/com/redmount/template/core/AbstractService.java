@@ -63,6 +63,8 @@ public abstract class AbstractService<T extends BaseDO> implements Service<T> {
         for (T model : updateList) {
             retList.add(this.save(model));
         }
+        mapper.insertList(insertList);
+        retList.addAll(insertList);
         return retList;
     }
 

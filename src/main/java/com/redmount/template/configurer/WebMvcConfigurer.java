@@ -135,7 +135,7 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
     /**
      * 解决跨域问题
      *
-     * @param registry
+     * @param registry 跨域注册器
      */
     @Override
     public void addCorsMappings(CorsRegistry registry) {

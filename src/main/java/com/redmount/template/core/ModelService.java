@@ -21,7 +21,7 @@ public interface ModelService<T> {
      *
      * @param model     原始实体
      * @param relations 关系数据
-     * @return
+     * @return 带关系的实体
      */
     T getAutomaticWithModel(T model, String relations);
 
@@ -30,7 +30,7 @@ public interface ModelService<T> {
      *
      * @param pageInfo  带分页的主表数据
      * @param relations 关系数据
-     * @return
+     * @return 带分页,带关系的列表
      */
     PageInfo listAutomaticWithRelations(PageInfo pageInfo, String relations);
 
@@ -55,16 +55,16 @@ public interface ModelService<T> {
     /**
      * 真实删除单条数据
      *
-     * @param pk
-     * @return
+     * @param pk PK
+     * @return 删除的条数
      */
     int delAutomaticByPk(String pk);
 
     /**
      * 按条件删除
      *
-     * @param condition
-     * @return
+     * @param condition 条件
+     * @return 删除的条数
      */
     int delByConditionAudomatic(String condition);
 

@@ -20,7 +20,6 @@ public class DemoJob extends AbstractJob {
     @PostConstruct
     public void init() {
         demoJob = this;
-        demoJob.service = this.service;
     }
 
     @Override

@@ -30,7 +30,7 @@ public class ApplicationStartupConfigurer implements ApplicationListener<Context
     /**
      * 将数据库中的sys_service_exception表中的业务异常信息取出,放在内存中.
      *
-     * @param contextRefreshedEvent
+     * @param contextRefreshedEvent 上下文刷新事件
      */
     private void loadServiceExceptions(ContextRefreshedEvent contextRefreshedEvent) {
         SysServiceExceptionDOBaseDao service = contextRefreshedEvent.getApplicationContext().getBean(SysServiceExceptionDOBaseDaoImpl.class);

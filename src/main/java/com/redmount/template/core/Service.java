@@ -58,13 +58,13 @@ public interface Service<T> {
      * @param fieldName 需要匹配的字段(数据库中的)
      * @param value 匹配值
      * @return 符合条件的单个对象,如果查询出多个对象,则抛出异常.
-     * @throws TooManyResultsException
+     * @throws TooManyResultsException 结果过多异常
      */
     T findBy(String fieldName, Object value) throws TooManyResultsException;
 
     /**
      * 通过多个ID查找//eg：ids -> “1,2,3,4”
-     * @param ids
+     * @param ids id列表
      * @return 符合条件的对象List
      */
     List<T> findByIds(String ids);

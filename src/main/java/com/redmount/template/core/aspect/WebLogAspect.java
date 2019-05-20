@@ -22,7 +22,7 @@ public class WebLogAspect {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    ThreadLocal<Long> startTime = new ThreadLocal<>();
+    private ThreadLocal<Long> startTime = new ThreadLocal<>();
 
     /**
      * 定义一个切入点.
@@ -44,6 +44,7 @@ public class WebLogAspect {
         logger.info("-----------------------请求开始" + startTime + "-----------------------");
         logger.info("WebLogAspect.doBefore()");
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        assert attributes != null;
         HttpServletRequest request = attributes.getRequest();
         logger.info("请求地址 : " + request.getRequestURL().toString());
         logger.info("请求方式 : " + request.getMethod());

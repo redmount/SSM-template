@@ -121,15 +121,15 @@ public class WebSocket {
         }
     }
 
-    public static synchronized int getOnlineCount() {
+    private static synchronized int getOnlineCount() {
         return onlineCount;
     }
 
-    public static synchronized void addOnlineCount() {
+    private static synchronized void addOnlineCount() {
         WebSocket.onlineCount++;
     }
 
-    public static synchronized void subOnlineCount() {
+    private static synchronized void subOnlineCount() {
         WebSocket.onlineCount--;
     }
 }

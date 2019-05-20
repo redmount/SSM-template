@@ -28,7 +28,7 @@ public interface Controller<T> {
      *
      * @param model 待修改的资源实体
      * @return 修改后的资源实体
-     * @Param pk 待更新的实体pk
+     * @param pk 待更新的实体pk
      */
     @ApiOperation(value="局部更新资源")
     Result modifyAutomatic(String pk, T model);
