@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ScheduledTaskConfigurer {
+public class JobConfigurer {
 
     @Autowired
     DemoJob job;
@@ -15,10 +15,10 @@ public class ScheduledTaskConfigurer {
     @Scheduled(cron = "0 0/1 * * * ?")
     @Async
     public void scheduled() {
-        String[] args = {"demo"};
+        String[] startArgs = {"demo Starting"};
+        String[] doArgs = {"demo Doing"};
+        String[] endArgs = {"demo Done"};
         job.setData("data");
-        job.beforeJob(args);
-        job.doJob(args);
-        job.afterJob(args);
+        job.runJob(startArgs, doArgs, endArgs);
     }
 }

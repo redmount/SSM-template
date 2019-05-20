@@ -1,15 +1,16 @@
 package com.redmount.template.job;
 
-import com.redmount.template.job.base.JobImpl;
+import com.redmount.template.job.base.AbstractJob;
 import com.redmount.template.service.ClazzService;
 import com.redmount.template.util.LoggerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 
 @Component
-public class DemoJob extends JobImpl {
+public class DemoJob extends AbstractJob {
 
     @Autowired
     ClazzService service;
@@ -24,17 +25,17 @@ public class DemoJob extends JobImpl {
 
     @Override
     public void beforeJob(String[] args) {
-        this.data = args[0];
-        LoggerUtil.info("beforeJob" + this.data.toString());
+        LoggerUtil.info("beforeJob:" + Arrays.toString(args));
     }
 
     @Override
     public void doJob(String[] args) {
-        LoggerUtil.info(service.listAutomaticWithoutRelations("","","","updated desc",1,5).toString());
+        LoggerUtil.info("doingJob:" + Arrays.toString(args));
+        LoggerUtil.info(service.listAutomaticWithoutRelations("", "", "", "updated desc", 1, 5).toString());
     }
 
     @Override
     public void afterJob(String[] args) {
-        LoggerUtil.info("afterJob" + this.data.toString());
+        LoggerUtil.info("afterJob: " + Arrays.toString(args));
     }
 }
