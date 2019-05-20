@@ -1,6 +1,5 @@
 package com.redmount.template.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
 
@@ -12,18 +11,22 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class RedisUtil {
 
-    @Autowired
-    private RedisTemplate redisTemplate;
+    private final RedisTemplate redisTemplate;
+
+    public RedisUtil(RedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
     /**
      * 写入缓存
-     * @param key
-     * @param value
-     * @return
+     * @param key key
+     * @param value value
+     * @return 是否正常存储
      */
     public boolean set(final String key, Object value) {
         boolean result = false;
         try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+            ValueOperations operations = redisTemplate.opsForValue();
             operations.set(key, value);
             result = true;
         } catch (Exception e) {

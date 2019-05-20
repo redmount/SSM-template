@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 public class MD5Utils {
 
@@ -23,10 +24,10 @@ public class MD5Utils {
     }
 
     /* 将data数组转换为16进制字符串 */
-    private static String convertToHexString(byte data[]) {
-        StringBuffer strBuffer = new StringBuffer();
-        for (int i = 0; i < data.length; i++) {
-            strBuffer.append(Integer.toHexString(0xff & data[i]));
+    private static String convertToHexString(byte[] data) {
+        StringBuilder strBuffer = new StringBuilder();
+        for (byte datum : data) {
+            strBuffer.append(Integer.toHexString(0xff & datum));
         }
         return strBuffer.toString();
     }
@@ -34,12 +35,12 @@ public class MD5Utils {
     private static byte[] md5sum(File file) {
         InputStream fis = null;
         byte[] buffer = new byte[1024];
-        int numRead = 0;
         MessageDigest md5;
         try {
             fis = new FileInputStream(file);
             md5 = MessageDigest.getInstance(ENCODING_ALGORITHM);
-            while ((numRead = fis.read(buffer)) > 0) {
+            int numRead;
+            while (0 < (numRead = fis.read(buffer))) {
                 md5.update(buffer, 0, numRead);
             }
             return md5.digest();
@@ -60,9 +61,9 @@ public class MD5Utils {
     /**
      * 获取字符串的MD5值
      */
-    public static String getMD5(String str) {
+    static String getMD5(String str) {
         if (str != null && str.length() > 0)
-            return new String(convertToHexString(md5sum(str.getBytes())));
+            return convertToHexString(Objects.requireNonNull(md5sum(str.getBytes())));
         else
             return null;
     }
@@ -71,9 +72,9 @@ public class MD5Utils {
      * 获取文件的MD5值
      */
     public static String getMD5(File file) {
-        if (file != null && file.exists())
-            return new String(convertToHexString(md5sum(file)));
-        else
+        if (file != null && file.exists()) {
+            return convertToHexString(Objects.requireNonNull(md5sum(file)));
+        } else
             return null;
     }
 }

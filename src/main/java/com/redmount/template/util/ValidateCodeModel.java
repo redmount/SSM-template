@@ -13,7 +13,7 @@ public class ValidateCodeModel {
 
     /**
      * 验证
-     * @return
+     * @return 是否符合验证
      */
     public Boolean isValidate() {
         if (StringUtils.isBlank(realCode)) {
@@ -36,7 +36,7 @@ public class ValidateCodeModel {
      * @param realCode 真实值
      * @return 加密后的验证码实体
      */
-    public ValidateCodeModel initCode(String realCode) {
+    ValidateCodeModel initCode(String realCode) {
         this.realCode = MD5Utils.getMD5(realCode);
         return this;
     }

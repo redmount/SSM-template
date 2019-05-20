@@ -1,48 +1,13 @@
 package com.redmount.template.util;
 
 import com.google.common.base.CaseFormat;
-import com.redmount.template.core.ProjectConstant;
 import com.redmount.template.core.exception.AuthorizationException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.URL;
-import java.util.List;
 
 public class NameUtil {
-    /**
-     * 小驼峰/大驼峰格式转为下划线格式
-     * adviserPk -> adviser_pk
-     *
-     * @param source
-     * @return
-     */
-    public static String getDBFieldName(String source) {
-        return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, source.replaceAll("Model", ""));
-    }
-
-    /**
-     * 取Mapper类的全名
-     *
-     * @param source
-     * @return
-     */
-    public static String getRepoClassName(String source) {
-        return ProjectConstant.MAPPER_PACKAGE + "." + source + "Mapper";
-    }
-
-    public static String getShortClassName(String fullClassName) {
-        return null;
-    }
-
-    public static List<String> getRetain(List<String>... strList) {
-        List<String> retList = strList[0];
-        for (List<String> currentList : strList) {
-            retList.retainAll(currentList);
-        }
-        return retList;
-    }
-
-    public static void validateConditionString(String condition) {
+    private static void validateConditionString(String condition) {
         // 单引号个数不匹配
         if (StringUtils.countMatches(condition, "'") % 2 != 0) {
             throw new AuthorizationException();
@@ -91,8 +56,8 @@ public class NameUtil {
     /**
      * "cn.fh.lightning" -> "cn/fh/lightning"
      *
-     * @param name
-     * @return
+     * @param name 包全名(包含'.'的)
+     * @return 路径全名(包含'/'的)
      */
     public static String dotToSplash(String name) {
         return name.replaceAll("\\.", "/");
@@ -108,18 +73,5 @@ public class NameUtil {
         }
 
         return name;
-    }
-
-    /**
-     * /application/home -> /home
-     *
-     * @param uri
-     * @return
-     */
-    public static String trimURI(String uri) {
-        String trimmed = uri.substring(1);
-        int splashIndex = trimmed.indexOf('/');
-
-        return trimmed.substring(splashIndex);
     }
 }

@@ -1,8 +1,6 @@
 package com.redmount.template.util;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.Enumeration;
 
 public class RequestUtil {
@@ -26,7 +24,8 @@ public class RequestUtil {
      * @return IP地址
      */
     public static String getIpAddress(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
+        String ip;
+        ip = request.getHeader("x-forwarded-for");
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
@@ -43,41 +42,10 @@ public class RequestUtil {
             ip = request.getRemoteAddr();
         }
         // 如果是多级代理，那么取第一个ip为客户端ip
-        if (ip != null && ip.indexOf(",") != -1) {
+        if (ip != null && ip.contains(",")) {
             ip = ip.substring(0, ip.indexOf(",")).trim();
         }
 
         return ip;
-    }
-
-    /**
-     * 将request中的Body数据以字符串形式取出
-     *
-     * @param request
-     * @return
-     */
-    public static String getBodyStringFromRequest(HttpServletRequest request) {
-
-        BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
-        try {
-            br = request.getReader();
-            String str;
-            while ((str = br.readLine()) != null) {
-                sb.append(str);
-            }
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (null != br) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return sb.toString();
     }
 }

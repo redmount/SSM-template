@@ -3,8 +3,6 @@ package com.redmount.template.util;
 import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.Keywords;
 import com.redmount.template.core.annotation.RelationData;
-
-import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,11 +13,11 @@ public class ReflectUtil {
 
     public static Field getRelationDataField(Class clazz, String baseDOName) {
         Field[] fields = clazz.getDeclaredFields();
-        Annotation annotation;
+        RelationData annotation;
         for (Field field : fields) {
             annotation = field.getAnnotation(RelationData.class);
             if (annotation != null) {
-                if (((RelationData) annotation).isRelation() && ((RelationData) annotation).baseDOTypeName().equals(baseDOName)) {
+                if (annotation.isRelation() && annotation.baseDOTypeName().equals(baseDOName)) {
                     return field;
                 }
             }
@@ -37,7 +35,7 @@ public class ReflectUtil {
                 return true;
             }
         }
-        /** 处理父类字段**/
+        // 处理父类字段
         Class<?> superClass = clazz.getSuperclass();
         if (superClass.equals(Object.class)) {
             return false;
@@ -61,7 +59,6 @@ public class ReflectUtil {
      * @param obj
      * @param toResult
      * @return
-     * @throws Exception 转换报错
      */
     public static <T> T cloneObj(Object obj, Class<T> toResult) {
         if (obj == null) {
@@ -79,7 +76,7 @@ public class ReflectUtil {
                     String getMethodName = "get" + firstLetter + field.getName().substring(1);
                     String setMethodName = "set" + firstLetter + field.getName().substring(1);
                     Method getMethod = obj.getClass().getMethod(getMethodName);   //从源对象获取get方法
-                    Method setMethod = toResult.getMethod(setMethodName, new Class[]{field.getType()}); //从目标对象获取set方法
+                    Method setMethod = toResult.getMethod(setMethodName, field.getType()); //从目标对象获取set方法
 
                     //如果get 和 set方法都从一个对象中获取会出现object is not an instance of declaring class这个错误
                     //like: User{name} People{name}
@@ -93,7 +90,7 @@ public class ReflectUtil {
                     //当然如果只是进行单独的对象复制，就不用担心会出现调用不属于本身的方法，也就不用区分对象get和set
 
                     Object value = getMethod.invoke(obj); // get 获取的是源对象的值
-                    setMethod.invoke(t, new Object[]{value}); // set 设置的是目标对象的值
+                    setMethod.invoke(t, value); // set 设置的是目标对象的值
                 }
             }
             return t;
@@ -112,7 +109,7 @@ public class ReflectUtil {
                 "java.lang.Short", "java.lang.Byte", "java.lang.Boolean", "java.lang.Char", "java.lang.String", "int",
                 "double", "long", "short", "byte", "boolean", "char", "float", "java.util.Date"};
         List<String> typeList = Arrays.asList(types);
-        return typeList.contains(field.getType().getName()) ? true : false;
+        return typeList.contains(field.getType().getName());
     }
 
     /**
@@ -128,17 +125,17 @@ public class ReflectUtil {
         List<Field> fieldList = new LinkedList<Field>();
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
-            /** 过滤静态属性**/
+            // 过滤静态属性
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            /** 过滤transient 关键字修饰的属性**/
+            // 过滤transient 关键字修饰的属性
             if (Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
             fieldList.add(field);
         }
-        /** 处理父类字段**/
+        // 处理父类字段
         Class<?> superClass = clazz.getSuperclass();
         if (superClass.equals(Object.class)) {
             return fieldList;
@@ -155,17 +152,17 @@ public class ReflectUtil {
         // List<Field> fieldList = new LinkedList<>();
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
-            /** 过滤静态属性**/
+            // 过滤静态属性
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            /** 过滤transient 关键字修饰的属性**/
+            // 过滤transient 关键字修饰的属性
             if (Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
             retList.add(field.getName());
         }
-        /** 处理父类字段**/
+        // 处理父类字段
         Class<?> superClass = clazz.getSuperclass();
         if (superClass.equals(Object.class)) {
             return retList;
@@ -196,11 +193,7 @@ public class ReflectUtil {
             Method getMethod = source.getClass().getDeclaredMethod(getMethodName);
             getMethod.setAccessible(true);
             value = getMethod.invoke(source); // get 获取的是源对象的值
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         } finally {
             return value;
@@ -213,12 +206,8 @@ public class ReflectUtil {
         try {
             Method setMethod = target.getClass().getDeclaredMethod(setMethodName);
             setMethod.setAccessible(true);
-            setMethod.invoke(target, new Object[]{value});
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+            setMethod.invoke(target, value);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }
@@ -231,8 +220,8 @@ public class ReflectUtil {
      * @param parameterTypes : 父类中的方法参数类型
      * @return 父类中的方法对象
      */
-    public static Method getDeclaredMethod(Object object, String methodName, Class<?>... parameterTypes) {
-        Method method = null;
+    private static Method getDeclaredMethod(Object object, String methodName, Class<?>... parameterTypes) {
+        Method method;
         for (Class<?> clazz = object.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
             try {
                 method = clazz.getDeclaredMethod(methodName, parameterTypes);
@@ -260,18 +249,13 @@ public class ReflectUtil {
         Method method = getDeclaredMethod(object, methodName, parameterTypes);
 
         //抑制Java对方法进行检查,主要是针对私有方法而言
+        assert method != null;
         method.setAccessible(true);
 
         try {
-            if (null != method) {
-                //调用object 的 method 所代表的方法，其方法的参数是 parameters
-                return method.invoke(object, parameters);
-            }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+            //调用object 的 method 所代表的方法，其方法的参数是 parameters
+            return method.invoke(object, parameters);
+        } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;
@@ -285,7 +269,7 @@ public class ReflectUtil {
      * @return 父类中的属性对象
      */
     public static Field getDeclaredField(Object object, String fieldName) {
-        Field field = null;
+        Field field;
         Class<?> clazz = object.getClass();
         for (; clazz != Object.class; clazz = clazz.getSuperclass()) {
             try {
@@ -310,13 +294,12 @@ public class ReflectUtil {
         //根据 对象和属性名通过反射 调用上面的方法获取 Field对象
         Field field = getDeclaredField(object, fieldName);
         //抑制Java对其的检查
+        assert field != null;
         field.setAccessible(true);
         try {
             //将 object 中 field 所代表的值 设置为 value
             field.set(object, value);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -333,6 +316,7 @@ public class ReflectUtil {
         //根据 对象和属性名通过反射 调用上面的方法获取 Field对象
         Field field = getDeclaredField(object, fieldName);
         //抑制Java对其的检查
+        assert field != null;
         field.setAccessible(true);
         try {
             //获取 object 中 field 所代表的属性值
@@ -371,11 +355,11 @@ public class ReflectUtil {
     public static <T extends BaseDO> List<Field> getKeywordsFields(Class<T> modelClass) {
         Field[] fields = modelClass.getDeclaredFields();
         List<Field> ret = new ArrayList<>();
-        Annotation keywordsAnnotation;
+        Keywords keywordsAnnotation;
         for (Field field : fields) {
             keywordsAnnotation = field.getAnnotation(Keywords.class);
             if (keywordsAnnotation != null) {
-                if (((Keywords) keywordsAnnotation).value()) {
+                if (keywordsAnnotation.value()) {
                     ret.add(field);
                 }
             }

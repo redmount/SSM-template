@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Token    生成/验证工具
@@ -31,7 +28,7 @@ public class JwtUtil {
         JwtUtil.key = key;
     }
 
-    public static String getKey() {
+    private static String getKey() {
         return key;
     }
 
@@ -42,7 +39,7 @@ public class JwtUtil {
         JwtUtil.expireTime = expireTime;
     }
 
-    public static Long getExpireTime() {
+    private static Long getExpireTime() {
         return expireTime;
     }
 
@@ -50,7 +47,7 @@ public class JwtUtil {
      * 用户登录成功后生成Jwt
      * 使用Hs256算法
      *
-     * @return
+     * @return 加密后的JWT文本
      */
     public static String createJWT(Object user) {
         //指定签名的时候使用的签名算法，也就是header那部分，jjwt已经将这部分内容封装好了。
@@ -63,7 +60,7 @@ public class JwtUtil {
         //创建payload的私有声明（根据特定的业务需要添加，如果要拿这个做验证，一般是需要和jwt的接收方提前沟通好验证方式的）
         Map<String, Object> claims = new HashMap<>();
         Object value;
-        for (Field field : ReflectUtil.getFieldList(user.getClass())) {
+        for (Field field : Objects.requireNonNull(ReflectUtil.getFieldList(user.getClass()))) {
             field.setAccessible(true);
             value = ReflectUtil.getFieldValue(user, field.getName());
             if (value != null) {
@@ -100,16 +97,15 @@ public class JwtUtil {
      * Token的解密
      *
      * @param token 加密后的token
-     * @return
+     * @return 解密后的用户信息
      */
     public static Claims parseJWT(String token) {
         //得到DefaultJwtParser
-        Claims claims = Jwts.parser()
+        return Jwts.parser()
                 //设置签名的秘钥
                 .setSigningKey(getKey())
                 //设置需要解析的jwt
                 .parseClaimsJws(token).getBody();
-        return claims;
     }
 
 
@@ -117,8 +113,8 @@ public class JwtUtil {
      * 校验token
      * 在这里可以使用官方的校验，我这里校验的是token中携带的密码于数据库一致的话就校验通过
      *
-     * @param token
-     * @return
+     * @param token token密文
+     * @return 此token是否合法
      */
     public static Boolean isVerify(String token) {
         if (StringUtils.isBlank(token)) {
@@ -140,7 +136,7 @@ public class JwtUtil {
     }
 
     public static Object getUserByToken(String token, Class userClass) {
-        Object user = null;
+        Object user;
         try {
             user = userClass.newInstance();
             Claims claims = Jwts.parser()
@@ -154,10 +150,7 @@ public class JwtUtil {
                     ReflectUtil.setFieldValue(user, field.getName(), claims.get(field.getName()));
                 }
             }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-            throw new AuthorizationException();
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             throw new AuthorizationException();
         }
