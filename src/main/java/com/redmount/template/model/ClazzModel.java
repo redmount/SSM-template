@@ -9,10 +9,12 @@ import com.redmount.template.core.annotation.RelationData;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data // 引入Lombok,使代码更简洁
 @RelationData(baseDOTypeName = "TestClazz") // 本类继承的DO类型
 @ApiModel("班级sdfasfdsfsadfsaf实体")

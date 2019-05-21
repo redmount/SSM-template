@@ -1,6 +1,6 @@
 package com.redmount.template.job;
 
-import com.redmount.template.job.base.AbstractJob;
+import com.redmount.template.core.AbstractJob;
 import com.redmount.template.service.ClazzService;
 import com.redmount.template.util.LoggerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ public class DemoJob extends AbstractJob {
     @Autowired
     ClazzService service;
 
-    public static DemoJob demoJob;
+    private static DemoJob demoJob;
 
     @PostConstruct
     public void init() {

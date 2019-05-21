@@ -1,4 +1,4 @@
-package com.redmount.template.job.base;
+package com.redmount.template.core;
 
 public interface Job {
     void beforeJob(String[] args);
