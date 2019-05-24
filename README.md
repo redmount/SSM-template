@@ -1,44 +1,38 @@
 ![Licence](https://img.shields.io/badge/licence-none-green.svg)
+<!-- TOC -->
 
+- [1. 简介](#1-简介)
+- [2. 表设计规则](#2-表设计规则)
+    - [2.1. 表名规则](#21-表名规则)
+    - [2.2. 字段名规则](#22-字段名规则)
+- [3. 实体创建规则](#3-实体创建规则)
+- [4. 基础功能介绍](#4-基础功能介绍)
+    - [4.1. 抽象Controller](#41-抽象controller)
+        - [4.1.1. 提供列表的分页/条件/关键字查询](#411-提供列表的分页条件关键字查询)
+        - [4.1.2. 根据pk查询单条实体](#412-根据pk查询单条实体)
+        - [4.1.3. 保存/修改实体](#413-保存修改实体)
+    - [4.2. 删除实体](#42-删除实体)
+- [5. 最佳实践](#5-最佳实践)
+    - [5.1. 准备阶段](#51-准备阶段)
+    - [5.2. 生成阶段](#52-生成阶段)
+    - [5.3. 编制Model阶段](#53-编制model阶段)
+    - [5.4. 创建通用Service.](#54-创建通用service)
+- [6. 代码样例](#6-代码样例)
+- [7. 测试用例](#7-测试用例)
+    - [7.1. 查询班级列表](#71-查询班级列表)
+    - [7.2. 按pk取单个班级实体](#72-按pk取单个班级实体)
+    - [7.3. 按pk删除班级](#73-按pk删除班级)
+    - [7.4. 按条件删除班级](#74-按条件删除班级)
+    - [7.5. 创建班级](#75-创建班级)
+    - [7.6. 强制创建/修改班级](#76-强制创建修改班级)
+    - [7.7. 局部修改班级](#77-局部修改班级)
+    - [7.8. 查看实体的全部结构及说明(仅在"dev"模式下生效)](#78-查看实体的全部结构及说明仅在dev模式下生效)
+- [8. 其他功能](#8-其他功能)
+    - [8.1. 生成数据库和js模型文档](#81-生成数据库和js模型文档)
+    - [8.2. 定时Job功能](#82-定时job功能)
 
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-
-<!-- code_chunk_output -->
-
-* [0. 简介](#0-简介)
-* [1. 表设计规则](#1-表设计规则)
-	* [1.1. 表名规则](#11-表名规则)
-	* [1.2. 字段名规则](#12-字段名规则)
-* [2. 实体创建规则](#2-实体创建规则)
-* [3. 基础功能介绍](#3-基础功能介绍)
-	* [3.1. 抽象Controller](#31-抽象controller)
-		* [3.1.1. 提供列表的分页/条件/关键字查询](#311-提供列表的分页条件关键字查询)
-		* [3.1.2. 根据pk查询单条实体](#312-根据pk查询单条实体)
-		* [3.1.3. 保存/修改实体](#313-保存修改实体)
-	* [3.1.3 删除实体](#313-删除实体)
-* [4. 最佳实践](#4-最佳实践)
-	* [4.1. 准备阶段](#41-准备阶段)
-	* [4.2. 生成阶段](#42-生成阶段)
-	* [4.3. 编制Model阶段](#43-编制model阶段)
-	* [4.4. 创建通用Service.](#44-创建通用service)
-* [5.代码样例](#5代码样例)
-* [6.测试用例](#6测试用例)
-	* [6.1. 查询班级列表](#61-查询班级列表)
-	* [6.2 按pk取单个班级实体](#62-按pk取单个班级实体)
-	* [6.3.按pk删除班级](#63按pk删除班级)
-	* [6.4.按条件删除班级](#64按条件删除班级)
-	* [6.5.创建班级](#65创建班级)
-	* [6.5.强制创建/修改班级](#65强制创建修改班级)
-	* [6.6.局部修改班级](#66局部修改班级)
-	* [6.7.查看实体的全部结构及说明(仅在"dev"模式下生效)](#67查看实体的全部结构及说明仅在dev模式下生效)
-* [7. 其他功能](#7-其他功能)
-	* [7.1. 生成数据库和js模型文档](#71-生成数据库和js模型文档)
-
-<!-- /code_chunk_output -->
-
-
-
-# 0. 简介
+<!-- /TOC -->
+# 1. 简介
 
 本项目继承自 https://github.com/lihengming/spring-boot-api-project-seed
 
@@ -57,7 +51,7 @@
 1. 生成基础数据模型js文件
 1. 整合异步定时Job功能(支持CRON表达式)
 
-# 1. 表设计规则
+# 2. 表设计规则
 本规范中表分为两种:一种是实体表,一种是关系表.
 
 实体表表现在最终的返回结果上,会把主键(pk)返回的,也就是具有业务意义的表.
@@ -87,17 +81,17 @@
             ]
 }
 ```
-## 1.1. 表名规则
+## 2.1. 表名规则
 > 表名全部采用小写+下划线的形式
-## 1.2. 字段名规则
+## 2.2. 字段名规则
 >	1. 字段名也采用小写字母+下划线的形式
 >	1. 主键名强制为"pk","CHAR"或"VARCHAR",36位长度.(在框架内部,将采用UUID.Random().toString()方法生成主键,此方法生成的主键带中间的减号,需要额外占用4个字符位置.)	
 	
-# 2. 实体创建规则
+# 3. 实体创建规则
 实体必须继承自一个DO实体(也就是生成的数据实体)
-# 3. 基础功能介绍
-## 3.1. 抽象Controller
-### 3.1.1. 提供列表的分页/条件/关键字查询
+# 4. 基础功能介绍
+## 4.1. 抽象Controller
+### 4.1.1. 提供列表的分页/条件/关键字查询
 请求全参数
 ```
 Method: GET
@@ -133,9 +127,9 @@ Path:   /class?page=1&size=10&keywords=班&condition=nickName like '%一班%'&re
 可以指定orderBy参数,指定按照主表的那个属性进行排序
 例: /class?orderBy=nickName desc
 ```
-### 3.1.2. 根据pk查询单条实体
+### 4.1.2. 根据pk查询单条实体
 与查询列表类似,区别仅在于没有page和size参数.返回的实体为单条实体.
-### 3.1.3. 保存/修改实体
+### 4.1.3. 保存/修改实体
 1. 强制创建实体
 使用POST方式会强制新建一个实体.
 新建实体的值完全传入的Body.
@@ -167,7 +161,7 @@ Path:   /class/{pk}
 Body:   {}
 ```
 
-## 3.1.3 删除实体
+## 4.2. 删除实体
 1. 按pk删除
 ```
 Method: DELETE
@@ -180,8 +174,8 @@ Method: DELETE
 Path:   /class?condition=nickName like '%一年%'
 ```
 
-# 4. 最佳实践
-## 4.1. 准备阶段
+# 5. 最佳实践
+## 5.1. 准备阶段
 1. 先将```src/test/resources/sys_service_exception.sql``` 执行到数据库中,创建业务异常表.
 1. 删除样例里面的 ```base```文件夹下的```controller```、```dao```、```model```、```service``` 文件夹里面的文件,**建议保留文件夹本身**.
 1. 按照数据库命名规则设计业务数据库.
@@ -212,7 +206,7 @@ Path:   /class?condition=nickName like '%一年%'
     |JDBC_PASSWORD|连接时使用的密码|root|
     |JDBC_DIVER_CLASS_NAME|连接时使用的数据库驱动|com.mysql.cj.jdbc.Driver|
 
-## 4.2. 生成阶段
+## 5.2. 生成阶段
 1. 数据库中执行```src/test/resources/ToolSql.sql```,以生成数据库中全部的表结构.
 其中```table_schema='test'```中的```test```需要替换为实际的数据库.
     ```sql
@@ -221,7 +215,7 @@ Path:   /class?condition=nickName like '%一年%'
     ```
 1. 把执行的结果复制出来,粘贴到src/test/CodeGenerator.java文件中的main函数中.
 1. 执行```src/test/CodeGenerator.java```文件中的```main```函数.
-## 4.3. 编制Model阶段
+## 5.3. 编制Model阶段
 1. 在```src/main/java/.../model(建议放在此文件夹)```中,新建业务需要的Model实体.
 1. 在实体上加上描述注解:
 
@@ -248,7 +242,7 @@ Path:   /class?condition=nickName like '%一年%'
     |从主实体视角看来的多对多关系|@RelationData(baseDOTypeName = "TestTeacher", isManyToMany = true, relationDOTypeName = "RTestTeacherTTestClazz", foreignProperty = "teacherPk", mainProperty = "clazzPk")| |
     |此实体作为其他的主实体时,中间的关联数据|@RelationData(baseDOTypeName = "RTestTeacherTTestClazz",isRelation = true)| |
     
-## 4.4. 创建通用Service.
+## 5.4. 创建通用Service.
 1. 在```src/service(建议放在此文件夹)```中,新建Service的接口.
     ``` java 
     public interface 实体服务名 extends ModelService<服务对应的实体Model>
@@ -261,7 +255,7 @@ Path:   /class?condition=nickName like '%一年%'
     ```
 1. 在```src/controller(建议放在此文件夹)```中新建controller,调用实体服务即可.
 
-# 5.代码样例
+# 6. 代码样例
 ```java
 // Model.java
 @Data // 引入Lombok,使代码更简洁
@@ -344,8 +338,8 @@ public class ClazzServiceImpl extends AbstractModelService<ClazzModel> implement
 }
 ```
 
-# 6.测试用例
-## 6.1. 查询班级列表
+# 7. 测试用例
+## 7.1. 查询班级列表
 带关系(学生列表,教师列表,班主任)
 请求
 ```
@@ -477,7 +471,7 @@ Path:   /class?relations=students,teachers,adviser
 }
 ```
 
-## 6.2 按pk取单个班级实体
+## 7.2. 按pk取单个班级实体
 带关系数据(学生列表,教师列表,班主任)
 请求
 ```
@@ -536,7 +530,7 @@ Path:   /class/c1?relations=students,teachers,adviser
     "message": "SUCCESS"
 }
 ```
-## 6.3.按pk删除班级
+## 7.3. 按pk删除班级
 请求
 ```
 Method: DELETE
@@ -550,7 +544,7 @@ Path:   /class/c1
     "message": "SUCCESS"
 }
 ```
-## 6.4.按条件删除班级
+## 7.4. 按条件删除班级
 请求
 ```
 Method: DELETE
@@ -564,7 +558,7 @@ Path:   /class?condition=name like '&一班&'
     "message": "SUCCESS"
 }
 ```
-## 6.5.创建班级
+## 7.5. 创建班级
 请求
 ```
 Method: POST
@@ -581,7 +575,7 @@ BODY:   {}
     "message": "SUCCESS"
 }
 ```
-## 6.5.强制创建/修改班级
+## 7.6. 强制创建/修改班级
 班级本身的null值也进行保存,不包含关系,但如果关系数据记录在班级表中,则也进行null的保存,会丢失关系,即保存实体的即为最终结果
 请求
 ```
@@ -599,7 +593,7 @@ BODY:   {}
     "message": "SUCCESS"
 }
 ```
-## 6.6.局部修改班级
+## 7.7. 局部修改班级
 null值不保存,无论是关系数据还是班级本身的属性,适用于对数据的修改.
 请求
 ```
@@ -617,7 +611,7 @@ BODY:   {}
     "message": "SUCCESS"
 }
 ```
-## 6.7.查看实体的全部结构及说明(仅在"dev"模式下生效)
+## 7.8. 查看实体的全部结构及说明(仅在"dev"模式下生效)
 请求
 ```
 Method: GET
@@ -669,8 +663,8 @@ Path:   /class/schema
     "message": "SUCCESS"
 }
 ```
-# 7. 其他功能
-## 7.1. 生成数据库和js模型文档
+# 8. 其他功能
+## 8.1. 生成数据库和js模型文档
 首先通过```CodeGenerator.java```中的```main()```方法生成基础的```baseModel.java```文件.
 运行```test/DocumentGenerator.java```中的```main()```方法,即可在根目录中生成/重写```数据库说明文档.md```和```baseModel.js```文件.
 
@@ -680,7 +674,7 @@ baseModel考虑到可能有些数据由于某些原因不公开给前端,所以�
 
 baseModel.js在生成后可以根据需要自行进行修改.
 
-## 7.2. 定时Job功能
+## 8.2. 定时Job功能
 Job的主业务代码,定义在```job/```下,推荐实现```job.base.JobImpl```抽象类.
 
 在```configurer/ScheduledTaskConfigurer.java```中,将```Job```通过@Autowired注解注入到变量中.
