@@ -1,9 +1,9 @@
 package com.redmount.template.configurer;
 
 import com.redmount.template.core.exception.ServiceException;
-import com.redmount.template.core.exception.SysServiceExceptionDO;
-import com.redmount.template.core.exception.SysServiceExceptionDOBaseDao;
-import com.redmount.template.core.exception.SysServiceExceptionDOBaseDaoImpl;
+import com.redmount.template.system.model.SysServiceException;
+import com.redmount.template.system.service.SysServiceExceptionBaseService;
+import com.redmount.template.system.service.impl.SysServiceExceptionBaseServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -33,9 +33,9 @@ public class ApplicationStartupConfigurer implements ApplicationListener<Context
      * @param contextRefreshedEvent 上下文刷新事件
      */
     private void loadServiceExceptions(ContextRefreshedEvent contextRefreshedEvent) {
-        SysServiceExceptionDOBaseDao service = contextRefreshedEvent.getApplicationContext().getBean(SysServiceExceptionDOBaseDaoImpl.class);
-        List<SysServiceExceptionDO> all = service.findAll();
-        for (SysServiceExceptionDO ex : all) {
+        SysServiceExceptionBaseService service = contextRefreshedEvent.getApplicationContext().getBean(SysServiceExceptionBaseServiceImpl.class);
+        List<SysServiceException> all = service.findAll();
+        for (SysServiceException ex : all) {
             ServiceException.ERROR_MAP.put(ex.getCode(), ex);
         }
     }

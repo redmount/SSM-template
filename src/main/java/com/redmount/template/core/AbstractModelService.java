@@ -7,7 +7,7 @@ import com.redmount.template.core.annotation.RelationData;
 import com.redmount.template.core.annotation.Tombstoned;
 import com.redmount.template.core.annotation.Validate;
 import com.redmount.template.core.exception.ServiceException;
-import com.redmount.template.core.exception.SysServiceExceptionDO;
+import com.redmount.template.system.model.SysServiceException;
 import com.redmount.template.util.NameUtil;
 import com.redmount.template.util.ReflectUtil;
 import io.swagger.annotations.ApiModel;
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
@@ -870,7 +869,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         String value = (String) ReflectUtil.getFieldValue(model, field.getName());
         assert value != null;
         if (validateAnnotation.stringMaxLength() < value.length()) {
-            SysServiceExceptionDO exceptionDO = new SysServiceExceptionDO();
+            SysServiceException exceptionDO = new SysServiceException();
             exceptionDO.setMessage("信息长度超过限制：" + validateAnnotation.stringMaxLength());
             exceptionDO.setCode(500);
             exceptionDO.setTitle("提交信息失败");

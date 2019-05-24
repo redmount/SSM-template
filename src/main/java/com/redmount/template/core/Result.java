@@ -1,7 +1,7 @@
 package com.redmount.template.core;
 
 import com.alibaba.fastjson.JSON;
-import com.redmount.template.core.exception.SysServiceExceptionDO;
+import com.redmount.template.system.model.SysServiceException;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
@@ -18,7 +18,7 @@ public class Result<T> {
     @ApiModelProperty("真正的返回结果")
     private T data;
     @ApiModelProperty("异常对象")
-    private SysServiceExceptionDO exception;
+    private SysServiceException exception;
 
     public static String fillResultString(Integer code, String message, Object data) {
         Result result = new Result();
@@ -28,12 +28,12 @@ public class Result<T> {
         return result.toString();
     }
 
-    public Result setException(SysServiceExceptionDO exception) {
+    public Result setException(SysServiceException exception) {
         this.exception = exception;
         return this;
     }
 
-    public SysServiceExceptionDO getException() {
+    public SysServiceException getException() {
         return this.exception;
     }
 

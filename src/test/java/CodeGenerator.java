@@ -65,7 +65,7 @@ public class CodeGenerator {
 
     public static void genCode(Map<String, Boolean> tombstonedTableMap) {
         for (String tableName : tombstonedTableMap.keySet()) {
-            if (!"sys_service_exception".equalsIgnoreCase(tableName)) {
+            if (!StringUtils.startsWithIgnoreCase(tableName, "sys_")) {
                 genCodeByCustomModelName(tableName, tableNameConvertUpperCamel(tableName), tombstonedTableMap.get(tableName));
             }
         }

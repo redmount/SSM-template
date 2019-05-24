@@ -1,4 +1,4 @@
-package com.redmount.template.core.exception;
+package com.redmount.template.system.model;
 
 import com.redmount.template.core.BaseDO;
 
@@ -9,7 +9,7 @@ import javax.persistence.*;
  * @date 2018年11月19日
  */
 @Table(name = "sys_service_exception")
-public class SysServiceExceptionDO extends BaseDO {
+public class SysServiceException extends BaseDO {
 
     private Integer code;
 

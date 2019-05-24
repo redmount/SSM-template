@@ -1,5 +1,6 @@
 package com.redmount.template.core.exception;
 
+import com.redmount.template.system.model.SysServiceException;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ import java.util.Map;
 @Service
 public class ServiceException extends RuntimeException {
     Logger logger = LoggerFactory.getLogger(ServiceException.class);
-    private SysServiceExceptionDO exception;
+    private SysServiceException exception;
 
     public ServiceException() {
     }
@@ -28,7 +29,7 @@ public class ServiceException extends RuntimeException {
         this.exception = ERROR_MAP.get(code);
     }
 
-    public ServiceException(SysServiceExceptionDO serviceExceptionDO) {
+    public ServiceException(SysServiceException serviceExceptionDO) {
         super("业务异常:" + serviceExceptionDO.getCode());
         this.exception = serviceExceptionDO;
     }
@@ -41,6 +42,6 @@ public class ServiceException extends RuntimeException {
         super(message, cause);
     }
 
-    public final static Map<Integer, SysServiceExceptionDO> ERROR_MAP = new HashMap<Integer, SysServiceExceptionDO>();
+    public final static Map<Integer, SysServiceException> ERROR_MAP = new HashMap<Integer, SysServiceException>();
 
 }

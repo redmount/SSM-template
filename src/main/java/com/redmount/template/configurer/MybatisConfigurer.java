@@ -52,7 +52,7 @@ public class MybatisConfigurer {
     public MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
         mapperScannerConfigurer.setSqlSessionFactoryBeanName("sqlSessionFactoryBean");
-        String[] strings = {ProjectConstant.MAPPER_PACKAGE, ProjectConstant.BASE_PACKAGE + "/core/exception", ProjectConstant.BASE_PACKAGE + "/repo"};
+        String[] strings = {ProjectConstant.MAPPER_PACKAGE, ProjectConstant.BASE_PACKAGE + "/system/repo", ProjectConstant.BASE_PACKAGE + "/repo"};
         mapperScannerConfigurer.setBasePackage(StringUtils.join(strings, ","));
         // 配置通用Mapper，详情请查阅官方文档
         Properties properties = new Properties();
