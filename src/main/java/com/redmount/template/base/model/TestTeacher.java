@@ -22,12 +22,23 @@ import lombok.experimental.Accessors;
 @Tombstoned
 @RelationData(baseDOTypeName = "TestTeacher")
 public class TestTeacher extends BaseDOTombstoned implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(value = "")
+    @Validate(nullable = false, stringMaxLength = 36)
+    private String pk;
 
     /**
      * 教师名称
      */
     @ApiModelProperty(value = "教师名称")
     private String name;
+
+    @ApiModelProperty(value = "")
+    private Date created;
+
+    @ApiModelProperty(value = "")
+    private Date updated;
 
     @ApiModelProperty(value = "")
     private Boolean deleted;

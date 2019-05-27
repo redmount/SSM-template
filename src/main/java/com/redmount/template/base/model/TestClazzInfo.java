@@ -19,6 +19,11 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @RelationData(baseDOTypeName = "TestClazzInfo")
 public class TestClazzInfo extends BaseDO implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(value = "")
+    @Validate(nullable = false, stringMaxLength = 36)
+    private String pk;
 
     @Column(name = "class_pk")
     @ApiModelProperty(value = "")

@@ -20,6 +20,11 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @RelationData(baseDOTypeName = "RTestTeacherTTestClazz")
 public class RTestTeacherTTestClazz extends BaseDO implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(value = "")
+    @Validate(nullable = false, stringMaxLength = 36)
+    private String pk;
 
     @Column(name = "teacher_pk")
     @ApiModelProperty(value = "")
@@ -34,6 +39,12 @@ public class RTestTeacherTTestClazz extends BaseDO implements Serializable {
 
     @ApiModelProperty(value = "")
     private Integer count;
+
+    @ApiModelProperty(value = "")
+    private Date created;
+
+    @ApiModelProperty(value = "")
+    private Date updated;
 
     private static final long serialVersionUID = 1L;
 }

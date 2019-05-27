@@ -17,7 +17,6 @@ import java.util.Date;
 @Accessors(chain = true)
 public class BaseDO implements Serializable {
     private static final long serialVersionUID = 1L;
-    @Id
     @ApiModelProperty("主键")
     private String pk;
 

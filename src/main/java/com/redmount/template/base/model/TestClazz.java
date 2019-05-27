@@ -20,6 +20,11 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @RelationData(baseDOTypeName = "TestClazz")
 public class TestClazz extends BaseDO implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(value = "")
+    @Validate(nullable = false, stringMaxLength = 36)
+    private String pk;
 
     /**
      * 班级名称
@@ -33,6 +38,12 @@ public class TestClazz extends BaseDO implements Serializable {
     @Column(name = "adviser_pk")
     @ApiModelProperty(value = "班主任pk")
     private String adviserPk;
+
+    @ApiModelProperty(value = "")
+    private Date updated;
+
+    @ApiModelProperty(value = "")
+    private Date created;
 
     @Column(name = "nick_name")
     @ApiModelProperty(value = "")
