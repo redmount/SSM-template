@@ -33,7 +33,7 @@ public class ApplicationStartupConfigurer implements ApplicationListener<Context
      * @param contextRefreshedEvent 上下文刷新事件
      */
     private void loadServiceExceptions(ContextRefreshedEvent contextRefreshedEvent) {
-        SysServiceExceptionBaseService service = contextRefreshedEvent.getApplicationContext().getBean(SysServiceExceptionBaseServiceImpl.class);
+        SysServiceExceptionBaseServiceImpl service = contextRefreshedEvent.getApplicationContext().getBean(SysServiceExceptionBaseServiceImpl.class);
         List<SysServiceException> all = service.findAll();
         for (SysServiceException ex : all) {
             ServiceException.ERROR_MAP.put(ex.getCode(), ex);

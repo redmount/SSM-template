@@ -7,11 +7,10 @@ import com.redmount.template.core.annotation.Validate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.apache.ibatis.type.JdbcType;
-import tk.mybatis.mapper.annotation.ColumnType;
 
 /**
  * @author Mybatis Generator
@@ -23,12 +22,15 @@ import tk.mybatis.mapper.annotation.ColumnType;
 @Tombstoned
 @RelationData(baseDOTypeName = "TestTeacher")
 public class TestTeacher extends BaseDOTombstoned implements Serializable {
+
     /**
      * 教师名称
      */
     @ApiModelProperty(value = "教师名称")
-    @ColumnType(jdbcType = JdbcType.VARCHAR)
     private String name;
+
+    @ApiModelProperty(value = "")
+    private Boolean deleted;
 
     private static final long serialVersionUID = 1L;
 }

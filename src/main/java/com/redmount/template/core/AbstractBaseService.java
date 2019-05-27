@@ -19,7 +19,7 @@ import java.util.UUID;
  * @author 朱峰
  * @date 2018年11月12日
  */
-public abstract class AbstractService<T extends BaseDO> implements Service<T> {
+public abstract class AbstractBaseService<T extends BaseDO> implements BaseService<T> {
 
     @Autowired
     protected Mapper<T> mapper;
@@ -29,7 +29,7 @@ public abstract class AbstractService<T extends BaseDO> implements Service<T> {
      */
     private Class<T> modelClass;
 
-    public AbstractService() {
+    public AbstractBaseService() {
         ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
         modelClass = (Class<T>) pt.getActualTypeArguments()[0];
     }

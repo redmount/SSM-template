@@ -6,11 +6,10 @@ import com.redmount.template.core.annotation.Validate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.apache.ibatis.type.JdbcType;
-import tk.mybatis.mapper.annotation.ColumnType;
 
 /**
  * @author Mybatis Generator
@@ -21,22 +20,19 @@ import tk.mybatis.mapper.annotation.ColumnType;
 @Accessors(chain = true)
 @RelationData(baseDOTypeName = "RTestTeacherTTestClazz")
 public class RTestTeacherTTestClazz extends BaseDO implements Serializable {
+
     @Column(name = "teacher_pk")
     @ApiModelProperty(value = "")
-    @ColumnType(jdbcType = JdbcType.CHAR)
     private String teacherPk;
 
     @Column(name = "clazz_pk")
     @ApiModelProperty(value = "")
-    @ColumnType(jdbcType = JdbcType.CHAR)
     private String clazzPk;
 
     @ApiModelProperty(value = "")
-    @ColumnType(jdbcType = JdbcType.VARCHAR)
     private String course;
 
     @ApiModelProperty(value = "")
-    @ColumnType(jdbcType = JdbcType.INTEGER)
     private Integer count;
 
     private static final long serialVersionUID = 1L;

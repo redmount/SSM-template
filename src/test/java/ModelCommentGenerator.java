@@ -33,7 +33,7 @@ public class ModelCommentGenerator extends MapperPlugin {
         this.modelFieldEnum = false;
         this.swaggerApiEnabled = true;
         this.columnTypeEnabled = false;
-        this.setterMethodChainEnabled = false;
+        this.setterMethodChainEnabled = true;
         this.lombokEnabled = true;
     }
 

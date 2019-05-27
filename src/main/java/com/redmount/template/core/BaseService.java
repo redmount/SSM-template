@@ -10,7 +10,7 @@ import java.util.List;
  * @author 朱峰
  * @date 2018年11月12日
  */
-public interface Service<T> {
+public interface BaseService<T> {
     /**
      * 持久化(忽略是否为新建对象)
      * @param model 需要存储的实体,不用区分是否是新建
