@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : localhost
+ Source Server         : redmount.cc
  Source Server Type    : MySQL
- Source Server Version : 80013
- Source Host           : localhost:3306
+ Source Server Version : 80016
+ Source Host           : api.redmount.cc:3306
  Source Schema         : test
 
  Target Server Type    : MySQL
- Target Server Version : 80013
+ Target Server Version : 80016
  File Encoding         : 65001
 
- Date: 03/01/2019 13:10:14
+ Date: 08/07/2019 16:10:39
 */
 
 SET NAMES utf8mb4;
@@ -35,12 +35,12 @@ CREATE TABLE `r_test_teacher_t_test_clazz`  (
 -- ----------------------------
 -- Records of r_test_teacher_t_test_clazz
 -- ----------------------------
-INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('27aa9828-95ff-41d5-be7a-c571207ba0b2', 't2', 'c1', '体育老师教的语文课', 1, '2018-12-30 03:07:41', NULL);
-INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('4', 't2', 'c2', '体育老师教的英语课', 0, NULL, NULL);
-INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('5', 't3', 'c2', '数学课', 210, NULL, NULL);
-INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('6', 't4', 'c2', '英语课', 310, NULL, NULL);
-INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('cd7f4ef3-4dce-44ed-8d86-d02e531b9ed9', 't1', 'c1', '语文课', 310, '2018-12-30 03:07:41', NULL);
-INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('e1a623a5-309a-472d-a204-c13592276f06', 't3', 'c1', '数学课', 210, '2018-12-30 03:07:41', NULL);
+INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('1', 't2', 'c1', '体育老师教的语文课', 1, '2018-12-30 03:07:41', NULL);
+INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('2', 't2', 'c2', '体育老师教的英语课', 0, NULL, NULL);
+INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('3', 't3', 'c2', '数学课', 210, NULL, NULL);
+INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('4', 't4', 'c2', '英语课', 310, NULL, NULL);
+INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('5', 't1', 'c1', '语文课', 310, '2018-12-30 03:07:41', NULL);
+INSERT INTO `r_test_teacher_t_test_clazz` VALUES ('6', 't3', 'c1', '数学课', 210, '2018-12-30 03:07:41', NULL);
 
 -- ----------------------------
 -- Table structure for sys_service_exception
@@ -74,15 +74,16 @@ CREATE TABLE `test_clazz`  (
   `updated` datetime(0) NULL DEFAULT NULL,
   `created` datetime(0) NULL DEFAULT NULL,
   `nick_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `detail` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   PRIMARY KEY (`pk`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of test_clazz
 -- ----------------------------
-INSERT INTO `test_clazz` VALUES ('c1', '班级1', 't1', '2018-12-30 03:07:41', '2018-12-25 15:03:47', '一年一班');
-INSERT INTO `test_clazz` VALUES ('c2', '班级2', 't4', '2018-12-25 15:03:43', '2018-12-25 15:03:47', '二年二班');
-INSERT INTO `test_clazz` VALUES ('c3', '班级3', '', '2018-12-24 10:21:05', '2018-12-24 10:20:37', '三年一班');
+INSERT INTO `test_clazz` VALUES ('c1', '班级1', 't1', '2018-12-30 03:07:41', '2018-12-25 15:03:47', '一年一班', NULL);
+INSERT INTO `test_clazz` VALUES ('c2', '班级2', 't4', '2018-12-25 15:03:43', '2018-12-25 15:03:47', '二年二班', NULL);
+INSERT INTO `test_clazz` VALUES ('c3', '班级3', '', '2018-12-24 10:21:05', '2018-12-24 10:20:37', '三年一班', NULL);
 
 -- ----------------------------
 -- Table structure for test_student
