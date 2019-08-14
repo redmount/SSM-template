@@ -4,6 +4,7 @@ import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.Keywords;
 import com.redmount.template.core.annotation.RelationData;
 import java.lang.reflect.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -107,7 +108,7 @@ public class ReflectUtil {
     public static boolean isWrapType(Field field) {
         String[] types = {"java.lang.Integer", "java.lang.Double", "java.lang.Float", "java.lang.Long",
                 "java.lang.Short", "java.lang.Byte", "java.lang.Boolean", "java.lang.Char", "java.lang.String", "int",
-                "double", "long", "short", "byte", "boolean", "char", "float", "java.util.Date"};
+                "double", "long", "short", "byte", "boolean", "char", "float", "java.util.Date", "java.math.BigDecimal"};
         List<String> typeList = Arrays.asList(types);
         return typeList.contains(field.getType().getName());
     }
