@@ -54,7 +54,7 @@ public class DocumentGenerator {
         StringBuilder sb = new StringBuilder();
         sb.append("/// Generated on " + DATE + line);
         sb.append(line);
-        sb.append("const baseModel = {" + line);
+        sb.append("export default {" + line);
         try {
             for (String className : classNameList) {
                 cls = Class.forName(className);
@@ -75,7 +75,6 @@ public class DocumentGenerator {
                 }
             }
             sb.append("}" + line);
-            sb.append("export default baseModel");
             File file = new File(PROJECT_PATH + "/baseModel.js");
             FileUtils.write(file, sb.toString());
         } catch (Exception ex) {
