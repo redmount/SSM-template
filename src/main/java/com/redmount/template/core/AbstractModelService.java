@@ -476,16 +476,29 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             BaseDO targetObject = null;
             try {
                 targetObject = (BaseDO) Class.forName(ProjectConstant.MODEL_PACKAGE + "." + currentFieldRelationDataAnnotation.baseDOTypeName()).newInstance();
+                targetObject = ReflectUtil.cloneObj(currentFeildValue, targetObject.getClass());
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
             // ReflectUtil.setFieldValue(targetObject, ProjectConstant.PRIMARY_KEY_FIELD_NAME, ReflectUtil.getFieldValue(currentFeildValue, ProjectConstant.PRIMARY_KEY_FIELD_NAME));
             assert targetObject != null;
-            targetObject.setPk((String) ReflectUtil.getFieldValue(currentFeildValue, ProjectConstant.PRIMARY_KEY_FIELD_NAME));
+            String pk = (String) ReflectUtil.getFieldValue(currentFeildValue, ProjectConstant.PRIMARY_KEY_FIELD_NAME);
+            boolean isNewPk = false;
+            if (StringUtils.isBlank(pk)) {
+                pk = UUID.randomUUID().toString();
+                isNewPk = true;
+            }
+            targetObject.setPk(pk);
             ReflectUtil.setFieldValue(targetObject, currentFieldRelationDataAnnotation.mainProperty(), model.getPk());
             // ReflectUtil.setFieldValue(targetObject, "updated", new Date());
             targetObject.setUpdated(new Date());
-            mapper.updateByPrimaryKeySelective(targetObject);
+            if (isNewPk) {
+                targetObject.setCreated(new Date());
+                mapper.insert(targetObject);
+            } else {
+
+                mapper.updateByPrimaryKeySelective(targetObject);
+            }
         }
         return model;
     }
