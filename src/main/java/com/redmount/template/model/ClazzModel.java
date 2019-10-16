@@ -37,7 +37,8 @@ public class ClazzModel extends TestClazz {
     @RelationData(baseDOClass = TestTeacher.class,
             baseDOMapperClass = TestTeacherMapper.class,
             isManyToMany = true, // 多对多关系,会到中间表(relationDOTypeName)中查询关系
-            relationDOTypeName = "RTestTeacherTTestClazz", // 关系表对应的DO类型
+            relationDOClass = RTestTeacherTTestClazz.class, // 关系表对应的DO类型
+            relationDOMapperClass = RTestTeacherTTestClazzMapper.class,
             foreignProperty = "teacherPk", // 从表的pk对应字段
             mainProperty = "clazzPk") // 主表的pk对应字段
     @ApiModelProperty("教师列表")

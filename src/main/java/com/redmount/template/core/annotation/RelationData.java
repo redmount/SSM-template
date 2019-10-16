@@ -11,15 +11,13 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RelationData {
-    // String baseDOTypeName() default "";
-
     Class baseDOClass() default Object.class;
 
     Class baseDOMapperClass() default Object.class;
 
-    String relationDOTypeName() default "";
-
     Class relationDOClass() default Object.class;
+
+    Class relationDOMapperClass() default Object.class;
 
     String mainProperty() default "";
 
