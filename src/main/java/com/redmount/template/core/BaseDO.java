@@ -3,7 +3,6 @@ package com.redmount.template.core;
 import com.alibaba.fastjson.annotation.JSONField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import javax.persistence.Id;
 import java.io.Serializable;
@@ -14,9 +13,9 @@ import java.util.Date;
  * @date 2018年11月19日
  */
 @Data
-@Accessors(chain = true)
 public class BaseDO implements Serializable {
     private static final long serialVersionUID = 1L;
+    @Id
     @ApiModelProperty("主键")
     private String pk;
 

@@ -143,7 +143,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         List<Object> results;
         PageInfo pageInfo = null;
         try {
-            mapper = (Mapper) sqlSession.getMapper(modelAnnotation.baseDOClass());
+            mapper = (Mapper) sqlSession.getMapper(modelAnnotation.baseDOMapperClass());
             Example example = new Condition(modelAnnotation.baseDOClass());
             Condition.Criteria criteriaKeywords = example.createCriteria();
             Condition.Criteria criteriaCondition = example.createCriteria();
@@ -573,7 +573,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         mapper.deleteByCondition(condition);
         Field relationDataField = null;
         try {
-            relationDataField = ReflectUtil.getRelationDataField(Class.forName(((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName()), currentFieldRelationDataAnnotation.relationDOTypeName());
+            relationDataField = ReflectUtil.getRelationDataField(Class.forName(((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName()), currentFieldRelationDataAnnotation.relationDOClass());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -646,7 +646,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             mapper = initMapperByMapperClass(fieldRelationDataAnnotation.baseDOMapperClass());
 
             result = mapper.selectByCondition(condition);
-            Field relationDataField = ReflectUtil.getRelationDataField(realSlaveDOClass, fieldRelationDataAnnotation.relationDOTypeName());
+            Field relationDataField = ReflectUtil.getRelationDataField(realSlaveDOClass, fieldRelationDataAnnotation.relationDOClass());
             if (relationDataField != null) {
                 result = fillRelationData(field, relationDataField, realSlaveDOClass, (List) relationResults, (List) result);
             }

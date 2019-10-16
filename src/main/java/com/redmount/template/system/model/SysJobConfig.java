@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Table(name = "sys_job_config")
 @Data
-@Accessors(chain = true)
+@Accessors(chain = false)
 public class SysJobConfig extends BaseDO {
     @Id
     private String pk;

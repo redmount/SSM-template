@@ -12,7 +12,7 @@ import java.util.Date;
  * @date 2018年11月19日
  */
 @Data
-@Accessors(chain = true)
+@Accessors(chain = false)
 @Table(name = "sys_service_exception")
 public class SysServiceException extends BaseDO {
 

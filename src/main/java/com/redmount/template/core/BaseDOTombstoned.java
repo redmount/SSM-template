@@ -6,7 +6,6 @@ import lombok.experimental.Accessors;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Accessors(chain = true)
 public class BaseDOTombstoned extends BaseDO {
     /**
      * 逻辑删除标记

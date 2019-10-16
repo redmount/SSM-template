@@ -1,15 +1,14 @@
 package com.redmount.template.base.model;
 
+import com.redmount.template.base.repo.TestClazzMapper;
 import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
 import com.redmount.template.core.annotation.Validate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
-import java.util.Date;
 import javax.persistence.*;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 /**
  * @author Mybatis Generator
@@ -17,15 +16,8 @@ import lombok.experimental.Accessors;
 @Table(name = "test_clazz")
 @ApiModel("TestClazz（）")
 @Data
-@Accessors(chain = true)
-@RelationData(baseDOTypeName = "TestClazz")
+@RelationData(baseDOClass = TestClazz.class, baseDOMapperClass = TestClazzMapper.class)
 public class TestClazz extends BaseDO implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(value = "")
-    @Validate(nullable = false, stringMaxLength = 36)
-    private String pk;
-
     /**
      * 班级名称
      */
@@ -38,12 +30,6 @@ public class TestClazz extends BaseDO implements Serializable {
     @Column(name = "adviser_pk")
     @ApiModelProperty(value = "班主任pk")
     private String adviserPk;
-
-    @ApiModelProperty(value = "")
-    private Date updated;
-
-    @ApiModelProperty(value = "")
-    private Date created;
 
     @Column(name = "nick_name")
     @ApiModelProperty(value = "")

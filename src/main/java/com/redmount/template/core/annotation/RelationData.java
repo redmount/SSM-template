@@ -19,6 +19,8 @@ public @interface RelationData {
 
     String relationDOTypeName() default "";
 
+    Class relationDOClass() default Object.class;
+
     String mainProperty() default "";
 
     String foreignProperty() default "";

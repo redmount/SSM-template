@@ -12,13 +12,13 @@ import java.util.List;
 
 public class ReflectUtil {
 
-    public static Field getRelationDataField(Class clazz, String baseDOName) {
+    public static Field getRelationDataField(Class clazz, Class baseDOClass) {
         Field[] fields = clazz.getDeclaredFields();
         RelationData annotation;
         for (Field field : fields) {
             annotation = field.getAnnotation(RelationData.class);
             if (annotation != null) {
-                if (annotation.isRelation() && annotation.baseDOTypeName().equals(baseDOName)) {
+                if (annotation.isRelation() && annotation.relationDOClass().equals(baseDOClass)) {
                     return field;
                 }
             }

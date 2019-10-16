@@ -33,7 +33,7 @@ public class ModelCommentGenerator extends MapperPlugin {
         this.modelFieldEnum = false;
         this.swaggerApiEnabled = true;
         this.columnTypeEnabled = false;
-        this.setterMethodChainEnabled = true;
+        this.setterMethodChainEnabled = false;
         this.lombokEnabled = true;
     }
 
@@ -99,7 +99,8 @@ public class ModelCommentGenerator extends MapperPlugin {
             }
         }
         topLevelClass.addImportedType(ProjectConstant.BASE_PACKAGE + ".core.annotation.RelationData");
-        topLevelClass.addAnnotation("@RelationData(baseDOTypeName = \"" + topLevelClass.getType().getShortName() + "\")");
+        topLevelClass.addImportedType(ProjectConstant.MAPPER_PACKAGE + "." + topLevelClass.getType().getShortName() + "Mapper");
+        topLevelClass.addAnnotation("@RelationData(baseDOClass = " + topLevelClass.getType().getShortName() + ".class, baseDOMapperClass = " + topLevelClass.getType().getShortName() + "Mapper.class)");
         topLevelClass.addJavaDocLine("/**");
         topLevelClass.addJavaDocLine(String.format(" * @author Mybatis Generator"));
         // topLevelClass.addJavaDocLine(" * @date " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
