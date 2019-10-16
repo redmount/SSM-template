@@ -7,6 +7,7 @@ import com.redmount.template.system.service.impl.SysServiceExceptionBaseServiceI
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
  * @author 朱峰
  * @date 2018年11月12日
  */
+@Configuration
 public class ApplicationStartupConfigurer implements ApplicationListener<ContextRefreshedEvent> {
     private final Logger logger = LoggerFactory.getLogger(ApplicationStartupConfigurer.class);
 
