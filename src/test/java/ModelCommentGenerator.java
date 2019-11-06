@@ -27,6 +27,8 @@ public class ModelCommentGenerator extends MapperPlugin {
     private boolean setterMethodChainEnabled;
     // lombok注解
     private boolean lombokEnabled;
+    // 是否开启Mybatis自身的二级缓存
+    private boolean cacheMapper;
 
     public ModelCommentGenerator() {
         this.implementSerializableInteface = true;
@@ -35,6 +37,7 @@ public class ModelCommentGenerator extends MapperPlugin {
         this.columnTypeEnabled = false;
         this.setterMethodChainEnabled = false;
         this.lombokEnabled = true;
+        this.cacheMapper = false;
     }
 
     public void setProperties(Properties properties) {
@@ -66,12 +69,19 @@ public class ModelCommentGenerator extends MapperPlugin {
         if (stringHasValue(lombokEnabled)) {
             this.lombokEnabled = Boolean.parseBoolean(lombokEnabled);
         }
+
+        String cacheMapper = this.properties.getProperty("cacheMapper");
+        if (stringHasValue(cacheMapper)) {
+            this.cacheMapper = Boolean.parseBoolean(cacheMapper);
+        }
     }
 
     public boolean clientGenerated(Interface interfaze, TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
         super.clientGenerated(interfaze, topLevelClass, introspectedTable);
-        interfaze.addAnnotation("@CacheNamespace");
-        interfaze.addImportedType(new FullyQualifiedJavaType("org.apache.ibatis.annotations.CacheNamespace"));
+        if (this.cacheMapper) {
+            interfaze.addAnnotation("@CacheNamespace");
+            interfaze.addImportedType(new FullyQualifiedJavaType("org.apache.ibatis.annotations.CacheNamespace"));
+        }
         return true;
     }
 
@@ -98,6 +108,7 @@ public class ModelCommentGenerator extends MapperPlugin {
                 topLevelClass.addAnnotation("@Tombstoned");
             }
         }
+        // 基础Model开启RelationData注解
         topLevelClass.addImportedType(ProjectConstant.BASE_PACKAGE + ".core.annotation.RelationData");
         topLevelClass.addImportedType(ProjectConstant.MAPPER_PACKAGE + "." + topLevelClass.getType().getShortName() + "Mapper");
         topLevelClass.addAnnotation("@RelationData(baseDOClass = " + topLevelClass.getType().getShortName() + ".class, baseDOMapperClass = " + topLevelClass.getType().getShortName() + "Mapper.class)");

@@ -3,7 +3,7 @@ package com.redmount.template.base.service.impl;
 import com.redmount.template.base.repo.RTestTeacherTTestClazzMapper;
 import com.redmount.template.base.model.RTestTeacherTTestClazz;
 import com.redmount.template.base.service.RTestTeacherTTestClazzBaseService;
-import com.redmount.template.core.AbstractBaseService;
+import com.redmount.template.core.AbstractModelService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,14 +11,11 @@ import javax.annotation.Resource;
 
 
 /**
- * Created by CodeGenerator on 2019/10/16.
+ * Created by CodeGenerator on 2019/11/06.
  * @author CodeGenerator
- * @date 2019/10/16
+ * @date 2019/11/06
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class RTestTeacherTTestClazzBaseServiceImpl extends AbstractBaseService<RTestTeacherTTestClazz> implements RTestTeacherTTestClazzBaseService {
-    @Resource
-    private RTestTeacherTTestClazzMapper rTestTeacherTTestClazzMapper;
-
+public class RTestTeacherTTestClazzBaseServiceImpl extends AbstractModelService<RTestTeacherTTestClazz> implements RTestTeacherTTestClazzBaseService {
 }

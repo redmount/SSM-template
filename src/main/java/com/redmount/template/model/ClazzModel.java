@@ -14,15 +14,15 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data // 引入Lombok,使代码更简洁
-@RelationData(baseDOClass = TestClazz.class, baseDOMapperClass = TestClazzMapper.class) // 本类继承的DO类型
+@RelationData(baseDOClass = TestClazz.class,
+        baseDOMapperClass = TestClazzMapper.class) // 本类继承的DO类型
 @ApiModel("班级实体")
-@Accessors(chain = false)
 public class ClazzModel extends TestClazz {
     public static final String BaseDOTypeName = "TestClazz";
 
     @RelationData(
-            baseDOClass = TestTeacher.class,
-            baseDOMapperClass = TestTeacherMapper.class,
+            baseDOClass = TestTeacher.class, // 实际关联的BaseModel的类型
+            baseDOMapperClass = TestTeacherMapper.class, // 实际
             foreignProperty = "adviserPk") // 一对一关系,从表的主键记录在主表中,记录的字段为 adviser_pk,对应到Java里的属性为adviserPk
     @ApiModelProperty("班主任")
     private TeacherModel adviser;

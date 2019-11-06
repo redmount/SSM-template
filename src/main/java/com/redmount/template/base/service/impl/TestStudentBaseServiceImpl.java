@@ -3,7 +3,7 @@ package com.redmount.template.base.service.impl;
 import com.redmount.template.base.repo.TestStudentMapper;
 import com.redmount.template.base.model.TestStudent;
 import com.redmount.template.base.service.TestStudentBaseService;
-import com.redmount.template.core.AbstractBaseService;
+import com.redmount.template.core.AbstractModelService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,14 +11,11 @@ import javax.annotation.Resource;
 
 
 /**
- * Created by CodeGenerator on 2019/10/16.
+ * Created by CodeGenerator on 2019/11/06.
  * @author CodeGenerator
- * @date 2019/10/16
+ * @date 2019/11/06
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class TestStudentBaseServiceImpl extends AbstractBaseService<TestStudent> implements TestStudentBaseService {
-    @Resource
-    private TestStudentMapper testStudentMapper;
-
+public class TestStudentBaseServiceImpl extends AbstractModelService<TestStudent> implements TestStudentBaseService {
 }

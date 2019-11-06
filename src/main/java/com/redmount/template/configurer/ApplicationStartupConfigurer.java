@@ -2,7 +2,6 @@ package com.redmount.template.configurer;
 
 import com.redmount.template.core.exception.ServiceException;
 import com.redmount.template.system.model.SysServiceException;
-import com.redmount.template.system.service.SysServiceExceptionBaseService;
 import com.redmount.template.system.service.impl.SysServiceExceptionBaseServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +19,6 @@ import java.util.List;
  */
 @Configuration
 public class ApplicationStartupConfigurer implements ApplicationListener<ContextRefreshedEvent> {
-    private final Logger logger = LoggerFactory.getLogger(ApplicationStartupConfigurer.class);
-
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         if (ServiceException.ERROR_MAP.size() == 0) {
