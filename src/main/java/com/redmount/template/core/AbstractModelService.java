@@ -253,14 +253,22 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         if (annotation == null) {
             throw new RuntimeException("没有找到" + modelClass.getName() + "对应的DO");
         }
+        mapper = initMapperByMapperClass(annotation.baseDOMapperClass());
         Condition delCondition = new Condition(annotation.baseDOMapperClass());
         delCondition.createCriteria().andCondition(getDBConditionString(condition));
         if (modelClass.isAnnotationPresent(Tombstoned.class)) {
-            BaseDOTombstoned example = new BaseDOTombstoned();
-            example.setDeleted(true);
-            return mapper.updateByConditionSelective(example, delCondition);
+            T model = null;
+            try {
+                model = modelClass.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            ReflectUtil.setFieldValue(model, ProjectConstant.TOMSTONED_FIELD, true);
+            return mapper.updateByConditionSelective(model, delCondition);
         }
-        mapper = initMapperByMapperClass(annotation.baseDOMapperClass());
+
         return mapper.deleteByCondition(delCondition);
     }
 
