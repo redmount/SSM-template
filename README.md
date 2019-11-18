@@ -6,18 +6,26 @@
     - [2.1. 表名规则](#21-表名规则)
     - [2.2. 字段名规则](#22-字段名规则)
 - [3. 实体创建规则](#3-实体创建规则)
+    - [3.1 实体分类](#31-实体分类)
+    - [3.2 基础实体规则](#32-基础实体规则)
+    - [3.3 复杂实体](#33-复杂实体)
+    - [3.4 自定义实体](#34-自定义实体)
 - [4. 基础功能介绍](#4-基础功能介绍)
     - [4.1. 抽象Controller](#41-抽象controller)
         - [4.1.1. 提供列表的分页/条件/关键字查询](#411-提供列表的分页条件关键字查询)
         - [4.1.2. 根据pk查询单条实体](#412-根据pk查询单条实体)
         - [4.1.3. 保存/修改实体](#413-保存修改实体)
-    - [4.2. 删除实体](#42-删除实体)
+        - [4.1.4. 删除实体](#414-删除实体)
 - [5. 最佳实践](#5-最佳实践)
     - [5.1. 准备阶段](#51-准备阶段)
     - [5.2. 生成阶段](#52-生成阶段)
     - [5.3. 编制Model阶段](#53-编制model阶段)
-    - [5.4. 创建通用Service.](#54-创建通用service)
+    - [5.4. 创建通用Service/ServiceImpl/Controller.](#54-创建通用serviceserviceimplcontroller)
 - [6. 代码样例](#6-代码样例)
+    - [6.1. *Model.java](#61-modeljava)
+    - [6.2. *Controller.java](#62-controllerjava)
+    - [6.3. *Service.java](#63-servicejava)
+    - [6.4. *ServiceImpl.java](#64-serviceimpljava)
 - [7. 测试用例](#7-测试用例)
     - [7.1. 查询班级列表](#71-查询班级列表)
     - [7.2. 按pk取单个班级实体](#72-按pk取单个班级实体)
@@ -27,17 +35,23 @@
     - [7.6. 强制创建/修改班级](#76-强制创建修改班级)
     - [7.7. 局部修改班级](#77-局部修改班级)
     - [7.8. 查看实体的全部结构及说明(仅在"dev"模式下生效)](#78-查看实体的全部结构及说明仅在dev模式下生效)
-- [8. 其他功能](#8-其他功能)
-    - [8.1. 生成数据库和js模型文档](#81-生成数据库和js模型文档)
-    - [8.2. 定时Job功能](#82-定时job功能)
+- [8. 异常的抛出](#8-异常的抛出)
+    - [8.1. 业务异常](#81-业务异常)
+        - [8.1.1. 业务异常表的结构](#811-业务异常表的结构)
+        - [8.1.2. 建议操作](#812-建议操作)
+    - [8.2 运行异常](#82-运行异常)
+    - [8.3 注意](#83-注意)
+- [9. 其他功能](#9-其他功能)
+    - [9.1. 生成数据库和js模型文档](#91-生成数据库和js模型文档)
+    - [9.2. 定时Job功能](#92-定时job功能)
 
 <!-- /TOC -->
 # 1. 简介
 
 本项目的宗旨:
 - 减少CRUD等重复性劳动
-- 统一接口格式
-- 
+- 以牺牲运行效率换取极快的开发效率
+- 统一接口格式(正常返回和异常返回)
 
 本项目继承自 https://github.com/lihengming/spring-boot-api-project-seed
 
@@ -62,7 +76,7 @@
 
 实体表表现在最终的返回结果上,会把主键(pk)返回的,也就是具有业务意义的表.
 
-例如: 班级、学生、老师等以及各种字典表.
+例如: 班级、学生、老师等以及各种字典表等.
 
 关系表的作用是记录两个实体之间有关系,以及他们之间是什么关系.
 
@@ -92,9 +106,56 @@
 ## 2.2. 字段名规则
 >	1. 字段名也采用小写字母+下划线的形式
 >	1. 主键名强制为"pk","CHAR"或"VARCHAR",36位长度.(在框架内部,将采用UUID.Random().toString()方法生成主键,此方法生成的主键带中间的减号,需要额外占用4个字符位置.)	
-	
+```
+原因:
+项目中实体/属性与表名/字段名的对应关系,就是驼峰形式与下划线形式的互相转换.
+如果表设计中不遵循此规则,可能会导致找不到表或者字段的情况,从而报错.
+```
+```
+补充: 名称转换使用的是com.google.common.base.CaseFormat进行转换
+```
+
 # 3. 实体创建规则
-实体必须继承自一个DO实体(也就是生成的数据实体)
+## 3.1 实体分类
+本规范中,实体分为三种
+- 基础实体(生成器生成的实体)
+```
+直接由实体生成器生成的(默认状态下生成至base.model包下).此实体与数据库表一一对应,并且都是平表的形式,不具有其他复杂属性.
+```
+- 复杂实体(自定义复杂实体)
+```
+由生成的实体继承而来,一般用于描述带有关系的实体.
+```
+- 规范外实体(不受框架管制的实体)
+```
+有开发者自定义,如果没有在类上标记"@RelationData"注解的,不受本框架影响,即一般实体.
+```
+
+
+## 3.2 基础实体规则
+基础实体是由代码生成器生成而来.默认情况下,存在于项目中的base.model包下.
+默认情况下会实现以下注解:
+```
+@RelationData   /// 本框架提供的数据查询引擎注解,用以确定查询的基类和基类Mapper
+@Data           /// Lombok注解,用以简化掉普通的setter/getter,使代码更简洁
+@ApiModel       /// Swagger注释注解,用以生成文档注释
+@Table          /// MyBatis使用,用以确定对应的表
+```
+
+## 3.3 复杂实体
+复杂实体必须继承自一个DO实体,并且标注RelationData注解,从而使框架能够找到对应的表和Mapper,从而进行进一步的操作.
+
+建议将复杂实体与基础实体分开存放,例如/model文件夹内
+
+例:
+```java
+@RelationData(baseDOClass = TestClazz.class, baseDOMapperClass = TestClazzMapper.class)
+public class ClazzModel extends TestClazz{}
+```
+
+## 3.4 自定义实体
+只要不标记"@RelationData"注解,框架将会对此实体忽略,不予管理.
+
 # 4. 基础功能介绍
 ## 4.1. 抽象Controller
 ### 4.1.1. 提供列表的分页/条件/关键字查询
@@ -166,8 +227,7 @@ Method: PATCH
 Path:   /class/{pk}
 Body:   {}
 ```
-
-## 4.2. 删除实体
+### 4.1.4. 删除实体
 1. 按pk删除
 ```
 Method: DELETE
@@ -183,14 +243,29 @@ Path:   /class?condition=nickName like '%一年%'
 # 5. 最佳实践
 ## 5.1. 准备阶段
 1. 先将```src/test/resources/sys_service_exception.sql``` 执行到数据库中,创建业务异常表.
+```
+    此步必须执行,否则项目启动会失败.
+    项目在启动之后,会加载所有的sys_service_exception表的数据至内存中,如果此表不存在或结构有变化,会导致异常退出.
+```
 1. 删除样例里面的 ```base```文件夹下的```controller```、```dao```、```model```、```service``` 文件夹里面的文件,**建议保留文件夹本身**.
 1. 按照数据库命名规则设计业务数据库.
 1. 修改src/main/java/com/redmount/template的名称,修改为对应的项目名称.(建议采用IntelliJ IDEA中的"Refector->Rename(Shift+F6)进行重命名.
+```
+    使用Rename功能会连带修改其他引用过此包的所有文件,降低修改的工作量.
+```
 1. 修改```src/core/aspect/WebLogAspect.java```文件中的切点位置(@Pointcut("(execution(public * com.redmount.template.controller.*.*(..))) || (execution(public * com.redmount.template.core.Controller.*(..)))")),将里面的切点改为您项目的Controller包下.
-1. 修改```src/main/java/.../core/ProjectConstant.java``` 里面的内容.
-   > 这里面的内容一旦修改好,尽量不要做调整,以避免各种麻烦.
+```
+    具体的表达式可参考 https://my.oschina.net/u/2474629/blog/1083448
+```
+1. 修改```src/main/java/.../core/ProjectConstant.java```里面的内容.
+
+
+    这里面的内容一旦修改好,尽量不要做调整,以避免各种麻烦.
+
+    可能出现的情况是再次生成成功之后,项目会瘫痪,报各种类找不到的错误
+
     除了BASE_PACKAGE外,其余值不建议修改.
-    
+
     其中生成的代码建议放在base文件夹下,以便维护.
 
     |常量名|作用|默认值|说明|
@@ -229,26 +304,31 @@ Path:   /class?condition=nickName like '%一年%'
 
 	| 注解 | 类型(默认值) | 作用 | 备注 |
 	|----|----|----|----|
-	|baseDOTypeName|必填字段|标明本类或属性对应的DO实体名称|对于标记在类上面的关系注解,该值就为所继承的类的名称(不含所在包)|
-    |relationDOTypeName|String("")|表示关系表的表名|当isManyToMany=true时生效|
-    |foreignProperty|String("")|表示在关联查询的时候,需要以哪个属性作为外键使用|当 isOneToMany=true或isManyToMany=true时,生效|
-    |mainProperty|""|表示在查询关系表时,主表的外键对应的属性|当isManyToMany=true时生效|
+	|baseDOClass|class(Object.class)|标明本类或属性对应的DO实体类|对于标记在类上面的关系注解,该值就为所继承的类|
+    |baseDOMapperClass|class(Object.class)|标明本类对应的DOMapper类|实体表的Mapper类|
+    |relationDOClass|class(Object.class)|表示关系表对应的类|isRelation=true时生效|
+    |relationDOMapperClass|class(Object.class)|标识关系表对应的DOMapper类|与relationDOClass同时出现|
+    |foreignProperty|String("")|表示在关联查询的时候,需要以哪个属性作为外键使用|存在于主表中的外键对应的属性名|
+    |mainProperty|String("")|表示在查询关系表时,主表的外键对应的属性|存在于子表中的主表主键属性名|
     |isOneToMany|boolean(false)|表示此关系字段是否是一对多的|此值为true时,需要指定"foreignProperty"|
-    |isManyToMany|boolean(false)|表示此字段是否是多对多的|此值为true时,需要指定"foreignProperty","mainProperty","relationDOTypeName"|
-    |isRelation|boolean(false)|表示此字段是否为多对多关系中的关系描述字段|此字段为true时,需要指定"baseDOTypeName",表示关系字段所在的DO类名|
+    |isManyToMany|boolean(false)|表示此字段是否是多对多的|此值为true时,需要指定"foreignProperty","mainProperty","relationDOClass","relationDOMapperClass"|
+    |isRelation|boolean(false)|表示此字段是否为多对多关系中的关系描述字段|此字段的类型一般都是关系表的实体|
 
-    @RelationData的组合情况
+    以上的解释相对准确,但难以理解.
+
+    以下列出常用的@RelationData的组合情况
     
-    | 情况 | 使用注解 |说明|
+    | 情况 | 使用注解 | 说明及举例 | 
     |-----|-----|---|
-    |主实体类对应的DO|@RelationData(baseDOTypeName = "TestClazz")| |
-    |从主实体视角看来的一对一关系(关系数据在主表中)|@RelationData(baseDOTypeName = "TestTeacher", foreignProperty = "adviserPk")| |
-    |从主实体视角看来的一对一关系(关系数据在子表中)|@RelationData(baseDOTypeName = "TestStudent", mainProperty = "clazzPk"| |
-    |从主实体视角看来的一对多关系|@RelationData(baseDOTypeName = "TestStudent", mainProperty = "clazzPk",isOneToMany = true)| |
-    |从主实体视角看来的多对多关系|@RelationData(baseDOTypeName = "TestTeacher", isManyToMany = true, relationDOTypeName = "RTestTeacherTTestClazz", foreignProperty = "teacherPk", mainProperty = "clazzPk")| |
-    |此实体作为其他的主实体时,中间的关联数据|@RelationData(baseDOTypeName = "RTestTeacherTTestClazz",isRelation = true)| |
+    |主实体类对应的DO|@RelationData(baseDOClass = TestClazz.class, <br/>baseDOMapperClass = TestClazzMapper.class)<br/>public class ClazzModel extends TestClazz{}| 1. 一个班级实体<br/>2. 此实体的类型为ClazzModel,继承自TestClazz<br/>3. 此实体对应的DO类型为TestClazz,<br/>4. 此实体对应的Mapper是TestClazzMapper |
+    |从主实体视角看来的一对一关系(关系数据在主表中)|@RelationData(baseDOClass = TestTeacher.class,<br/> baseDOMapperClass = TestTeacherMapper.class, <br/>foreignProperty = "adviserPk")<br/>private TestTeacher adviser;| 1. 定义一个班主任属性<br/>2. 类型为TestTeacher,属性名为adviser<br/>3. 该属性对应的DO实体是TestTeacher<br/>4. 对应的Mapper是TestTeacherMapper<br/>5. 班级表中存着班主任的pk,实体中的名称为"adviserPk" |
+    |从主实体视角看来的一对一关系(关系数据在子表中)| @RelationData(baseDOClass = TestClazzInfo.class, <br/>baseDOMapperClass = TestClazzInfoMapper.class, <br/>mainProperty = "clazzPk")<br/>private TestClazzInfo clazzInfo; | 1. 定义一个班级信息属性<br/>2. 类型为TestClazzInfo,属性名为clazzInfo<br/>3. 该属性对应的DO实体是TestClazzInfo<br/>4. 对应的Mapper是TestClazzInfoMapper<br/>5. 班级信息中存着班级的pk,实体中的名称为"clazzPk" |
+    |从主实体视角看来的一对多关系|@RelationData(baseDOClass = TestStudent.class,<br/> baseDOMapperClass = TestStudent.class, <br/>mainProperty = "clazzPk"<br/>private List<StudentModel> students;| 1. 定义一个学生列表属性<br/>2. 类型为List<StudentModel>,属性名为students<br/>3. 而StudentModel实际上是对应Student类,类型为Student<br/>4. 对应的Mapper是StudentMapper<br/>5. 在Student类中,存着班级的主键,储存的属性名为"clazzPk" |
+    |从主实体视角看来的多对多关系|@RelationData(baseDOClass = TestTeacher.class, <br/>baseDOMapperClass = TestTeacherMapper.class,<br/> isManyToMany = true, <br/>relationDOClass = RTestTeacherTTestClazz.class, <br/>relationDOMapperClass = RTestTeacherTTestClazzMapper.class,<br/> foreignProperty = "teacherPk",<br/> mainProperty = "clazzPk")<br/>private List<TeacherModel> teachers;| 1. 定义一个教师列表属性<br/>2. 类型为List<TeacherModel>,属性名为teachers<br/>3. 而TeacherModel对应的DO实体是TestTeacher,对应的Mapper是TestTeacherMapper<br/>4. 这个属性在数据库角度看来,是多对多的关系(一个教师可以与多个班级产生关系,一个班级也可以有多个教师)<br/>5. 维护两者关系的中间关系实体(关系表)为RTestTeacherTTestClazz,对应的Mapper是RTestTeacherTTestClazzMapper<br/>6. 关系表中,标识主实体(在此为班级)的属性为"clazzPk",标识子实体(在此为教师)的属性为"teacherPk" |
+    |此实体作为其他的主实体时,中间的关联数据|@RelationData(baseDOClass = RTestTeacherTTestClazz.class, <br/>baseDOMapperClass = RTestTeacherTTestClazzMapper.class, <br/>isRelation = true)<br/>private RTestTeacherTTestClazz courseCount;| 1. 定义一个关联数据的描述属性<br/>2. 类型为RTestTeacherTTestClazz,属性名为courseCount<br/>3. 该属性对应的DO实体是RTestTeacherTTestClazz<br/>4. 对应的Mapper是RTestTeacherTTestClazzMapper<br/>5. 标记这个属性是一个"关系"属性 |
     
-## 5.4. 创建通用Service.
+    以上即为常用的组合,初期使用时,可以根据实际情况拷贝响应的注解并做修改即可使用.
+## 5.4. 创建通用Service/ServiceImpl/Controller.
 1. 在```src/service(建议放在此文件夹)```中,新建Service的接口.
     ``` java 
     public interface 实体服务名 extends ModelService<服务对应的实体Model>
@@ -259,56 +339,99 @@ Path:   /class?condition=nickName like '%一年%'
         public class 实体服务实现类名 extends AbstractModelService<服务对应的实体Model> implements ClazzService {
         }
     ```
-1. 在```src/controller(建议放在此文件夹)```中新建controller,调用实体服务即可.
+1. 在```src/controller(建议放在此文件夹)```中新建controller.
+    ```java
+        @RequestMapping("/Mapping地址")
+        @RestController
+        @Api(description = "班级资源")
+        public class 实体Controller类名 extends AbstractController<服务对应的实体Model> {
+            @Autowired
+            实体服务名 service;
+            
+            // 固定动作,需要把Controller声明的service注入到AbstractController中
+            @Override
+            public void init() {
+                super.service = service;
+            }
+        }
+    ```
 
 # 6. 代码样例
+## 6.1. *Model.java
 ```java
-// Model.java
+//  ClazzModel.java
+
+@EqualsAndHashCode(callSuper = true)
 @Data // 引入Lombok,使代码更简洁
-@Accessors(chain = true)
-@RelationData(baseDOTypeName = "TestClazz") // 本类继承的DO类型
-@ApiModel("班级实体")
+@RelationData(baseDOClass = TestClazz.class, // 本类继承的DO类型
+        baseDOMapperClass = TestClazzMapper.class) // 本类所使用的Mapper类
+@ApiModel("班级实体") // Swagger注解
 public class ClazzModel extends TestClazz {
+    // 一对一关系,从表的主键记录在主表中
+    // 班级知道自己的班主任是谁,但教师并不知道自己是哪个班的班主任
+    @RelationData(
+            baseDOClass = TestTeacher.class, // 实际关联的DO的类型
+            baseDOMapperClass = TestTeacherMapper.class, // 实际应该调用的Mapper类
+            foreignProperty = "adviserPk") // 从表的pk对应字段,所谓从表,就是代表我当前正在写的这个属性所对应的表.我们现在写的是adviser属性,所以标识出Teacher的pk字段即为"FOREIGN"Property
+    @ApiModelProperty("班主任") // Swagger注解
+    private TeacherModel adviser; // 班主任属性
 
-    @RelationData(baseDOTypeName = "TestTeacher", // 这个属性对应的DO类型
-            foreignProperty = "adviserPk") // 一对一关系,从表的主键记录在主表中,记录的字段为 adviser_pk,对应到Java里的属性为adviserPk
-    @ApiModelProperty("班主任")
-    private TeacherModel adviser;
-
-    @RelationData(baseDOTypeName = "TestStudent", // 这个属性对应的DO类型
-            mainProperty = "clazzPk", // 在这个DO中,哪个属性代表本类的实体
-            isOneToMany = true) // 一对多关系,会查询出多条对象
-    @ApiModelProperty("学生列表")
-    private List<TestStudent> students;
-
-    @RelationData(baseDOTypeName = "TestTeacher", // 这个属性对应的DO类型
-            isManyToMany = true, // 多对多关系,会到中间表(relationDOTypeName)中查询关系
-            relationDOTypeName = "RTestTeacherTTestClazz", // 关系表对应的DO类型
-            foreignProperty = "teacherPk", // 从表的pk对应字段
-            mainProperty = "clazzPk") // 主表的pk对应字段
-    @ApiModelProperty("教师列表")
-    private List<TeacherModel> teachers;
-
-    @RelationData(baseDOTypeName = "RTestTeacherTTestClazz", // 关系数据对应的DO类型
-            isRelation = true) // 表示是关系数据
-    @ApiModelProperty("课程列表")
-    private RTestTeacherTTestClazz courseCount;
-
-    @RelationData(baseDOTypeName = "TestClazzInfo", // 这个属性对应的DO类型
+    // 一对一关系,主表的主键记录在从表中
+    // 班级信息知道自己属于哪个班级,但班级不知道自己的班级信息是谁
+    @RelationData(baseDOClass = TestClazzInfo.class, // 实际关联的DO的类型
+            baseDOMapperClass = TestClazzInfoMapper.class, // 实际应该调用的Mapper类
             mainProperty = "clazzPk") // 主表pk对应的字段
     @ApiModelProperty("班级信息")
     private TestClazzInfo info;
 
+    // 一对多关系,主表的主键记录在从表中
+    // 学生知道自己属于哪个班级,而班级不知道自己的学生都由哪些.
+    @RelationData(baseDOClass = TestStudent.class, // 实际关联的DO的类型
+            baseDOMapperClass = TestStudentMapper.class, // 实际应该调用的Mapper类
+            mainProperty = "clazzPk", // 在这个DO中,哪个属性代表本类的实体 // 在表结构中,每个学生都记录了自己属于哪个班级,字段为"clazz_pk",对应的Java属性名为"clazzPk"
+            isOneToMany = true) // 一对多关系,会查询出多条对象
+    @ApiModelProperty("学生列表") // Swagger注解
+    private List<TestStudent> students; // 学生列表属性
+
+    // 多对多关系,通过中间关系表来描述与是否存在关系
+    // 班级不知道自己有哪些老师,老师也不知道自己有哪些班级,但是中间表知道
+    @RelationData(baseDOClass = TestTeacher.class, // 实际关联的DO的类型
+            baseDOMapperClass = TestTeacherMapper.class, // 实际应该调用的Mapper类
+            isManyToMany = true, // 多对多关系,会到中间表(relationDOTypeName)中查询关系
+            relationDOClass = RTestTeacherTTestClazz.class, // 关系表对应的DO类型
+            relationDOMapperClass = RTestTeacherTTestClazzMapper.class, // 关系表对应的Mapper类
+            foreignProperty = "teacherPk", // 从表的pk对应字段,所谓从表,就是代表我当前正在写的这个属性所对应的表.我们现在写的是List<TeacherModel> teachers属性,所以标识出Teacher的pk字段即为"FOREIGN"Property
+            mainProperty = "clazzPk") // 主表的pk对应字段,所谓主表就是代表当前类的pk字段.我们现在正在写的是ClassModel,所以标识Class的pk的字段即为"MAIN"Property
+    @ApiModelProperty("教师列表") // Swagger注解
+    private List<TeacherModel> teachers; // 教师列表属性
+
+    // 关系描述数据
+    // 关系数据仅当别的表通过多对多带出本类实体时,才有意义.
+    // 比如当查询教师时,带出了这个老师所教学的班级列表,则在带出的每个班级中,会有此字段作为存储关系数据的容器出现.
+    // 单独查询班级时,这个属性始终为空
+    @RelationData(baseDOClass = RTestTeacherTTestClazz.class, // 实际关联的DO的类型
+            baseDOMapperClass = RTestTeacherTTestClazzMapper.class, // 实际应该调用的Mapper类
+            isRelation = true) // 表示是关系数据,此字段
+    @ApiModelProperty("课程列表")
+    private RTestTeacherTTestClazz courseCount; // 班级与教师描述数据
+
+    // @Keywords注解的应用
+    // @Keywords注解只能标注在String类型上,否在在查询时会报错
+    // @Keywords注解可以同时标注在多个字段上,此时,如果有任意一个标注@Keywords注解的值模糊匹配上了keywords参数,即认为满足查询条件.
+    // 例如,在此,name和nickName都标注了@Keywords注解,那么当输入的keywords参数为"班",则name模糊匹配上课"班"或者nickName模糊匹配上了"班",都会作为查询结果进行返回.
     @Keywords // 模糊查询生效的字段
     private String name;
 
-    @ApiModelProperty("学生数量")
-    private Integer studentsCount; // 没有标记,则此体系不掌管这个属性
-
     @Keywords // 模糊查询生效的字段
     private String nickName;
+
+    // 没有标记任何本框架下的注解,则本框架忽略不计,此属性可以作为正常属性正常使用.
+    @ApiModelProperty("学生数量")
+    private Integer studentsCount; // 没有标记,则此体系不掌管这个属性
 }
+
 ```
+## 6.2. *Controller.java
 ```java
 // Controller.java
 @RequestMapping("/class") // 此Controller对应的接口地址
@@ -327,6 +450,7 @@ public class ClazzController extends AbstractController<ClazzModel> {
     }
 }
 ```
+## 6.3. *Service.java
 ```java
 // Service.java
 // 自身的业务逻辑可在此文件中进行定义.
@@ -334,6 +458,7 @@ public interface ClazzService extends ModelService<ClazzModel> {
 
 }
 ```
+## 6.4. *ServiceImpl.java
 ```java
 // ServiceImpl.java
 // 继承自抽象Service,即拥有抽象Service提供的功能.
@@ -345,6 +470,20 @@ public class ClazzServiceImpl extends AbstractModelService<ClazzModel> implement
 ```
 
 # 7. 测试用例
+方法概览:
+
+| 需求 | 请求方式 |地址| 参数 | 效果 | 返回值 |
+|------|-------|--|------|-----|---|
+|取实体列表|GET|/model|relations (关系)<br/>condition (条件,仅对主表生效,where子句,小驼峰命名)<br/>keywords (关键字,多字段模糊匹配)<br/>page (取第几页)<br/>size (每页多少条)<br/>orderBy (orderBy子句,小驼峰命名,缺省值为"update desc")<br/>|取实体列表|带分页信息的列表|
+|按pk取单个实体|GET|/model/{pk}|relations|取单个实体|带关系的单个实体|
+|强制增加实体|POST|/model|{}|强制新建实体|写入后的实体|
+|增量修改实体|PATCH|/model/{pk}|{}|将传入的实体中,非null的字段更新到指定pk的实体中|更新后的结果|
+|新增或修改实体|PUT|/model|{}|如果传入的实体中有pk,则按照此pk进行更新(null值也会更新到数据库中)<br/>如果传入的实体中没有pk,则在库中新建实体|新增或修改后的实体|
+|按pk删除单个实体|DELETE|/model/{pk}||如果是逻辑删除表,则按pk进行逻辑删除<br/>如果不是逻辑删除表,则按pk物理删除该条记录|删除的条数|
+|按条件删除|DELETE|/model|condition (条件,仅对主表生效,where子句,小驼峰命名)|如果是逻辑删除表,则按条件进行逻辑删除<br/>如果不是逻辑删除表,则按条件物理删除该条记录|
+|取完整逻辑结构|GET|/model/schema|||带注释的完整实体结构|
+
+
 ## 7.1. 查询班级列表
 带关系(学生列表,教师列表,班主任)
 请求
@@ -669,8 +808,83 @@ Path:   /class/schema
     "message": "SUCCESS"
 }
 ```
-# 8. 其他功能
-## 8.1. 生成数据库和js模型文档
+# 8. 异常的抛出
+## 8.1. 业务异常
+### 8.1.1. 业务异常表的结构
+sys_service_exception 表
+|字段名|类型|说明|举例|
+|-----|----|----|---|
+|pk|char(36)|主键,无业务意义||
+|code|int|异常编码,抛出异常时的标志位,不允许重复,如果重复,则以后写入的数据为准|100001|
+|title|varchar(255)|业务异常的标题|登录失败|
+|message|varchar(255)|异常信息主体|用户名不存在|
+|reason|varchar(255)|造成异常的原因|您输入的用户名没有找到|
+|suggest|varchar(255)|建议操作|请重新输入用户名|
+
+### 8.1.2. 建议操作
+在处理请求的过程中,在任意位置都可以通过以下形式进行业务异常的抛出
+```java
+throw new ServiceException(100101);
+``` 
+调用方会得到以下样式的结果:
+```json
+{
+    "code": 412,
+    "exception": {
+        "code": 100001,
+        "message": "用户名不存在",
+        "pk": "100001",
+        "reason": "您输入的用户名没有找到",
+        "suggest": "请重新输入用户名",
+        "title": "登录失败"
+    },
+    "message": "登录失败"
+}
+```
+其中,所有的业务异常的code码,均为412,以便调用方进行判断.
+调用方得到的exception内的数据,即为```sys_service_exception``` 表中的内容.
+message字段中的内容默认为exception中的title.
+当代码中抛出的异常码在数据库中不存在时,message字段中的内容为"未知异常".此时,应检查异常表的数据和代码中的code两者是否对应上.
+
+## 8.2 运行异常
+运行异常时,会统一返回500状态,且会显示异常的概要,如下:
+```json
+{
+    "code": 500,
+    "data": null,
+    "message": "接口 [/test/ex] 内部错误：【/ by zero】，请联系管理员"
+}
+```
+特别的,当在dev运行模式下,data中还会携带具体的堆栈信息,如下:
+```json
+{
+    "code": 500,
+    "data": [
+        {
+            "className": "com.redmount.template.controller.TestController",
+            "fileName": "TestController.java",
+            "lineNumber": 44,
+            "methodName": "testException",
+            "nativeMethod": false
+        },
+        ......
+        {
+            "className": "java.lang.Thread",
+            "fileName": "Thread.java",
+            "lineNumber": 748,
+            "methodName": "run",
+            "nativeMethod": false
+        }
+    ],
+    "message": "接口 [/test/ex] 内部错误：【/ by zero】，请联系管理员"
+}
+```
+## 8.3 注意
+由于框架在最顶层已经抓住了所有的异常,在非特殊情况下,无须进行try...catch等操作.
+特殊情况指需要在发生异常的情况下进行进一步操作的时候,需要进行catch拦截.
+
+# 9. 其他功能
+## 9.1. 生成数据库和js模型文档
 首先通过```CodeGenerator.java```中的```main()```方法生成基础的```baseModel.java```文件.
 运行```test/DocumentGenerator.java```中的```main()```方法,即可在根目录中生成/重写```数据库说明文档.md```和```baseModel.js```文件.
 
@@ -680,7 +894,7 @@ baseModel考虑到可能有些数据由于某些原因不公开给前端,所以�
 
 baseModel.js在生成后可以根据需要自行进行修改.
 
-## 8.2. 定时Job功能
+## 9.2. 定时Job功能
 Job的主业务代码,定义在```job/```下,推荐实现```job.base.JobImpl```抽象类.
 
 在```configurer/ScheduledTaskConfigurer.java```中,将```Job```通过@Autowired注解注入到变量中.
