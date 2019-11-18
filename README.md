@@ -45,6 +45,8 @@
     - [9.2. 定时Job功能](#92-定时job功能)
     - [9.3. MyBatis二级缓存的开启](#93-mybatis二级缓存的开启)
     - [9.4. Token/JWT](#94-tokenjwt)
+    - [9.5. Swagger-UI](#95-swagger-ui)
+    - [9.6. 请求跟踪](#96-请求跟踪)
 - [99. 路线图](#99-路线图)
 
 <!-- /TOC -->
@@ -921,6 +923,15 @@ Job的主业务代码,定义在```job/```下,推荐实现```job.base.JobImpl```�
 标记此注解的方法,需要进行Token验证.
 
 签发Token的样例方法,在TestController.test()方法中,可以根据需求进行移植改造.
+
+## 9.5. Swagger-UI
+http://ip:port/swagger-ui.html
+
+## 9.6. 请求跟踪
+默认情况下,在Console中会打印出每次请求的请求方式/URL/QueryString/对应的处理方法名/SQL打印/请求耗时等.
+
+本功能通过AOP实现,主要实现逻辑在```core/aspect/WebLogAspect```中.
+
 
 # 99. 路线图
 1. ModelService的内部化,在ModelService提供更多的供后台自身调用的方法.
