@@ -72,7 +72,7 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
     }
 
     /**
-     * 按pk物理删除
+     * 按pk删除
      *
      * @param pk 实体pk
      * @return 删除了多少条(1或0, 1代表删除成功, 0代表没有删除成功)

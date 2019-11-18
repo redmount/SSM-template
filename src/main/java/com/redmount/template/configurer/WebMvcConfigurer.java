@@ -123,7 +123,9 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
                 } else {
                     message = e.toString();
                 }
-                result.setData(e.getStackTrace());
+                if ("dev".equals(env)) {
+                    result.setData(e.getStackTrace());
+                }
                 logger.error(message, e);
             }
             responseResult(response, result);

@@ -3,6 +3,7 @@ package com.redmount.template.controller;
 import com.redmount.template.core.Result;
 import com.redmount.template.core.ResultGenerator;
 import com.redmount.template.core.annotation.Token;
+import com.redmount.template.core.exception.ServiceException;
 import com.redmount.template.model.User;
 import com.redmount.template.service.ClazzService;
 import com.redmount.template.service.TestService;
@@ -38,8 +39,18 @@ public class TestController {
         return ResultGenerator.genSuccessResult(JwtUtil.createJWT(user));
     }
 
+    @GetMapping("/test/serviceException")
+    public Result testServiceException() {
+        throw new ServiceException(100001);
+    }
+
+    @GetMapping("/test/runtimeException")
+    public Result testRuntimeException() {
+        return ResultGenerator.genSuccessResult(1 / 0);
+    }
+
     @Token
-    @PostMapping("/test/test")
+    @PostMapping("/test/token")
     public Result validate(@RequestBody ValidateCodeModel model, @RequestHeader(value = "token", defaultValue = "") String token) {
         User user = (User) JwtUtil.getUserByToken(token, User.class);
         return ResultGenerator.genSuccessResult(user);
