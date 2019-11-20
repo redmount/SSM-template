@@ -654,6 +654,107 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return mainMap;
     }
 
+    @Override
+    public T save(T model) {
+        mapper = initMainMapper();
+        if (StringUtils.isBlank(model.getPk())) {
+            model.setPk(UUID.randomUUID().toString());
+            model.setCreated(new Date());
+            mapper.insertSelective(model);
+        } else {
+            model.setUpdated(new Date());
+            mapper.updateByPrimaryKeySelective(model);
+        }
+        return model;
+    }
+
+    @Override
+    public List<T> save(List<T> models) {
+        mapper = initMainMapper();
+        List<T> insertList = new ArrayList<>();
+        List<T> updateList = new ArrayList<>();
+        for (T item : models) {
+            if (StringUtils.isBlank(item.getPk())) {
+                item.setPk(UUID.randomUUID().toString());
+                insertList.add(item);
+            } else {
+                updateList.add(item);
+            }
+        }
+        List<T> retList = new ArrayList<>();
+        for (T model : updateList) {
+            retList.add(this.save(model));
+        }
+        mapper.insertList(insertList);
+        retList.addAll(insertList);
+        return retList;
+    }
+
+    @Override
+    public boolean deleteById(String id) {
+        mapper = initMainMapper();
+        mapper.deleteByPrimaryKey(id);
+        return true;
+    }
+
+    @Override
+    public boolean deleteByIds(String ids) {
+        mapper = initMainMapper();
+        mapper.deleteByIds(ids);
+        return true;
+    }
+
+    @Override
+    public T update(T model) {
+        mapper = initMainMapper();
+        mapper.updateByPrimaryKeySelective(model);
+        return model;
+    }
+
+    @Override
+    public T findById(String id) {
+        mapper = initMainMapper();
+        return (T) mapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public T findBy(String fieldName, Object value) throws TooManyResultsException {
+        mapper = initMainMapper();
+        try {
+            T model = modelClass.newInstance();
+            Field field = modelClass.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(model, value);
+            return (T) mapper.selectOne(model);
+        } catch (ReflectiveOperationException e) {
+            throw new ServiceException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<T> findByIds(String ids) {
+        mapper = initMainMapper();
+        return mapper.selectByIds(ids);
+    }
+
+    @Override
+    public List<T> findByCondition(Condition condition) {
+        mapper = initMainMapper();
+        return mapper.selectByCondition(condition);
+    }
+
+    @Override
+    public List<T> findAll() {
+        mapper = initMainMapper();
+        return mapper.selectAll();
+    }
+
+    @Override
+    public int deleteByCondition(Condition condition) {
+        mapper = initMainMapper();
+        return mapper.deleteByCondition(condition);
+    }
+
     /**
      * 生成List类型的实体注释实例
      *

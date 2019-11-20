@@ -1,6 +1,8 @@
 package com.redmount.template.system.model;
 
 import com.redmount.template.core.BaseDO;
+import com.redmount.template.core.annotation.RelationData;
+import com.redmount.template.system.repo.SysServiceExceptionMapper;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -12,12 +14,9 @@ import java.util.Date;
  * @date 2018年11月19日
  */
 @Data
-@Accessors(chain = false)
 @Table(name = "sys_service_exception")
+@RelationData(baseDOClass = SysServiceException.class, baseDOMapperClass = SysServiceExceptionMapper.class)
 public class SysServiceException extends BaseDO {
-
-    @Id
-    private String pk;
 
     private Integer code;
 
@@ -40,6 +39,4 @@ public class SysServiceException extends BaseDO {
      * 建议操作
      */
     private String suggest;
-    private Date created;
-    private Date updated;
 }

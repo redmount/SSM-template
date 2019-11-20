@@ -39,12 +39,12 @@ public class CodeGenerator {
 
     public static void main(String[] args) {
         List<String> tableNames = new ArrayList<>();
-//        tableNames.add("sys_service_exception");
+        tableNames.add("r_test_teacher_t_test_clazz");
+        tableNames.add("sys_service_exception");
         tableNames.add("test_clazz");
-        // tableNames.add("test_clazz_info");
+        tableNames.add("test_clazz_info");
         tableNames.add("test_student");
         tableNames.add("test_teacher");
-        tableNames.add("r_test_teacher_t_test_clazz");
         /// tableNames.add("sys_service_exception"); 这个的实体已经被定义在项目内部,不允许生成,否则会由于类名相同而无法启动.
         for (String tableName : tableNames) {
             if (!"sys_service_exception".equalsIgnoreCase(tableName)) {

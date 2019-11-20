@@ -1,8 +1,9 @@
 package com.redmount.template.base.model;
 
-import com.redmount.template.base.repo.TestClazzMapper;
+import com.redmount.template.base.repo.TestClazzInfoMapper;
 import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
+import com.redmount.template.core.annotation.Validate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -15,15 +16,17 @@ import lombok.Data;
 @Table(name = "test_clazz_info")
 @ApiModel("TestClazzInfo（）")
 @Data
-@RelationData(baseDOClass = TestClazzInfo.class, baseDOMapperClass = TestClazzMapper.class)
+@RelationData(baseDOClass = TestClazzInfo.class, baseDOMapperClass = TestClazzInfoMapper.class)
 public class TestClazzInfo extends BaseDO implements Serializable {
-
-    @Column(name = "class_pk")
+    @Column(name = "clazz_pk")
     @ApiModelProperty(value = "")
-    private String classPk;
+    private String clazzPk;
 
     @ApiModelProperty(value = "")
-    private byte[] img;
+    private String introduction;
+
+    @ApiModelProperty(value = "")
+    private String info;
 
     private static final long serialVersionUID = 1L;
 }

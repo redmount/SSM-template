@@ -1,6 +1,6 @@
 package com.redmount.template.system.service.impl;
 
-import com.redmount.template.core.AbstractBaseService;
+import com.redmount.template.core.AbstractModelService;
 import com.redmount.template.system.repo.SysServiceExceptionMapper;
 import com.redmount.template.system.model.SysServiceException;
 import com.redmount.template.system.service.SysServiceExceptionBaseService;
@@ -17,7 +17,7 @@ import javax.annotation.Resource;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class SysServiceExceptionBaseServiceImpl extends AbstractBaseService<SysServiceException> implements SysServiceExceptionBaseService {
+public class SysServiceExceptionBaseServiceImpl extends AbstractModelService<SysServiceException> implements SysServiceExceptionBaseService {
     @Resource
     private SysServiceExceptionMapper sysServiceExceptionMapper;
 
