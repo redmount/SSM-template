@@ -30,7 +30,7 @@ public class DemoJob extends AbstractJob {
     @Override
     public void doJob(String[] args) {
         LoggerUtil.info("doingJob:" + Arrays.toString(args));
-        LoggerUtil.info(service.listAutomaticWithoutRelations("", "", "", "updated desc", 1, 5).toString());
+        LoggerUtil.info(service.listAutomaticallyWithoutRelations("", "", "", "updated desc", 1, 5).toString());
     }
 
     @Override

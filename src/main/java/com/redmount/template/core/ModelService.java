@@ -16,7 +16,7 @@ public interface ModelService<T> {
      * @param relations 关系数据
      * @return 带关系数据的单个实体
      */
-    T getAutomatic(String pk, String relations);
+    T getAutomatically(String pk, String relations);
 
     /**
      * 给单个实体挂关系
@@ -25,16 +25,16 @@ public interface ModelService<T> {
      * @param relations 关系数据
      * @return 带关系的实体
      */
-    T getAutomaticWithModel(T model, String relations);
+    T getAutomaticallyWithModel(T model, String relations);
 
     /**
      * 取带关系的列表
      *
      * @param pageInfo  带分页的主表数据
      * @param relations 关系数据
-     * @return 带分页,带关系的列表
+     * @return 带分页, 带关系的列表
      */
-    PageInfo listAutomaticWithRelations(PageInfo pageInfo, String relations);
+    PageInfo listAutomaticallyWithRelations(PageInfo pageInfo, String relations);
 
     /**
      * 取符合条件的实体列表
@@ -44,7 +44,7 @@ public interface ModelService<T> {
      * @param orderBy   排序
      * @return 带关系数据的排序的实体列表
      */
-    PageInfo listAutomaticWithoutRelations(String keywords, String condition, String relations, String orderBy, int page, int size);
+    PageInfo listAutomaticallyWithoutRelations(String keywords, String condition, String relations, String orderBy, int page, int size);
 
     /**
      * 自动保存
@@ -52,7 +52,7 @@ public interface ModelService<T> {
      * @param model 需要保存的数据,目前的限制是只保存表现层中的两层,带关系数据的,保存关系数据.再往下就不管了.
      * @return 保存之后的结果
      */
-    T saveAutomatic(T model, boolean forceSaveNull);
+    T saveAutomatically(T model, boolean forceSaveNull);
 
     /**
      * 真实删除单条数据
@@ -60,7 +60,7 @@ public interface ModelService<T> {
      * @param pk PK
      * @return 删除的条数
      */
-    int delAutomaticByPk(String pk);
+    int delAutomaticallyByPk(String pk);
 
     /**
      * 按条件删除
@@ -68,7 +68,7 @@ public interface ModelService<T> {
      * @param condition 条件
      * @return 删除的条数
      */
-    int delByConditionAudomatic(String condition);
+    int delByConditionAutomatically(String condition);
 
     /**
      * 加载一对一关系数据

@@ -57,7 +57,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * 此方法以TestClazzModel作为说明.
      */
     @Override
-    public T getAutomatic(String pk, String relations) {
+    public T getAutomatically(String pk, String relations) {
         mapper = initMainMapper();
         if (mapper == null) {
             throw new RuntimeException(modelClass.getName() + "没有RelationData注解");
@@ -70,7 +70,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         if (StringUtils.isBlank(relations)) {
             return model;
         }
-        return getAutomaticWithModel(model, relations);
+        return getAutomaticallyWithModel(model, relations);
     }
 
     /**
@@ -81,7 +81,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @return 已经挂上关系的实体模型
      */
     @Override
-    public T getAutomaticWithModel(T model, String relations) {
+    public T getAutomaticallyWithModel(T model, String relations) {
         List<String> relationList = ReflectUtil.getFieldList(modelClass, relations);
         Field field;
         for (String relation : relationList) {
@@ -113,11 +113,11 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @return 带关系的实体列表
      */
     @Override
-    public PageInfo listAutomaticWithRelations(PageInfo pageInfo, String relations) {
+    public PageInfo listAutomaticallyWithRelations(PageInfo pageInfo, String relations) {
         List<Object> resultWithRelations = new ArrayList<>();
         List<T> list = pageInfo.getList();
         for (T item : list) {
-            resultWithRelations.add(getAutomaticWithModel(item, relations));
+            resultWithRelations.add(getAutomaticallyWithModel(item, relations));
         }
         pageInfo.setList(resultWithRelations);
         return pageInfo;
@@ -132,7 +132,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @return 带排序和条件的数据实体列表
      */
     @Override
-    public PageInfo listAutomaticWithoutRelations(String keywords, String condition, String relations, String orderBy, int page, int size) {
+    public PageInfo listAutomaticallyWithoutRelations(String keywords, String condition, String relations, String orderBy, int page, int size) {
         List<T> retList = new ArrayList<>();
         List<Field> fields = ReflectUtil.getKeywordsFields(modelClass);
         List<Object> results;
@@ -178,7 +178,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @return 保存之后的结果
      */
     @Override
-    public T saveAutomatic(T model, boolean forceSaveNull) {
+    public T saveAutomatically(T model, boolean forceSaveNull) {
         validateModelToSave(model);
         String mainPk = model.getPk();
         List<Field> relationFields;
@@ -229,7 +229,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @return 删除的条数
      */
     @Override
-    public int delAutomaticByPk(String pk) {
+    public int delAutomaticallyByPk(String pk) {
         mapper = initMapperByMapperClass(modelAnnotation.baseDOMapperClass());
         if (modelClass.isAnnotationPresent(Tombstoned.class)) {
             BaseDOTombstoned example = new BaseDOTombstoned();
@@ -248,7 +248,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      * @return 删除的条数
      */
     @Override
-    public int delByConditionAudomatic(String condition) {
+    public int delByConditionAutomatically(String condition) {
         RelationData annotation = modelClass.getAnnotation(RelationData.class);
         if (annotation == null) {
             throw new RuntimeException("没有找到" + modelClass.getName() + "对应的DO");

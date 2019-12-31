@@ -26,7 +26,7 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
     @Override
     public Result saveAutomatic(@RequestBody T model) {
         initService();
-        return ResultGenerator.genSuccessResult(service.saveAutomatic(model, true));
+        return ResultGenerator.genSuccessResult(service.saveAutomatically(model, true));
     }
 
     /**
@@ -50,9 +50,9 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
                                 @RequestParam(value = "page", defaultValue = "1") int page,
                                 @RequestParam(value = "size", defaultValue = "10") int size) {
         initService();
-        PageInfo pageInfo = service.listAutomaticWithoutRelations(keywords, condition, relations, orderBy, page, size);
+        PageInfo pageInfo = service.listAutomaticallyWithoutRelations(keywords, condition, relations, orderBy, page, size);
         if (StringUtils.isNotBlank(relations)) {
-            pageInfo = service.listAutomaticWithRelations(pageInfo, relations);
+            pageInfo = service.listAutomaticallyWithRelations(pageInfo, relations);
         }
         return ResultGenerator.genSuccessResult(pageInfo);
     }
@@ -68,7 +68,7 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
     @Override
     public Result getAutomatic(@PathVariable String pk, @RequestParam(defaultValue = "") String relations) {
         initService();
-        return ResultGenerator.genSuccessResult(service.getAutomatic(pk, relations));
+        return ResultGenerator.genSuccessResult(service.getAutomatically(pk, relations));
     }
 
     /**
@@ -81,7 +81,7 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
     @Override
     public Result delAutomatic(@PathVariable String pk) {
         initService();
-        return ResultGenerator.genSuccessResult(service.delAutomaticByPk(pk));
+        return ResultGenerator.genSuccessResult(service.delAutomaticallyByPk(pk));
     }
 
     /**
@@ -97,7 +97,7 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
             throw new ServiceException(999902);
         }
         initService();
-        return ResultGenerator.genSuccessResult(service.delByConditionAudomatic(condition));
+        return ResultGenerator.genSuccessResult(service.delByConditionAutomatically(condition));
     }
 
     /**
@@ -111,7 +111,7 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
     public Result addAutomatic(@RequestBody T model) {
         initService();
         model.setPk(null);
-        return ResultGenerator.genSuccessResult(service.saveAutomatic(model, false));
+        return ResultGenerator.genSuccessResult(service.saveAutomatically(model, false));
     }
 
     /**
@@ -125,7 +125,7 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
     public Result modifyAutomatic(@PathVariable("pk") String pk, @RequestBody T model) {
         initService();
         model.setPk(pk);
-        return ResultGenerator.genSuccessResult(service.saveAutomatic(model, false));
+        return ResultGenerator.genSuccessResult(service.saveAutomatically(model, false));
     }
 
     private void initService() {
