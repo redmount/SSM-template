@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Created by CodeGenerator on 2019/11/19.
-*/
+ * Created by CodeGenerator on 2020/02/20.
+ */
 @RestController
 @RequestMapping("/testStudent")
 public class TestStudentController extends AbstractController<TestStudent> {

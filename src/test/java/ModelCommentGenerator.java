@@ -37,7 +37,7 @@ public class ModelCommentGenerator extends MapperPlugin {
         this.columnTypeEnabled = false;
         this.setterMethodChainEnabled = false;
         this.lombokEnabled = true;
-        this.cacheMapper = false;
+        this.cacheMapper = true;
     }
 
     public void setProperties(Properties properties) {
@@ -113,7 +113,7 @@ public class ModelCommentGenerator extends MapperPlugin {
         topLevelClass.addImportedType(ProjectConstant.MAPPER_PACKAGE + "." + topLevelClass.getType().getShortName() + "Mapper");
         topLevelClass.addAnnotation("@RelationData(baseDOClass = " + topLevelClass.getType().getShortName() + ".class, baseDOMapperClass = " + topLevelClass.getType().getShortName() + "Mapper.class)");
         topLevelClass.addJavaDocLine("/**");
-        topLevelClass.addJavaDocLine(String.format(" * @author Mybatis Generator"));
+        topLevelClass.addJavaDocLine(" * @author Mybatis Generator");
         // topLevelClass.addJavaDocLine(" * @date " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         topLevelClass.addJavaDocLine(" */");
         return true;
@@ -154,11 +154,12 @@ public class ModelCommentGenerator extends MapperPlugin {
     }
 
     @Override
-    public boolean modelGetterMethodGenerated(Method method, TopLevelClass topLevelClass, IntrospectedColumn introspectedColumn, IntrospectedTable introspectedTable, ModelClassType modelClassType) {
-        if (lombokEnabled) {
-            return false;
-        }
-        return true;
+    public boolean modelGetterMethodGenerated(Method method,
+                                              TopLevelClass topLevelClass,
+                                              IntrospectedColumn introspectedColumn,
+                                              IntrospectedTable introspectedTable,
+                                              ModelClassType modelClassType) {
+        return !lombokEnabled;
     }
 
     private void impSerializableInterface(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
@@ -179,7 +180,7 @@ public class ModelCommentGenerator extends MapperPlugin {
     }
 
     private void swaggerApiAnnotation(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
-        Iterator i$ = null;
+        Iterator i$;
         if (this.swaggerApiEnabled) {
             String apiModel = "io.swagger.annotations.ApiModel";
             String apiModelProperty = "io.swagger.annotations.ApiModelProperty";
@@ -331,7 +332,7 @@ public class ModelCommentGenerator extends MapperPlugin {
 
     public String getDelimiterName(String name) {
         if (name.indexOf(".") > 0) {
-            name = name.substring(name.indexOf(".") + 1, name.length());
+            name = name.substring(name.indexOf(".") + 1);
         }
         String beginningDelimiter = this.properties.getProperty("beginningDelimiter");
         String endingDelimiter = this.properties.getProperty("endingDelimiter");
