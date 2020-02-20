@@ -16,7 +16,7 @@ import static org.mybatis.generator.internal.util.StringUtility.stringHasValue;
 public class ModelCommentGenerator extends MapperPlugin {
 
     // 可序列化实体
-    private boolean implementSerializableInteface;
+    private boolean implementSerializableInterface;
     // 字段生成枚举值
     private boolean modelFieldEnum;
     // swagger注解
@@ -31,7 +31,7 @@ public class ModelCommentGenerator extends MapperPlugin {
     private boolean cacheMapper;
 
     public ModelCommentGenerator() {
-        this.implementSerializableInteface = true;
+        this.implementSerializableInterface = true;
         this.modelFieldEnum = false;
         this.swaggerApiEnabled = true;
         this.columnTypeEnabled = false;
@@ -44,7 +44,7 @@ public class ModelCommentGenerator extends MapperPlugin {
         super.setProperties(properties);
         String sImplementSerializableInteface = this.properties.getProperty("implementSerializableInteface");
         if (stringHasValue(sImplementSerializableInteface)) {
-            this.implementSerializableInteface = Boolean.parseBoolean(sImplementSerializableInteface);
+            this.implementSerializableInterface = Boolean.parseBoolean(sImplementSerializableInteface);
         }
 
         String sModelFieldEnum = this.properties.getProperty("modelFieldEnum");
@@ -162,7 +162,7 @@ public class ModelCommentGenerator extends MapperPlugin {
     }
 
     private void impSerializableInterface(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
-        if (this.implementSerializableInteface) {
+        if (this.implementSerializableInterface) {
             String serializable = "java.io.Serializable";
             topLevelClass.addImportedType(serializable);
             FullyQualifiedJavaType superInterface = new FullyQualifiedJavaType(serializable);
