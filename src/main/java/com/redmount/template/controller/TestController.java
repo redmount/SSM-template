@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.UUID;
 
 /**
  * @author 朱峰
@@ -32,8 +33,8 @@ public class TestController {
     @GetMapping("/test/test")
     public Result test() {
         User user = new User();
-        user.setId(10);
-        user.setPassword("abc");
+        user.setPk(UUID.randomUUID().toString());
+//        user.setPassword("abc");
         user.setUserName("username");
         user.setPk("pk");
         return ResultGenerator.genSuccessResult(JwtUtil.createJWT(user));

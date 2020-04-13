@@ -136,6 +136,9 @@ public class JwtUtil {
     }
 
     public static Object getUserByToken(String token, Class userClass) {
+        if (StringUtils.isBlank(token)) {
+            throw new AuthorizationException();
+        }
         Object user;
         try {
             user = userClass.newInstance();

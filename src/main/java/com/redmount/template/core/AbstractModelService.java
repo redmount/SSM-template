@@ -58,6 +58,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
      */
     @Override
     public T getAutomatically(String pk, String relations) {
+        if (StringUtils.isBlank(pk)) {
+            return null;
+        }
         mapper = initMainMapper();
         if (mapper == null) {
             throw new RuntimeException(modelClass.getName() + "没有RelationData注解");
@@ -157,7 +160,10 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             if (modelClass.isAnnotationPresent(Tombstoned.class)) {
                 example.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
             }
-            example.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));
+            if (StringUtils.isNotBlank(orderBy)) {
+                example.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));
+            }
+
             PageHelper.startPage(page, size);
             results = mapper.selectByCondition(example);
             pageInfo = new PageInfo(results);
@@ -674,8 +680,10 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         List<T> insertList = new ArrayList<>();
         List<T> updateList = new ArrayList<>();
         for (T item : models) {
+            item.setUpdated(new Date());
             if (StringUtils.isBlank(item.getPk())) {
                 item.setPk(UUID.randomUUID().toString());
+                // todo:如果有逻辑删除时, 需要增加逻辑删除的默认值
                 insertList.add(item);
             } else {
                 updateList.add(item);
@@ -707,6 +715,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     @Override
     public T update(T model) {
         mapper = initMainMapper();
+        model.setUpdated(new Date());
         mapper.updateByPrimaryKeySelective(model);
         return model;
     }
