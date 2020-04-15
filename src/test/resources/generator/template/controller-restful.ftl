@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("${baseRequestMapping}")
 public class ${modelNameUpperCamel}Controller extends AbstractController<${modelNameUpperCamel}> {
-@Autowired
-private ${modelNameUpperCamel}BaseService service;
+    @Autowired
+    private ${modelNameUpperCamel}BaseService baseService;
 
-@Override
-public void init() {
-super.service = service;
-}
+    @Override
+    public void init() {
+        super.service = baseService;
+    }
 }
