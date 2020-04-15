@@ -18,5 +18,5 @@ private ${modelNameUpperCamel}BaseService service;
 @Override
 public void init() {
 super.service = service;
-    }
+}
 }
