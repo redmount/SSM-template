@@ -2,10 +2,7 @@ package com.redmount.template.util;
 
 import com.redmount.template.core.ProjectConstant;
 import com.redmount.template.core.exception.AuthorizationException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -128,6 +125,9 @@ public class JwtUtil {
                     //设置需要解析的jwt
                     .parseClaimsJws(token).getBody();
             claims.getSubject();
+        } catch (ExpiredJwtException ex) {
+            ex.printStackTrace();
+            throw new AuthorizationException("身份信息过期");
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new AuthorizationException("身份验证失败");
