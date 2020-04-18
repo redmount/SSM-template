@@ -130,16 +130,16 @@ public class JwtUtil {
             claims.getSubject();
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new AuthorizationException();
+            throw new AuthorizationException("身份验证失败");
         }
         return true;
     }
 
     public static Object getUserByToken(String token, Class userClass) {
         if (StringUtils.isBlank(token)) {
-            throw new AuthorizationException();
+            throw new AuthorizationException("身份信息缺失");
         }
-        Object user;
+        Object user = null;
         try {
             user = userClass.newInstance();
             Claims claims = Jwts.parser()
@@ -155,7 +155,7 @@ public class JwtUtil {
             }
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
-            throw new AuthorizationException();
+            throw new AuthorizationException("身份验证失败");
         }
         return user;
     }

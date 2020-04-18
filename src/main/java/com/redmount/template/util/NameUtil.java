@@ -2,6 +2,7 @@ package com.redmount.template.util;
 
 import com.google.common.base.CaseFormat;
 import com.redmount.template.core.exception.AuthorizationException;
+import com.redmount.template.core.exception.ServiceException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.URL;
@@ -10,11 +11,11 @@ public class NameUtil {
     private static void validateConditionString(String condition) {
         // 单引号个数不匹配
         if (StringUtils.countMatches(condition, "'") % 2 != 0) {
-            throw new AuthorizationException();
+            throw new ServiceException(100002);
         }
         // 含注释
         if (StringUtils.contains(condition, "--")) {
-            throw new AuthorizationException();
+            throw new ServiceException(100003);
         }
     }
 

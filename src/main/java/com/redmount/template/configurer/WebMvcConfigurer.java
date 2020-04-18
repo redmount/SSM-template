@@ -105,7 +105,7 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
                 }
                 logger.info(e.getMessage());
             } else if (e instanceof AuthorizationException) {
-                result.setCode(ResultCode.UNAUTHORIZED).setMessage("登录失效");
+                result.setCode(ResultCode.UNAUTHORIZED).setMessage(e.getMessage());
             } else if (e instanceof NoHandlerFoundException) {
                 result.setCode(ResultCode.NOT_FOUND).setMessage("接口 [" + request.getRequestURI() + "] 不存在");
             } else if (e instanceof ServletException) {

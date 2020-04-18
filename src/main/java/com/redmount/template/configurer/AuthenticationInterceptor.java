@@ -3,6 +3,7 @@ package com.redmount.template.configurer;
 import com.redmount.template.core.annotation.Token;
 import com.redmount.template.core.exception.AuthorizationException;
 import com.redmount.template.util.JwtUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -36,8 +37,11 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         }
         // 从 http 请求头中取出 token
         String token = httpServletRequest.getHeader("token");
+        if(StringUtils.isBlank(token)){
+            throw new AuthorizationException("身份信息缺失");
+        }
         if (!JwtUtil.isVerify(token)) {
-            throw new AuthorizationException();
+            throw new AuthorizationException("身份验证失败");
         }
         return true;
     }
