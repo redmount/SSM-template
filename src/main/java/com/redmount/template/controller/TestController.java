@@ -30,7 +30,7 @@ public class TestController {
     @Resource
     ClazzService clazzService;
 
-    @GetMapping("/test/test")
+    @GetMapping("/test/getToken")
     public Result test() {
         User user = new User();
         user.setPk(UUID.randomUUID().toString());
@@ -51,7 +51,7 @@ public class TestController {
     }
 
     @Token
-    @PostMapping("/test/token")
+    @PostMapping("/test/validateToken")
     public Result validate(@RequestBody ValidateCodeModel model, @RequestHeader(value = "token", defaultValue = "") String token) {
         User user = (User) JwtUtil.getUserByToken(token, User.class);
         return ResultGenerator.genSuccessResult(user);
