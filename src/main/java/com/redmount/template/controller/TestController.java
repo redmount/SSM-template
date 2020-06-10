@@ -53,7 +53,7 @@ public class TestController {
     @Token
     @PostMapping("/test/validateToken")
     public Result validate(@RequestBody ValidateCodeModel model, @RequestHeader(value = "token", defaultValue = "") String token) {
-        User user = (User) JwtUtil.getUserByToken(token, User.class);
+        User user = service.getUserByToken();
         return ResultGenerator.genSuccessResult(user);
     }
 }
