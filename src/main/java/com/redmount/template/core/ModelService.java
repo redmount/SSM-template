@@ -278,6 +278,22 @@ public interface ModelService<T> {
      * @return 删除的条数
      */
     int deleteByCondition(Condition condition); //根据条件删除
+
+    /**
+     * 根据条件字符串取数量
+     * @param conditionString 条件字符串
+     * @return 符合条件的数量
+     */
+    int getCountByCondition(String conditionString);
+
+    /**
+     * 根据条件取数量
+     *
+     * @param condition condition对象
+     * @return 符合条件的数量
+     */
+    int getCountByCondition(Condition condition);
+
     /**
      * 取实体注释模型
      *

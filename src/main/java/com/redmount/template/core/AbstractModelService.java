@@ -250,18 +250,18 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     /**
      * 按条件删除
      *
-     * @param condition 条件
+     * @param conditionString 条件
      * @return 删除的条数
      */
     @Override
-    public int delByConditionAutomatically(String condition) {
+    public int delByConditionAutomatically(String conditionString) {
         RelationData annotation = modelClass.getAnnotation(RelationData.class);
         if (annotation == null) {
             throw new RuntimeException("没有找到" + modelClass.getName() + "对应的DO");
         }
         mapper = initMapperByMapperClass(annotation.baseDOMapperClass());
         Condition delCondition = new Condition(annotation.baseDOMapperClass());
-        delCondition.createCriteria().andCondition(getDBConditionString(condition));
+        delCondition.createCriteria().andCondition(getDBConditionString(conditionString));
         if (modelClass.isAnnotationPresent(Tombstoned.class)) {
             T model = null;
             try {
@@ -764,6 +764,24 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return mapper.deleteByCondition(condition);
     }
 
+    @Override
+    public int getCountByCondition(String conditionString) {
+        Condition condition = getConditionFromConditionString(this.modelBaseDOClass, conditionString);
+        return getCountByCondition(condition);
+    }
+
+    /**
+     * 根据条件取数量
+     *
+     * @param condition condition对象
+     * @return 符合条件的数量
+     */
+    @Override
+    public int getCountByCondition(Condition condition) {
+        mapper = initMainMapper();
+        return mapper.selectCountByCondition(condition);
+    }
+
     /**
      * 生成List类型的实体注释实例
      *
@@ -850,17 +868,21 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         return condition;
     }
 
+    private Condition getConditionFromConditionString(Class baseDOClass, String conditionString) {
+        Condition condition = new Condition(baseDOClass);
+        condition.createCriteria();
+        if (StringUtils.isNotBlank(conditionString)) {
+            condition.and().andCondition(getDBConditionString(conditionString));
+        }
+        return condition;
+    }
+
     private Condition getConditionByFieldAndConditionString(Field field, String conditionString) {
         RelationData annotation = field.getAnnotation(RelationData.class);
         if (annotation == null) {
             return null;
         }
-        Condition condition = new Condition(annotation.baseDOClass());
-        condition.createCriteria();
-        if (StringUtils.isNotBlank(conditionString)) {
-            condition.and().andCondition(conditionString);
-        }
-        return condition;
+        return getConditionFromConditionString(annotation.baseDOClass(), conditionString);
     }
 
     /**

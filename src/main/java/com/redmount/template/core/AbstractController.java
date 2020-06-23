@@ -128,6 +128,13 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
         return ResultGenerator.genSuccessResult(service.saveAutomatically(model, false));
     }
 
+    @GetMapping("/count")
+    @Override
+    public Result getCountByCondition(@RequestParam("condition") String condition) {
+        initService();
+        return ResultGenerator.genSuccessResult(service.getCountByCondition(condition));
+    }
+
     private void initService() {
         if (service == null) {
             init();

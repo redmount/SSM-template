@@ -1,6 +1,7 @@
 package com.redmount.template.core;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -63,18 +64,24 @@ public interface Controller<T> {
      * @param pk 实体pk
      * @return 删除了多少条(1或0, 1代表删除成功, 0代表没有删除成功)
      */
-    @ApiOperation(value="按pk屋里删除资源")
+    @ApiOperation(value="按pk物理删除资源")
     Result delAutomatic(String pk);
 
     /**
      * 按条件物理删除
      *
-     * @param condition 条件(小驼峰形式,SQL子语句)
+     * @param condition 条件(小驼峰形式,SQL Where子语句)
      * @return 删除了多少条数据
      */
     @ApiOperation(value="按条件物理删除资源")
     Result delByConditionAutomatic(String condition);
 
+    /**
+     * 按条件取数量
+     * @param condition 条件(小驼峰形式,SQL Where子语句)
+     * @return 符合条件的条数
+     */
+    Result getCountByCondition(@RequestParam("condition") String condition);
     /**
      * 取实体说明
      *
