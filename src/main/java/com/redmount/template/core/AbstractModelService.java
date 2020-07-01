@@ -28,7 +28,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     private Mapper mapper;
 
     @Autowired
-    SqlSession sqlSession;
+    private SqlSession sqlSession;
 
     /**
      * 当前泛型真实类型的Class
@@ -87,9 +87,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     public T getAutomaticallyWithModel(T model, String relations) {
         List<String> relationList = ReflectUtil.getFieldList(modelClass, relations);
         Field field;
-        for (String relation : relationList) {
+        for (String relationString : relationList) {
             try {
-                field = modelClass.getDeclaredField(relation);
+                field = modelClass.getDeclaredField(relationString);
                 RelationData fieldRelationDataAnnotation = field.getDeclaredAnnotation(RelationData.class);
                 if (fieldRelationDataAnnotation == null) {
                     continue;
@@ -188,7 +188,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         validateModelToSave(model);
         String mainPk = model.getPk();
         List<Field> relationFields;
-        Object currentFeildValue;
+        Object currentFieldValue;
 
         mapper = initMainMapper();
         if (StringUtils.isBlank(mainPk)) {
@@ -205,8 +205,8 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         }
         relationFields = ReflectUtil.getRelationFields(model);
         for (Field currentField : relationFields) {
-            currentFeildValue = ReflectUtil.getFieldValue(model, currentField.getName());
-            if (currentFeildValue == null) {
+            currentFieldValue = ReflectUtil.getFieldValue(model, currentField.getName());
+            if (currentFieldValue == null) {
                 continue;
             }
             RelationData currentFieldRelationDataAnnotation = currentField.getAnnotation(RelationData.class);
@@ -467,23 +467,23 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     @Override
     public T saveOneToOneRelation(T model, Field field) {
         RelationData currentFieldRelationDataAnnotation = field.getAnnotation(RelationData.class);
-        Object currentFeildValue = ReflectUtil.getFieldValue(model, field.getName());
+        Object currentFieldValue = ReflectUtil.getFieldValue(model, field.getName());
         if (StringUtils.isNotBlank(currentFieldRelationDataAnnotation.foreignProperty())) {
             String javaTargetFieldName = currentFieldRelationDataAnnotation.foreignProperty();
-            assert currentFeildValue != null;
-            ReflectUtil.setFieldValue(model, javaTargetFieldName, ((BaseDO) currentFeildValue).getPk());
+            assert currentFieldValue != null;
+            ReflectUtil.setFieldValue(model, javaTargetFieldName, ((BaseDO) currentFieldValue).getPk());
         }
         if (StringUtils.isNotBlank(currentFieldRelationDataAnnotation.mainProperty())) {
             mapper = initMapperByMapperClass(currentFieldRelationDataAnnotation.baseDOMapperClass());
             BaseDO targetObject = null;
             try {
                 targetObject = (BaseDO) currentFieldRelationDataAnnotation.baseDOClass().newInstance();
-                targetObject = ReflectUtil.cloneObj(currentFeildValue, targetObject.getClass());
+                targetObject = ReflectUtil.cloneObj(currentFieldValue, targetObject.getClass());
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
             assert targetObject != null;
-            String pk = (String) ReflectUtil.getFieldValue(currentFeildValue, ProjectConstant.PRIMARY_KEY_FIELD_NAME);
+            String pk = (String) ReflectUtil.getFieldValue(currentFieldValue, ProjectConstant.PRIMARY_KEY_FIELD_NAME);
             boolean isNewPk = false;
             if (StringUtils.isBlank(pk)) {
                 pk = UUID.randomUUID().toString();
@@ -554,8 +554,6 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         mapper = initMapperByMapperClass(currentFieldRelationDataAnnotation.relationDOMapperClass());
         javaMainFieldName = currentFieldRelationDataAnnotation.mainProperty();
         javaTargetFieldName = currentFieldRelationDataAnnotation.foreignProperty();
-
-        // Condition condition = initConditionBySimpleDOName(field.getAnnotation(RelationData.class).relationDOTypeName());
         Condition condition = new Condition(field.getAnnotation(RelationData.class).relationDOClass());
         condition.createCriteria().andEqualTo(javaMainFieldName, model.getPk());
         mapper.deleteByCondition(condition);
@@ -565,27 +563,27 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        List currentFeildValue = (List) ReflectUtil.getFieldValue(model, field.getName());
-        Object currentRelatioinedDO = new BaseDO();
-        assert currentFeildValue != null;
-        for (Object currentRelationedListItem : currentFeildValue) {
+        List currentFieldValue = (List) ReflectUtil.getFieldValue(model, field.getName());
+        Object currentRelationDO = new BaseDO();
+        assert currentFieldValue != null;
+        for (Object currentRelationListItem : currentFieldValue) {
             if (relationDataField != null) {
-                currentRelatioinedDO = ReflectUtil.getFieldValue(currentRelationedListItem, relationDataField.getName());
+                currentRelationDO = ReflectUtil.getFieldValue(currentRelationListItem, relationDataField.getName());
             } else {
                 try {
-                    currentRelatioinedDO = currentFieldRelationDataAnnotation.relationDOClass().newInstance();
+                    currentRelationDO = currentFieldRelationDataAnnotation.relationDOClass().newInstance();
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
-            assert currentRelatioinedDO != null;
-            ((BaseDO) currentRelatioinedDO).setPk(UUID.randomUUID().toString());
-            ReflectUtil.setFieldValue(currentRelatioinedDO, javaMainFieldName, model.getPk());
-            ReflectUtil.setFieldValue(currentRelatioinedDO, javaTargetFieldName, ((BaseDO) currentRelationedListItem).getPk());
-            ((BaseDO) currentRelatioinedDO).setCreated(new Date());
-            ((BaseDO) currentRelatioinedDO).setUpdated(new Date());
-            mapper.insert(currentRelatioinedDO);
-            ((BaseDO) currentRelatioinedDO).setPk(null);
+            assert currentRelationDO != null;
+            ((BaseDO) currentRelationDO).setPk(UUID.randomUUID().toString());
+            ReflectUtil.setFieldValue(currentRelationDO, javaMainFieldName, model.getPk());
+            ReflectUtil.setFieldValue(currentRelationDO, javaTargetFieldName, ((BaseDO) currentRelationListItem).getPk());
+            ((BaseDO) currentRelationDO).setCreated(new Date());
+            ((BaseDO) currentRelationDO).setUpdated(new Date());
+            mapper.insert(currentRelationDO);
+            ((BaseDO) currentRelationDO).setPk(null);
         }
         return model;
     }
@@ -605,7 +603,6 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         mapper = initMapperByMapperClass(fieldRelationDataAnnotation.relationDOMapperClass());
         String javaMainFieldName = fieldRelationDataAnnotation.mainProperty();
         Object result = null;
-        // Condition relationCondition = initConditionBySimpleDOName(fieldRelationDataAnnotation.relationDOTypeName());
         Condition relationCondition = new Condition(fieldRelationDataAnnotation.relationDOClass());
         relationCondition.createCriteria().andEqualTo(javaMainFieldName, model.getPk());
         Object relationResults = mapper.selectByCondition(relationCondition);
