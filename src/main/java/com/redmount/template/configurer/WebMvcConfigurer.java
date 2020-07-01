@@ -47,10 +47,10 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registStaticResource(registry);
+        registerStaticResource(registry);
     }
 
-    private void registStaticResource(ResourceHandlerRegistry registry) {
+    private void registerStaticResource(ResourceHandlerRegistry registry) {
         if ("dev".equals(env)) {
             registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
             registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
