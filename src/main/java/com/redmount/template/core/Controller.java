@@ -81,6 +81,7 @@ public interface Controller<T> {
      * @param condition 条件(小驼峰形式,SQL Where子语句)
      * @return 符合条件的条数
      */
+    @ApiOperation("按条件取数量")
     Result getCountByCondition(@RequestParam("condition") String condition);
     /**
      * 取实体说明
