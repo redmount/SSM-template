@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.redmount.template.base.repo.SysFileMapper">
+  <resultMap id="BaseResultMap" type="com.redmount.template.base.model.SysFile">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="pk" jdbcType="CHAR" property="pk" />
+    <result column="ori_file_name" jdbcType="VARCHAR" property="oriFileName" />
+    <result column="server_file_name" jdbcType="VARCHAR" property="serverFileName" />
+    <result column="suffix" jdbcType="VARCHAR" property="suffix" />
+    <result column="size" jdbcType="BIGINT" property="size" />
+    <result column="created" jdbcType="TIMESTAMP" property="created" />
+    <result column="updated" jdbcType="TIMESTAMP" property="updated" />
+  </resultMap>
+</mapper>

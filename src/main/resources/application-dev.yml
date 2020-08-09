@@ -6,3 +6,4 @@ spring:
     username: root
     password: 2wsx@WSX
     driver-class-name: com.mysql.cj.jdbc.Driver
+upload-file-path: d:\

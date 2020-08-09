@@ -1,8 +1,8 @@
 package com.redmount.template.base.service.impl;
 
-import com.redmount.template.base.repo.RTestTeacherTTestClazzMapper;
-import com.redmount.template.base.model.RTestTeacherTTestClazz;
-import com.redmount.template.base.service.RTestTeacherTTestClazzBaseService;
+import com.redmount.template.base.repo.SysFileMapper;
+import com.redmount.template.base.model.SysFile;
+import com.redmount.template.base.service.SysFileBaseService;
 import com.redmount.template.core.AbstractModelService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,5 +17,5 @@ import javax.annotation.Resource;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class RTestTeacherTTestClazzBaseServiceImpl extends AbstractModelService<RTestTeacherTTestClazz> implements RTestTeacherTTestClazzBaseService {
+public class SysFileBaseServiceImpl extends AbstractModelService<SysFile> implements SysFileBaseService {
 }

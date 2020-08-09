@@ -41,6 +41,7 @@ public class CodeGenerator {
         List<String> tableNames = new ArrayList<>();
         tableNames.add("r_test_teacher_t_test_clazz");
         tableNames.add("sys_service_exception");
+        tableNames.add("sys_file");
         tableNames.add("test_clazz");
         tableNames.add("test_clazz_info");
         tableNames.add("test_student");

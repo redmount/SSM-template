@@ -7,16 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Created by CodeGenerator on 2020/02/20.
- */
+* Created by CodeGenerator on 2020/08/09.
+*/
 @RestController
 @RequestMapping("/rTestTeacherTTestClazz")
 public class RTestTeacherTTestClazzController extends AbstractController<RTestTeacherTTestClazz> {
     @Autowired
-    private RTestTeacherTTestClazzBaseService service;
+    private RTestTeacherTTestClazzBaseService baseService;
 
     @Override
     public void init() {
-        super.service = service;
+        super.service = baseService;
     }
 }
