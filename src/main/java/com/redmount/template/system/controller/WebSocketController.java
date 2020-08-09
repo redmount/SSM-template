@@ -1,12 +1,14 @@
 package com.redmount.template.system.controller;
 
 import com.redmount.template.websocket.WebSocketServer;
+import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
 @RestController
 @RequestMapping("/ws")
+@Api(tags="WebSocket控制器")
 public class WebSocketController {
 
     /**

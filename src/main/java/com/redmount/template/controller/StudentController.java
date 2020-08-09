@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/student")
-@Api(description = "学生资源")
+@Api(tags = "学生资源")
 public class StudentController extends AbstractController<StudentModel> {
     @Autowired
     StudentService service;

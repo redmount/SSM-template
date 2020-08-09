@@ -21,7 +21,7 @@ import java.util.UUID;
  */
 
 @RestController
-@Api(description = "测试Controller")
+@Api(tags = "测试Controller")
 public class TestController {
 
     @Resource

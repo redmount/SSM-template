@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/teacher")
 @RestController
-@Api(description = "教师资源")
+@Api(tags = "教师资源")
 public class TeacherController extends AbstractController<TeacherModel> {
     @Autowired
     TeacherSerivce service;

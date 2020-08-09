@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/class")
 @RestController
-@Api(description = "班级资源")
+@Api(tags = "班级资源")
 public class ClazzController extends AbstractController<ClazzModel> {
     @Autowired
     ClazzService service;
