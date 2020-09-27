@@ -29,15 +29,6 @@ logging:
         web: INFO
         boot:
           autoconfigure: ERROR
-    com:
-      cfioter:
-        msp:
-          endpoint:
-            base:
-              mapper: DEBUG
-              dao: DEBUG
-            core:
-              exception: DEBUG
 mybatis:
   configuration:
     cache-enabled: true
