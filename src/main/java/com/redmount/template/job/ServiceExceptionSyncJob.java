@@ -33,7 +33,7 @@ public class ServiceExceptionSyncJob extends AbstractJob {
 
     @Override
     public void doJob(String[] args) {
-        LoggerUtil.info("Syncing ServiceException:" + Arrays.toString(args));
+        LoggerUtil.info("Synchronizing ServiceException:" + Arrays.toString(args));
         List<SysServiceException> all = service.findAll();
         for (SysServiceException ex : all) {
             ServiceException.ERROR_MAP.put(ex.getCode(), ex);
