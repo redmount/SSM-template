@@ -12,7 +12,7 @@ public class JobConfigurer {
     @Autowired
     ServiceExceptionSyncJob serviceExceptionSyncJob;
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0/30 * * * ?")
     @Async
     public void syncServiceException(){
         String[] startArgs = {"demo Starting"};

@@ -17,7 +17,7 @@ import java.util.List;
 public class ServiceExceptionSyncJob extends AbstractJob {
 
     @Autowired
-    SysServiceExceptionBaseService service;
+    private SysServiceExceptionBaseService service;
 
     private static ServiceExceptionSyncJob job;
 
