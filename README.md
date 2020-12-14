@@ -930,6 +930,8 @@ Job的主业务代码,定义在```job/```下,推荐实现```job.base.JobImpl```�
 ## 9.5. Swagger-UI
 http://ip:port/swagger-ui.html
 
+http://ip:port/doc.html
+
 ## 9.6. 请求跟踪
 默认情况下,在Console中会打印出每次请求的请求方式/URL/QueryString/对应的处理方法名/SQL打印/请求耗时等.
 
