@@ -3,8 +3,6 @@ package com.redmount.template.configurer;
 import com.redmount.template.core.exception.ServiceException;
 import com.redmount.template.system.model.SysServiceException;
 import com.redmount.template.system.service.impl.SysServiceExceptionBaseServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;

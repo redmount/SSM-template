@@ -2,7 +2,6 @@ package com.redmount.template.system.repo;
 
 import com.redmount.template.core.Mapper;
 import com.redmount.template.system.model.SysJobConfig;
-import com.redmount.template.system.model.SysServiceException;
 
 /**
  * @author 朱峰

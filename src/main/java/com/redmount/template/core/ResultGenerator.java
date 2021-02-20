@@ -1,8 +1,5 @@
 package com.redmount.template.core;
 
-import com.alibaba.fastjson.JSON;
-import com.redmount.template.util.LoggerUtil;
-
 /**
  * 响应结果生成工具
  *
@@ -19,7 +16,6 @@ public class ResultGenerator {
     }
 
     public static <T> Result<T> genSuccessResult(T data) {
-        LoggerUtil.debug(JSON.toJSONString(data));
         return new Result()
                 .setCode(ResultCode.SUCCESS)
                 .setMessage(DEFAULT_SUCCESS_MESSAGE)

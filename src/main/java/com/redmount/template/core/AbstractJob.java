@@ -1,6 +1,6 @@
 package com.redmount.template.core;
 
-import com.redmount.template.util.LoggerUtil;
+import com.redmount.template.util.Logger;
 import lombok.Data;
 
 @Data
@@ -20,12 +20,12 @@ public abstract class AbstractJob implements Job {
      * @param afterArgs 运行后方法参数
      */
     public void runJob(String[] startArgs, String[] doArgs, String[] afterArgs) {
-        LoggerUtil.info("BeforeJob");
+        Logger.info("BeforeJob");
         this.beforeJob(startArgs);
-        LoggerUtil.info("DoingJob");
+        Logger.info("DoingJob");
         this.doJob(doArgs);
-        LoggerUtil.info("Done");
+        Logger.info("Done");
         this.afterJob(afterArgs);
-        LoggerUtil.info("JobOver");
+        Logger.info("JobOver");
     }
 }

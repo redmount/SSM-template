@@ -1,7 +1,6 @@
 package com.redmount.template.util;
 
 import com.google.common.base.CaseFormat;
-import com.redmount.template.core.exception.AuthorizationException;
 import com.redmount.template.core.exception.ServiceException;
 import org.apache.commons.lang3.StringUtils;
 

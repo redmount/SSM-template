@@ -24,7 +24,7 @@ public class ValidateCodeModel {
         }
         try {
             inputCode = inputCode.toUpperCase().trim();
-            String code = MD5Utils.getMD5(inputCode);
+            String code = MD5Util.getMD5(inputCode);
             return code.equalsIgnoreCase(realCode);
         } catch (Exception e) {
             return null;
@@ -37,7 +37,7 @@ public class ValidateCodeModel {
      * @return 加密后的验证码实体
      */
     ValidateCodeModel initCode(String realCode) {
-        this.realCode = MD5Utils.getMD5(realCode);
+        this.realCode = MD5Util.getMD5(realCode);
         return this;
     }
 }

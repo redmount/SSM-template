@@ -1,7 +1,7 @@
 package com.redmount.template.configurer;
 
-import com.redmount.template.core.ProjectConstant;
 import com.github.pagehelper.PageInterceptor;
+import com.redmount.template.core.ProjectConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;

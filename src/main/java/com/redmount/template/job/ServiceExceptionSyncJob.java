@@ -5,7 +5,7 @@ import com.redmount.template.core.exception.ServiceException;
 import com.redmount.template.service.ClazzService;
 import com.redmount.template.system.model.SysServiceException;
 import com.redmount.template.system.service.SysServiceExceptionBaseService;
-import com.redmount.template.util.LoggerUtil;
+import com.redmount.template.util.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,12 +28,12 @@ public class ServiceExceptionSyncJob extends AbstractJob {
 
     @Override
     public void beforeJob(String[] args) {
-        LoggerUtil.info("prepare to sync ServiceException:" + Arrays.toString(args));
+        Logger.info("prepare to sync ServiceException:" + Arrays.toString(args));
     }
 
     @Override
     public void doJob(String[] args) {
-        LoggerUtil.info("Synchronizing ServiceException:" + Arrays.toString(args));
+        Logger.info("Synchronizing ServiceException:" + Arrays.toString(args));
         List<SysServiceException> all = service.findAll();
         for (SysServiceException ex : all) {
             ServiceException.ERROR_MAP.put(ex.getCode(), ex);
@@ -42,6 +42,6 @@ public class ServiceExceptionSyncJob extends AbstractJob {
 
     @Override
     public void afterJob(String[] args) {
-        LoggerUtil.info("ServiceExceptionSynced: " + Arrays.toString(args));
+        Logger.info("ServiceExceptionSynced: " + Arrays.toString(args));
     }
 }

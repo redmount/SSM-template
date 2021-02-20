@@ -4,11 +4,9 @@ import com.redmount.template.core.AbstractModelService;
 import com.redmount.template.model.ClazzModel;
 import com.redmount.template.repo.ClazzModelRepo;
 import com.redmount.template.service.ClazzService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-
 
 @Service
 public class ClazzServiceImpl extends AbstractModelService<ClazzModel> implements ClazzService {

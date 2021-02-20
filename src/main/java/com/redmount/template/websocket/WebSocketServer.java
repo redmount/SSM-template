@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@ServerEndpoint(value = "/ws/asset")
+@ServerEndpoint(value = "/")
 @Component
 public class WebSocketServer {
 

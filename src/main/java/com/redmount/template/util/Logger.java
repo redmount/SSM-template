@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
  * Logback对每个Logger对象做了缓存，每次调用LoggerFactory.getLogger(String name)时如果已存在则从缓存中获取不会生成新的对象;
  * 同时也不会有对象的创建与销毁造成的性能损失
  */
-public class LoggerUtil {
+public class Logger {
 
     public static void error(String msg) {
         LoggerFactory.getLogger(getClassName()).error(msg);

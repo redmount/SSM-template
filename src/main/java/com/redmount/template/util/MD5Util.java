@@ -8,7 +8,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
-public class MD5Utils {
+public class MD5Util {
 
     private static final String ENCODING_ALGORITHM = "MD5";
 

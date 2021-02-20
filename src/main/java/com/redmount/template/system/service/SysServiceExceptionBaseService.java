@@ -8,5 +8,4 @@ import com.redmount.template.system.model.SysServiceException;
  * @date 2018年11月19日
  */
 public interface SysServiceExceptionBaseService extends ModelService<SysServiceException> {
-
 }

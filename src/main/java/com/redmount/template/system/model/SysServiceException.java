@@ -4,10 +4,8 @@ import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
 import com.redmount.template.system.repo.SysServiceExceptionMapper;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
-import javax.persistence.*;
-import java.util.Date;
+import javax.persistence.Table;
 
 /**
  * @author 朱峰
