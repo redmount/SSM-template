@@ -4,7 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.CaseFormat;
 import com.redmount.template.core.annotation.RelationData;
-import com.redmount.template.core.annotation.Tombstoned;
+import com.redmount.template.core.annotation.LogicDelete;
 import com.redmount.template.core.annotation.Validate;
 import com.redmount.template.core.exception.ServiceException;
 import com.redmount.template.system.model.SysServiceException;
@@ -157,7 +157,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 criteriaCondition.andCondition(NameUtil.transToDBCondition(condition));
                 example.and(criteriaCondition);
             }
-            if (modelClass.isAnnotationPresent(Tombstoned.class)) {
+            if (modelClass.isAnnotationPresent(LogicDelete.class)) {
                 example.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
             }
             if (StringUtils.isNotBlank(orderBy)) {
@@ -237,8 +237,8 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     @Override
     public int delAutomaticallyByPk(String pk) {
         mapper = initMapperByMapperClass(modelAnnotation.baseDOMapperClass());
-        if (modelClass.isAnnotationPresent(Tombstoned.class)) {
-            BaseDOTombstoned example = new BaseDOTombstoned();
+        if (modelClass.isAnnotationPresent(LogicDelete.class)) {
+            BaseDOLogicDeletion example = new BaseDOLogicDeletion();
             example.setDeleted(true);
             example.setPk(pk);
             Object obj = ReflectUtil.cloneObj(example, modelClass);
@@ -262,7 +262,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         mapper = initMapperByMapperClass(annotation.baseDOMapperClass());
         Condition delCondition = new Condition(annotation.baseDOMapperClass());
         delCondition.createCriteria().andCondition(getDBConditionString(conditionString));
-        if (modelClass.isAnnotationPresent(Tombstoned.class)) {
+        if (modelClass.isAnnotationPresent(LogicDelete.class)) {
             T model = null;
             try {
                 model = modelClass.newInstance();
@@ -328,7 +328,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 condition = new Condition(fieldRelationDataAnnotation.baseDOClass());
                 condition.createCriteria();
             }
-            if (field.getType().isAnnotationPresent(Tombstoned.class)) {
+            if (field.getType().isAnnotationPresent(LogicDelete.class)) {
                 condition.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
             }
             condition.and().andEqualTo(javaMainFieldName, model.getPk());
@@ -351,7 +351,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 condition = new Condition(fieldRelationDataAnnotation.baseDOClass());
                 condition.createCriteria();
             }
-            if (field.getType().isAnnotationPresent(Tombstoned.class)) {
+            if (field.getType().isAnnotationPresent(LogicDelete.class)) {
                 condition.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
             }
             condition.and().andEqualTo(ProjectConstant.PRIMARY_KEY_FIELD_NAME, pk);
@@ -419,7 +419,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             condition.createCriteria();
         }
         condition.and().andEqualTo(javaMainFieldName, model.getPk());
-        if (field.getType().isAnnotationPresent(Tombstoned.class)) {
+        if (field.getType().isAnnotationPresent(LogicDelete.class)) {
             condition.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
         }
         Object result = mapper.selectByCondition(condition);
@@ -624,7 +624,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 e.printStackTrace();
             }
             assert realSlaveDOClass != null;
-            if (realSlaveDOClass.isAnnotationPresent(Tombstoned.class)) {
+            if (realSlaveDOClass.isAnnotationPresent(LogicDelete.class)) {
                 condition.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
             }
             mapper = initMapperByMapperClass(fieldRelationDataAnnotation.baseDOMapperClass());

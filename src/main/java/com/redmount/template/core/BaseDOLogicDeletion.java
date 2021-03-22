@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class BaseDOTombstoned extends BaseDO {
+public class BaseDOLogicDeletion extends BaseDO {
     /**
      * 逻辑删除标记
      */
