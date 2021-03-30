@@ -965,7 +965,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         assert value != null;
         if (validateAnnotation.stringMaxLength() < value.length()) {
             SysServiceException exceptionDO = new SysServiceException();
-            exceptionDO.setMessage("信息长度超过限制：" + validateAnnotation.stringMaxLength());
+            exceptionDO.setMessage("信息长度超过限制（" + field.getName() + "）：" + validateAnnotation.stringMaxLength());
             exceptionDO.setCode(500);
             exceptionDO.setTitle("提交信息失败");
             exceptionDO.setReason(exceptionDO.getMessage());
