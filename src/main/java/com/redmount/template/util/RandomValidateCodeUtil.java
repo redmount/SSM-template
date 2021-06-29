@@ -11,8 +11,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
 public class RandomValidateCodeUtil {
-    //private static final String randString = "0123456789";//随机产生只有数字的字符串
-    //private static final String randString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";//随机产生只有字母的字符串
+    // private static final String randString = "0123456789";//随机产生只有数字的字符串
+    // private static final String randString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";//随机产生只有字母的字符串
     private static final String randString = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";//随机产生数字与字母组合的字符串
     private static final int width = 95;// 图片宽
     private static final int height = 25;// 图片高
@@ -58,12 +58,12 @@ public class RandomValidateCodeUtil {
         g.setColor(getRandColor(110, 133));//字体颜色
         // 绘制干扰线
         for (int i = 0; i <= lineSize; i++) {
-            drowLine(g);
+            drawLine(g);
         }
         // 绘制随机字符
         String randomString = "";
         for (int i = 1; i <= stringNum; i++) {
-            randomString = drowString(g, randomString, i);
+            randomString = drawString(g, randomString, i);
         }
         logger.info(randomString);
         g.dispose();
@@ -85,7 +85,7 @@ public class RandomValidateCodeUtil {
     /**
      * 绘制字符串
      */
-    private static String drowString(Graphics g, String randomString, int i) {
+    private static String drawString(Graphics g, String randomString, int i) {
         g.setFont(getFont());
         g.setColor(new Color(random.nextInt(101), random.nextInt(111), random
                 .nextInt(121)));
@@ -100,7 +100,7 @@ public class RandomValidateCodeUtil {
     /**
      * 绘制干扰线
      */
-    private static void drowLine(Graphics g) {
+    private static void drawLine(Graphics g) {
         int x = random.nextInt(width);
         int y = random.nextInt(height);
         int xl = random.nextInt(13);
