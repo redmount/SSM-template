@@ -19,8 +19,8 @@ import static com.redmount.template.core.ProjectConstant.*;
  */
 public class CodeGenerator {
     //JDBC配置，请修改为你项目的实际配置
-    private static final String JDBC_URL = "jdbc:mysql://api.redmount.cc:3306/test?serverTimezone=GMT%2B8";
-    private static final String JDBC_USERNAME = "root";
+    private static final String JDBC_URL = "jdbc:mysql://192.144.231.168:3306/ssm-with-user?serverTimezone=GMT%2B8";
+    private static final String JDBC_USERNAME = "ssm-with-user";
     private static final String JDBC_PASSWORD = "2wsx@WSX";
     private static final String JDBC_DIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
 
@@ -39,34 +39,41 @@ public class CodeGenerator {
 
     public static void main(String[] args) {
         List<String> tableNames = new ArrayList<>();
-        tableNames.add("r_test_teacher_t_test_clazz");
-        tableNames.add("sys_service_exception");
-        tableNames.add("sys_file");
-        tableNames.add("test_clazz");
-        tableNames.add("test_clazz_info");
-        tableNames.add("test_student");
-        tableNames.add("test_teacher");
-        /// tableNames.add("sys_service_exception"); 这个的实体已经被定义在项目内部,不允许生成,否则会由于类名相同而无法启动.
-        for (String tableName : tableNames) {
-            if (!"sys_service_exception".equalsIgnoreCase(tableName)) {
-                genCode(tableName);
-            }
-        }
+//        tableNames.add("audit_operation_history");
+//        tableNames.add("authority");
+//        tableNames.add("r_role_t_authority");
+//        tableNames.add("r_role_t_role_group");
+//        tableNames.add("r_user_t_role");
+//        tableNames.add("user");
+//        tableNames.add("user_base_info");
+//        tableNames.add("user_contact_info");
+//        /// tableNames.add("sys_service_exception"); 这个的实体已经被定义在项目内部,不允许生成,否则会由于类名相同而无法启动.
+//        for (String tableName : tableNames) {
+//            if (!"sys_service_exception".equalsIgnoreCase(tableName)) {
+//                genCode(tableName);
+//            }
+//        }
         //genCodeByCustomModelName("输入表名","输入自定义Model名称");
-        Map<String, Boolean> tombstonedTableMap = new HashMap<>();
-//        tombstonedTableMap.put("r_test_teacher_t_test_clazz", false);
-//        tombstonedTableMap.put("sys_service_exception", false);
-//        tombstonedTableMap.put("test_clazz", false);
-//        // tombstonedTableMap.put("test_clazz_info", false);
-//        tombstonedTableMap.put("test_student", false);
-//        tombstonedTableMap.put("test_teacher", true);
-        genCode(tombstonedTableMap);
+        Map<String, Boolean> logicDeletionTableMap = new HashMap<>();
+        logicDeletionTableMap.put("audit_operation_history" ,true);
+        logicDeletionTableMap.put("authority" ,true);
+        logicDeletionTableMap.put("r_role_t_authority" ,false);
+        logicDeletionTableMap.put("r_role_t_role_group" ,false);
+        logicDeletionTableMap.put("r_user_t_role" ,false);
+        logicDeletionTableMap.put("r_user_t_role_group" ,false);
+        logicDeletionTableMap.put("role" ,true);
+        logicDeletionTableMap.put("role_group" ,true);
+        logicDeletionTableMap.put("sys_service_exception" ,false);
+        logicDeletionTableMap.put("user" ,true);
+        logicDeletionTableMap.put("user_base_info" ,true);
+        logicDeletionTableMap.put("user_contact_info" ,true);
+        genCode(logicDeletionTableMap);
     }
 
-    public static void genCode(Map<String, Boolean> tombstonedTableMap) {
-        for (String tableName : tombstonedTableMap.keySet()) {
+    public static void genCode(Map<String, Boolean> logicDeletionTableMap) {
+        for (String tableName : logicDeletionTableMap.keySet()) {
             if (!StringUtils.startsWithIgnoreCase(tableName, "sys_")) {
-                genCodeByCustomModelName(tableName, tableNameConvertUpperCamel(tableName), tombstonedTableMap.get(tableName));
+                genCodeByCustomModelName(tableName, tableNameConvertUpperCamel(tableName), logicDeletionTableMap.get(tableName));
             }
         }
     }
@@ -90,13 +97,13 @@ public class CodeGenerator {
      * @param tableName 数据表名称
      * @param modelName 自定义的 Model 名称
      */
-    public static void genCodeByCustomModelName(String tableName, String modelName, Boolean isTombstoned) {
-        genModelAndMapper(tableName, modelName, isTombstoned);
+    public static void genCodeByCustomModelName(String tableName, String modelName, Boolean islogicDeletion) {
+        genModelAndMapper(tableName, modelName, islogicDeletion);
         genService(tableName, modelName);
         genController(tableName, modelName);
     }
 
-    public static void genModelAndMapper(String tableName, String modelName, boolean isTombstoned) {
+    public static void genModelAndMapper(String tableName, String modelName, boolean isLogicDeletion) {
         Context context = new Context(ModelType.FLAT);
         context.setId("Potato");
         context.setTargetRuntime("MyBatis3Simple");
@@ -118,8 +125,8 @@ public class CodeGenerator {
         JavaModelGeneratorConfiguration javaModelGeneratorConfiguration = new JavaModelGeneratorConfiguration();
         javaModelGeneratorConfiguration.setTargetProject(PROJECT_PATH + JAVA_PATH);
         javaModelGeneratorConfiguration.setTargetPackage(MODEL_PACKAGE);
-        if (isTombstoned) {
-            javaModelGeneratorConfiguration.addProperty("rootClass", BASE_PACKAGE + ".core.BaseDOTombstoned");
+        if (isLogicDeletion) {
+            javaModelGeneratorConfiguration.addProperty("rootClass", BASE_PACKAGE + ".core.BaseDOLogicDeletion");
         } else {
             javaModelGeneratorConfiguration.addProperty("rootClass", BASE_PACKAGE + ".core.BaseDO");
         }

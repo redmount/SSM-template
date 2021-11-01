@@ -11,7 +11,7 @@ public final class ProjectConstant {
     /**
      * 逻辑删除的标记
      */
-    public static final String TOMSTONED_FIELD = "deleted";
+    public static final String LOGIC_DELETION_FIELD_NAME = "deleted";
 
     public static final String PRIMARY_KEY_FIELD_NAME = "pk";
 

@@ -2,7 +2,6 @@ package com.redmount.template.job;
 
 import com.redmount.template.core.AbstractJob;
 import com.redmount.template.core.exception.ServiceException;
-import com.redmount.template.service.ClazzService;
 import com.redmount.template.system.model.SysServiceException;
 import com.redmount.template.system.service.SysServiceExceptionBaseService;
 import com.redmount.template.util.Logger;

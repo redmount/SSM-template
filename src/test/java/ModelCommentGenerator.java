@@ -103,9 +103,9 @@ public class ModelCommentGenerator extends MapperPlugin {
 
         List<IntrospectedColumn> allColumns = introspectedTable.getAllColumns();
         for (IntrospectedColumn column : allColumns) {
-            if (ProjectConstant.TOMSTONED_FIELD.equals(column.getActualColumnName())) {
-                topLevelClass.addImportedType(ProjectConstant.BASE_PACKAGE + ".core.annotation.Tombstoned");
-                topLevelClass.addAnnotation("@Tombstoned");
+            if (ProjectConstant.LOGIC_DELETION_FIELD_NAME.equals(column.getActualColumnName())) {
+                topLevelClass.addImportedType(ProjectConstant.BASE_PACKAGE + ".core.annotation.LogicDeletion");
+                topLevelClass.addAnnotation("@LogicDeletion");
             }
         }
         // 基础Model开启RelationData注解

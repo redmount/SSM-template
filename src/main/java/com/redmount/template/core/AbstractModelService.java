@@ -4,7 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.CaseFormat;
 import com.redmount.template.core.annotation.RelationData;
-import com.redmount.template.core.annotation.LogicDelete;
+import com.redmount.template.core.annotation.LogicDeletion;
 import com.redmount.template.core.annotation.Validate;
 import com.redmount.template.core.exception.ServiceException;
 import com.redmount.template.system.model.SysServiceException;
@@ -157,8 +157,8 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 criteriaCondition.andCondition(NameUtil.transToDBCondition(condition));
                 example.and(criteriaCondition);
             }
-            if (modelClass.isAnnotationPresent(LogicDelete.class)) {
-                example.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
+            if (modelClass.isAnnotationPresent(LogicDeletion.class)) {
+                example.and().andNotEqualTo(ProjectConstant.LOGIC_DELETION_FIELD_NAME, true).orIsNull(ProjectConstant.LOGIC_DELETION_FIELD_NAME);
             }
             if (StringUtils.isNotBlank(orderBy)) {
                 example.setOrderByClause(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy));
@@ -237,7 +237,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     @Override
     public int delAutomaticallyByPk(String pk) {
         mapper = initMapperByMapperClass(modelAnnotation.baseDOMapperClass());
-        if (modelClass.isAnnotationPresent(LogicDelete.class)) {
+        if (modelClass.isAnnotationPresent(LogicDeletion.class)) {
             BaseDOLogicDeletion example = new BaseDOLogicDeletion();
             example.setDeleted(true);
             example.setPk(pk);
@@ -262,7 +262,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         mapper = initMapperByMapperClass(annotation.baseDOMapperClass());
         Condition delCondition = new Condition(annotation.baseDOMapperClass());
         delCondition.createCriteria().andCondition(getDBConditionString(conditionString));
-        if (modelClass.isAnnotationPresent(LogicDelete.class)) {
+        if (modelClass.isAnnotationPresent(LogicDeletion.class)) {
             T model = null;
             try {
                 model = modelClass.newInstance();
@@ -271,7 +271,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-            ReflectUtil.setFieldValue(model, ProjectConstant.TOMSTONED_FIELD, true);
+            ReflectUtil.setFieldValue(model, ProjectConstant.LOGIC_DELETION_FIELD_NAME, true);
             return mapper.updateByConditionSelective(model, delCondition);
         }
 
@@ -328,8 +328,8 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 condition = new Condition(fieldRelationDataAnnotation.baseDOClass());
                 condition.createCriteria();
             }
-            if (field.getType().isAnnotationPresent(LogicDelete.class)) {
-                condition.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
+            if (field.getType().isAnnotationPresent(LogicDeletion.class)) {
+                condition.and().andNotEqualTo(ProjectConstant.LOGIC_DELETION_FIELD_NAME, true).orIsNull(ProjectConstant.LOGIC_DELETION_FIELD_NAME);
             }
             condition.and().andEqualTo(javaMainFieldName, model.getPk());
             result = mapper.selectByCondition(condition);
@@ -351,8 +351,8 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 condition = new Condition(fieldRelationDataAnnotation.baseDOClass());
                 condition.createCriteria();
             }
-            if (field.getType().isAnnotationPresent(LogicDelete.class)) {
-                condition.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
+            if (field.getType().isAnnotationPresent(LogicDeletion.class)) {
+                condition.and().andNotEqualTo(ProjectConstant.LOGIC_DELETION_FIELD_NAME, true).orIsNull(ProjectConstant.LOGIC_DELETION_FIELD_NAME);
             }
             condition.and().andEqualTo(ProjectConstant.PRIMARY_KEY_FIELD_NAME, pk);
             result = mapper.selectByCondition(condition);
@@ -419,8 +419,8 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
             condition.createCriteria();
         }
         condition.and().andEqualTo(javaMainFieldName, model.getPk());
-        if (field.getType().isAnnotationPresent(LogicDelete.class)) {
-            condition.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
+        if (field.getType().isAnnotationPresent(LogicDeletion.class)) {
+            condition.and().andNotEqualTo(ProjectConstant.LOGIC_DELETION_FIELD_NAME, true).orIsNull(ProjectConstant.LOGIC_DELETION_FIELD_NAME);
         }
         Object result = mapper.selectByCondition(condition);
         ReflectUtil.setFieldValue(model, field.getName(), result);
@@ -624,8 +624,8 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 e.printStackTrace();
             }
             assert realSlaveDOClass != null;
-            if (realSlaveDOClass.isAnnotationPresent(LogicDelete.class)) {
-                condition.and().andNotEqualTo(ProjectConstant.TOMSTONED_FIELD, true).orIsNull(ProjectConstant.TOMSTONED_FIELD);
+            if (realSlaveDOClass.isAnnotationPresent(LogicDeletion.class)) {
+                condition.and().andNotEqualTo(ProjectConstant.LOGIC_DELETION_FIELD_NAME, true).orIsNull(ProjectConstant.LOGIC_DELETION_FIELD_NAME);
             }
             mapper = initMapperByMapperClass(fieldRelationDataAnnotation.baseDOMapperClass());
 

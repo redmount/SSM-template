@@ -2,58 +2,16 @@ package com.redmount.template.controller;
 
 import com.redmount.template.core.Result;
 import com.redmount.template.core.ResultGenerator;
-import com.redmount.template.core.annotation.Token;
-import com.redmount.template.core.exception.ServiceException;
-import com.redmount.template.model.User;
-import com.redmount.template.service.ClazzService;
-import com.redmount.template.service.TestService;
-import com.redmount.template.util.JwtUtil;
 import com.redmount.template.util.ValidateCodeModel;
-import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
-import java.util.UUID;
-
-/**
- * @author 朱峰
- * @date 2018年11月19日
- */
-
-@RestController
-@Api(tags = "测试Controller")
+@RequestMapping("/test") // 此Controller对应的接口地址
+@RestController // 声明是Rest风格的Controll
 public class TestController {
-
-    @Resource
-    TestService service;
-
-    @Resource
-    ClazzService clazzService;
-
-    @GetMapping("/test/getToken")
-    public Result test() {
-        User user = new User();
-        user.setPk(UUID.randomUUID().toString());
-//        user.setPassword("abc");
-        user.setUserName("username");
-        user.setPk("pk");
-        return ResultGenerator.genSuccessResult(JwtUtil.createJWT(user));
-    }
-
-    @GetMapping("/test/serviceException")
-    public Result testServiceException() {
-        throw new ServiceException(100001);
-    }
-
-    @GetMapping("/test/runtimeException")
-    public Result testRuntimeException() {
-        return ResultGenerator.genSuccessResult(1 / 0);
-    }
-
-    @Token
-    @PostMapping("/test/validateToken")
-    public Result validate(@RequestBody ValidateCodeModel model, @RequestHeader(value = "token", defaultValue = "") String token) {
-        User user = service.getUserByToken();
-        return ResultGenerator.genSuccessResult(user);
+    @RequestMapping("/isEmail")
+    public Result isEmail(@RequestParam("input") String input){
+        return ResultGenerator.genSuccessResult(ValidateCodeModel.isEmail(input));
     }
 }

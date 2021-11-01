@@ -5,7 +5,7 @@ select concat('tableNames.add("',table_name,'");') from information_schema.table
 取数据库中所有表名,并且判断有没有deleted字段
  */
 SELECT
-	concat( 'tombstonedTableMap.add("', tbName, '" ,',
+	concat( 'logicDeletionTableMap.add("', tbName, '" ,',
 	( CASE column_name WHEN 'deleted' then 'true' ELSE 'false' END ),
 	');' ) AS r
 
