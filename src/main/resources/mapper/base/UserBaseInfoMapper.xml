@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.redmount.template.base.repo.UserBaseInfoMapper">
+  <resultMap id="BaseResultMap" type="com.redmount.template.base.model.UserBaseInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="pk" jdbcType="CHAR" property="pk" />
+    <result column="user_pk" jdbcType="CHAR" property="userPk" />
+    <result column="real_name" jdbcType="VARCHAR" property="realName" />
+    <result column="gender" jdbcType="VARCHAR" property="gender" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="creator" jdbcType="CHAR" property="creator" />
+    <result column="created" jdbcType="TIMESTAMP" property="created" />
+    <result column="updator" jdbcType="CHAR" property="updator" />
+    <result column="updated" jdbcType="TIMESTAMP" property="updated" />
+    <result column="deleted" jdbcType="BIT" property="deleted" />
+  </resultMap>
+</mapper>

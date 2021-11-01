@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.redmount.template.base.repo.RRoleTAuthorityMapper">
+  <resultMap id="BaseResultMap" type="com.redmount.template.base.model.RRoleTAuthority">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="pk" jdbcType="CHAR" property="pk" />
+    <result column="role_pk" jdbcType="CHAR" property="rolePk" />
+    <result column="authority_pk" jdbcType="CHAR" property="authorityPk" />
+    <result column="creator" jdbcType="CHAR" property="creator" />
+    <result column="created" jdbcType="TIMESTAMP" property="created" />
+  </resultMap>
+</mapper>
