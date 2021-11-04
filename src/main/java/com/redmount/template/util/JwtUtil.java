@@ -154,8 +154,11 @@ public class JwtUtil {
                 }
             }
         } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             throw new AuthorizationException("身份验证失败");
+        } catch (ExpiredJwtException e){
+//            e.printStackTrace();
+            throw new AuthorizationException("身份验证已过期");
         }
         return user;
     }

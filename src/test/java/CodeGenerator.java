@@ -58,11 +58,8 @@ public class CodeGenerator {
         logicDeletionTableMap.put("audit_operation_history" ,true);
         logicDeletionTableMap.put("authority" ,true);
         logicDeletionTableMap.put("r_role_t_authority" ,false);
-        logicDeletionTableMap.put("r_role_t_role_group" ,false);
         logicDeletionTableMap.put("r_user_t_role" ,false);
-        logicDeletionTableMap.put("r_user_t_role_group" ,false);
         logicDeletionTableMap.put("role" ,true);
-        logicDeletionTableMap.put("role_group" ,true);
         logicDeletionTableMap.put("sys_service_exception" ,false);
         logicDeletionTableMap.put("user" ,true);
         logicDeletionTableMap.put("user_base_info" ,true);

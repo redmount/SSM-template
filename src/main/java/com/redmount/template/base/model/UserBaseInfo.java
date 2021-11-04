@@ -28,13 +28,6 @@ public class UserBaseInfo extends BaseDOLogicDeletion implements Serializable {
     private String userPk;
 
     /**
-     * 用户真实姓名
-     */
-    @Column(name = "real_name")
-    @ApiModelProperty(value = "用户真实姓名")
-    private String realName;
-
-    /**
      * 用户性别, 以字符串记录
      */
     @ApiModelProperty(value = "用户性别, 以字符串记录")

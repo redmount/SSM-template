@@ -1,17 +1,25 @@
 package com.redmount.template.controller;
 
+import com.redmount.template.base.model.User;
 import com.redmount.template.core.Result;
 import com.redmount.template.core.ResultGenerator;
+import com.redmount.template.core.annotation.Audit;
+import com.redmount.template.util.JwtUtil;
+import com.redmount.template.util.UserUtil;
 import com.redmount.template.util.ValidateCodeModel;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/test") // 此Controller对应的接口地址
 @RestController // 声明是Rest风格的Controll
 public class TestController {
-    @RequestMapping("/isEmail")
-    public Result isEmail(@RequestParam("input") String input){
-        return ResultGenerator.genSuccessResult(ValidateCodeModel.isEmail(input));
+    @GetMapping("/isMobile")
+    public Result isMobile(@RequestParam("input") String input){
+        return ResultGenerator.genSuccessResult(ValidateCodeModel.isMobile(input));
+    }
+
+    @GetMapping("/validateToken")
+    @Audit("验证Token")
+    public Result validateToken(){
+        return ResultGenerator.genSuccessResult(UserUtil.getUserByToken(User.class));
     }
 }

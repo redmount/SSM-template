@@ -8,6 +8,6 @@ public class PasswordUtil {
 
     public static boolean validatePasswordWithSalt(String inputPassword, String password, String salt) {
         String passwordSalted = MD5WithSalt(inputPassword, salt);
-        return password == passwordSalted;
+        return password.equalsIgnoreCase(passwordSalted);
     }
 }

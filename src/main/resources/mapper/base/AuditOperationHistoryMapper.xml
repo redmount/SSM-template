@@ -11,8 +11,7 @@
     <result column="operator_user_name" jdbcType="VARCHAR" property="operatorUserName" />
     <result column="operation_function" jdbcType="VARCHAR" property="operationFunction" />
     <result column="operation" jdbcType="VARCHAR" property="operation" />
-    <result column="operation_query" jdbcType="VARCHAR" property="operationQuery" />
-    <result column="operation_data" jdbcType="VARCHAR" property="operationData" />
+    <result column="operation_arguments" jdbcType="VARCHAR" property="operationArguments" />
     <result column="operation_result" jdbcType="VARCHAR" property="operationResult" />
     <result column="duration" jdbcType="BIGINT" property="duration" />
     <result column="creator" jdbcType="CHAR" property="creator" />

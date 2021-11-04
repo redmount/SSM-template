@@ -55,18 +55,11 @@ public class AuditOperationHistory extends BaseDOLogicDeletion implements Serial
     private String operation;
 
     /**
-     * 操作URL参数
-     */
-    @Column(name = "operation_query")
-    @ApiModelProperty(value = "操作URL参数")
-    private String operationQuery;
-
-    /**
      * 操作body data
      */
-    @Column(name = "operation_data")
+    @Column(name = "operation_arguments")
     @ApiModelProperty(value = "操作body data")
-    private String operationData;
+    private String operationArguments;
 
     /**
      * 操作结果

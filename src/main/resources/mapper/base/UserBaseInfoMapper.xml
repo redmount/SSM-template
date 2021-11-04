@@ -7,7 +7,6 @@
     -->
     <id column="pk" jdbcType="CHAR" property="pk" />
     <result column="user_pk" jdbcType="CHAR" property="userPk" />
-    <result column="real_name" jdbcType="VARCHAR" property="realName" />
     <result column="gender" jdbcType="VARCHAR" property="gender" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
     <result column="creator" jdbcType="CHAR" property="creator" />

@@ -263,7 +263,6 @@ Path:   /class?condition=nickName like '%一年%'
 ```
 1. 修改```src/main/java/.../core/ProjectConstant.java```里面的内容.
 
-
     这里面的内容一旦修改好,尽量不要做调整,以避免各种麻烦.
 
     可能出现的情况是再次生成成功之后,项目会瘫痪,报各种类找不到的错误
@@ -273,8 +272,8 @@ Path:   /class?condition=nickName like '%一年%'
     其中生成的代码建议放在base文件夹下,以便维护.
 
     |常量名|作用|默认值|说明|
-    |-----|----|----|---|
-    |BASE_PACKAGE|生成代码所在的基础包名称,可根据自己公司的项目修改<br/>(注意：这个配置修改之后需要手工修改src目录项目默认的包路径,使其保持一致,不然会找不到类)|com.redmount.template|根据项目进行修改|
+    |-----|----|----|------|
+    |BASE_PACKAGE|生成代码所在的基础包名称,可根据自己公司的项目修(注意：这个配置修改之后需要手工修改src目录项目默认的包路径,使其保持一致,不然会找不到类)|com.redmount.template|根据项目进行修改|
     |MODEL_PACKAGE|生成的Model所在包|BASE_PACKAGE + ".base.model"|不建议修改|
     |MAPPER_PACKAGE|生成的Mapper所在包|BASE_PACKAGE + ".base.repo"|不建议修改|
     |SERVICE_PACKAGE|生成的Service所在包|BASE_PACKAGE + ".base.service"|不建议修改|

@@ -20,9 +20,9 @@ import java.util.Enumeration;
 @Component
 public class WebLogAspect {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private ThreadLocal<Long> startTime = new ThreadLocal<>();
+    private final ThreadLocal<Long> startTime = new ThreadLocal<>();
 
     /**
      * 定义一个切入点.
@@ -34,14 +34,14 @@ public class WebLogAspect {
      * ~ ..匹配任意数量的参数.
      */
 
-    @Pointcut("(execution(public * com.redmount.template.controller.*.*(..))) || (execution(public * com.redmount.template.core.Controller.*(..)))")
+    @Pointcut("(execution(public * com.redmount.template.controller.*.*(..))) || (execution(public * com.redmount.template.system.controller.*.*(..)))")
     public void webLog() {
     }
 
     @Before("webLog()")
     public void doBefore(JoinPoint joinPoint) {
         startTime.set(System.currentTimeMillis());
-        logger.info("-----------------------请求开始" + startTime + "-----------------------");
+        logger.info("-----------------------请求开始" + startTime + "@" + startTime.get() + "-----------------------");
         logger.info("WebLogAspect.doBefore()");
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert attributes != null;
@@ -64,6 +64,6 @@ public class WebLogAspect {
         // 处理完请求，返回内容
         logger.info("WebLogAspect.doAfterReturning()");
         logger.info("耗时（毫秒） : " + (System.currentTimeMillis() - startTime.get()));
-        logger.info("-----------------------请求结束" + startTime + "-----------------------");
+        logger.info("-----------------------请求结束" + startTime + "@" + startTime.get() + "-----------------------");
     }
 }

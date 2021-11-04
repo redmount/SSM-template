@@ -38,6 +38,13 @@ public class User extends BaseDOLogicDeletion implements Serializable {
     private String salt;
 
     /**
+     * 用户真实姓名
+     */
+    @Column(name = "real_name")
+    @ApiModelProperty(value = "用户真实姓名")
+    private String realName;
+
+    /**
      * 用户手机号
      */
     @ApiModelProperty(value = "用户手机号")
