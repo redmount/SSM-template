@@ -15,7 +15,7 @@ spring:
 
 token:
   key: YWJj
-  expireTime: 3600000
+  expireTime: 3600000 #一小时过期
 
 # logback配置
 debug: true

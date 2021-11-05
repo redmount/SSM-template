@@ -13,16 +13,18 @@ public class Logger {
         LoggerFactory.getLogger(getClassName()).error(msg);
     }
 
+    public static void error(Exception ex){LoggerFactory.getLogger(getClassName()).error(ex.getMessage(),ex);}
+
     public static void error(String msg, Object... obj) {
         LoggerFactory.getLogger(getClassName()).error(msg, obj);
     }
 
     public static void warn(String msg) {
-        LoggerFactory.getLogger(getClassName()).error(msg);
+        LoggerFactory.getLogger(getClassName()).warn(msg);
     }
 
     public static void warn(String msg, Object... obj) {
-        LoggerFactory.getLogger(getClassName()).error(msg, obj);
+        LoggerFactory.getLogger(getClassName()).warn(msg, obj);
     }
 
     public static void info(String msg) {

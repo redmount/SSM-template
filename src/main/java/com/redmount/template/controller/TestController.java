@@ -7,6 +7,7 @@ import com.redmount.template.core.annotation.Audit;
 import com.redmount.template.util.JwtUtil;
 import com.redmount.template.util.UserUtil;
 import com.redmount.template.util.ValidateCodeModel;
+import com.redmount.template.util.ValidateUtil;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/test") // 此Controller对应的接口地址
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class TestController {
     @GetMapping("/isMobile")
     public Result isMobile(@RequestParam("input") String input){
-        return ResultGenerator.genSuccessResult(ValidateCodeModel.isMobile(input));
+        return ResultGenerator.genSuccessResult(ValidateUtil.isMobile(input));
     }
 
     @GetMapping("/validateToken")

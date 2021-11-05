@@ -126,7 +126,7 @@ public class JwtUtil {
                     .parseClaimsJws(token).getBody();
             claims.getSubject();
         } catch (ExpiredJwtException ex) {
-            ex.printStackTrace();
+            Logger.error(ex.toString());
             throw new AuthorizationException("身份信息过期");
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -135,18 +135,49 @@ public class JwtUtil {
         return true;
     }
 
-    public static Object getUserByToken(String token, Class userClass) {
+    public static Object getUserByToken(String token, Class userClass, boolean isIgnoreExpired) {
         if (StringUtils.isBlank(token)) {
             throw new AuthorizationException("身份信息缺失");
         }
         Object user = null;
         try {
-            user = userClass.newInstance();
             Claims claims = Jwts.parser()
                     //设置签名的秘钥
                     .setSigningKey(getKey())
                     //设置需要解析的jwt
                     .parseClaimsJws(token).getBody();
+            user = getUserByClaims(claims, userClass);
+        } catch (ExpiredJwtException e) {
+            if (!isIgnoreExpired) {
+                throw new AuthorizationException("身份验证已过期");
+            } else {
+                user = getUserByClaims(e.getClaims(), userClass);
+            }
+        }
+        return user;
+    }
+
+    /**
+     * 根据Token取用户, 如果Token过期, 会抛出异常.
+     * @param token token
+     * @param userClass 需要转换的类
+     * @return 用户实体
+     */
+    public static Object getUserByToken(String token, Class userClass) {
+        return getUserByToken(token, userClass, false);
+    }
+
+    /**
+     * 通过Token负载取用户
+     *
+     * @param claims    token解析的负载
+     * @param userClass 需要转换的类
+     * @return 用户实体
+     */
+    public static Object getUserByClaims(Claims claims, Class userClass) {
+        Object user = null;
+        try {
+            user = userClass.newInstance();
             for (Field field : ReflectUtil.getFieldList(userClass)) {
                 field.setAccessible(true);
                 if (claims.containsKey(field.getName())) {
@@ -154,11 +185,8 @@ public class JwtUtil {
                 }
             }
         } catch (InstantiationException | IllegalAccessException e) {
-//            e.printStackTrace();
-            throw new AuthorizationException("身份验证失败");
-        } catch (ExpiredJwtException e){
-//            e.printStackTrace();
-            throw new AuthorizationException("身份验证已过期");
+            Logger.error(e);
+            throw new Error("身份验证失败");
         }
         return user;
     }
