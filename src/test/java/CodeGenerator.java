@@ -18,11 +18,6 @@ import static com.redmount.template.core.ProjectConstant.*;
  * 代码生成器，根据数据表名称生成对应的Model、Mapper、Service、Controller简化开发。
  */
 public class CodeGenerator {
-    //JDBC配置，请修改为你项目的实际配置
-    private static final String JDBC_URL = "jdbc:mysql://192.144.231.168:3306/ssm-with-user?serverTimezone=GMT%2B8";
-    private static final String JDBC_USERNAME = "ssm-with-user";
-    private static final String JDBC_PASSWORD = "2wsx@WSX";
-    private static final String JDBC_DIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
 
     private static final String PROJECT_PATH = System.getProperty("user.dir"); //项目在硬盘上的基础路径
     private static final String TEMPLATE_FILE_PATH = PROJECT_PATH + "/src/test/resources/generator/template";//模板位置
@@ -38,21 +33,21 @@ public class CodeGenerator {
     private static final String DATE = new SimpleDateFormat("yyyy/MM/dd").format(new Date());//@date
 
     public static void main(String[] args) {
-        List<String> tableNames = new ArrayList<>();
-//        tableNames.add("audit_operation_history");
-//        tableNames.add("authority");
-//        tableNames.add("r_role_t_authority");
-//        tableNames.add("r_role_t_role_group");
-//        tableNames.add("r_user_t_role");
-//        tableNames.add("user");
-//        tableNames.add("user_base_info");
-//        tableNames.add("user_contact_info");
-//        /// tableNames.add("sys_service_exception"); 这个的实体已经被定义在项目内部,不允许生成,否则会由于类名相同而无法启动.
-//        for (String tableName : tableNames) {
-//            if (!"sys_service_exception".equalsIgnoreCase(tableName)) {
-//                genCode(tableName);
-//            }
-//        }
+//        List<String> tableNames = new ArrayList<>();
+        //        tableNames.add("audit_operation_history");
+        //        tableNames.add("authority");
+        //        tableNames.add("r_role_t_authority");
+        //        tableNames.add("r_role_t_role_group");
+        //        tableNames.add("r_user_t_role");
+        //        tableNames.add("user");
+        //        tableNames.add("user_base_info");
+        //        tableNames.add("user_contact_info");
+        //        /// tableNames.add("sys_service_exception"); 这个的实体已经被定义在项目内部,不允许生成,否则会由于类名相同而无法启动.
+        //        for (String tableName : tableNames) {
+        //            if (!"sys_service_exception".equalsIgnoreCase(tableName)) {
+        //                genCode(tableName);
+        //            }
+        //        }
         //genCodeByCustomModelName("输入表名","输入自定义Model名称");
         Map<String, Boolean> logicDeletionTableMap = new HashMap<>();
         logicDeletionTableMap.put("audit_operation_history" ,true);
@@ -108,10 +103,10 @@ public class CodeGenerator {
         context.addProperty(PropertyRegistry.CONTEXT_ENDING_DELIMITER, "`");
 
         JDBCConnectionConfiguration jdbcConnectionConfiguration = new JDBCConnectionConfiguration();
-        jdbcConnectionConfiguration.setConnectionURL(JDBC_URL);
-        jdbcConnectionConfiguration.setUserId(JDBC_USERNAME);
-        jdbcConnectionConfiguration.setPassword(JDBC_PASSWORD);
-        jdbcConnectionConfiguration.setDriverClass(JDBC_DIVER_CLASS_NAME);
+        jdbcConnectionConfiguration.setConnectionURL(DBUtil.JDBC_URL);
+        jdbcConnectionConfiguration.setUserId(DBUtil.JDBC_USERNAME);
+        jdbcConnectionConfiguration.setPassword(DBUtil.JDBC_PASSWORD);
+        jdbcConnectionConfiguration.setDriverClass(DBUtil.JDBC_DIVER_CLASS_NAME);
         context.setJdbcConnectionConfiguration(jdbcConnectionConfiguration);
 
         PluginConfiguration pluginConfiguration = new PluginConfiguration();
@@ -148,7 +143,7 @@ public class CodeGenerator {
             tableConfiguration.setDomainObjectName(modelName);
 //            tableConfiguration.addProperty("useActualColumnNames", "true");
         }
-        tableConfiguration.setGeneratedKey(new GeneratedKey("pk", "Mysql", true, null));
+        tableConfiguration.setGeneratedKey(new GeneratedKey(PRIMARY_KEY_FIELD_NAME, "Mysql", true, null));
         context.addTableConfiguration(tableConfiguration);
 
         List<String> warnings;
@@ -158,8 +153,8 @@ public class CodeGenerator {
             config.addContext(context);
             config.validate();
 
-            boolean overwrite = true;
-            DefaultShellCallback callback = new DefaultShellCallback(overwrite);
+//            boolean overwrite = true;
+            DefaultShellCallback callback = new DefaultShellCallback(true);
             warnings = new ArrayList<>();
             generator = new MyBatisGenerator(config, callback, warnings);
             generator.generate(null);

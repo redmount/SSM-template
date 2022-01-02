@@ -42,14 +42,14 @@ public class ModelCommentGenerator extends MapperPlugin {
 
     public void setProperties(Properties properties) {
         super.setProperties(properties);
-        String sImplementSerializableInteface = this.properties.getProperty("implementSerializableInteface");
-        if (stringHasValue(sImplementSerializableInteface)) {
-            this.implementSerializableInterface = Boolean.parseBoolean(sImplementSerializableInteface);
+        String implementSerializableInterface = this.properties.getProperty("implementSerializableInterface");
+        if (stringHasValue(implementSerializableInterface)) {
+            this.implementSerializableInterface = Boolean.parseBoolean(implementSerializableInterface);
         }
 
-        String sModelFieldEnum = this.properties.getProperty("modelFieldEnum");
-        if (stringHasValue(sModelFieldEnum)) {
-            this.modelFieldEnum = Boolean.parseBoolean(sModelFieldEnum);
+        String modelFieldEnum = this.properties.getProperty("modelFieldEnum");
+        if (stringHasValue(modelFieldEnum)) {
+            this.modelFieldEnum = Boolean.parseBoolean(modelFieldEnum);
         }
         String swaggerApiEnabled = this.properties.getProperty("swaggerApiEnabled");
         if (stringHasValue(swaggerApiEnabled)) {

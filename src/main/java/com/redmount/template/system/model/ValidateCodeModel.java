@@ -1,5 +1,6 @@
-package com.redmount.template.util;
+package com.redmount.template.system.model;
 
+import com.redmount.template.util.MD5Util;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -16,7 +17,7 @@ public class ValidateCodeModel {
      * @param realCode 真实值
      * @return 加密后的验证码实体
      */
-    ValidateCodeModel initCode(String realCode) {
+    public ValidateCodeModel initCode(String realCode) {
         this.cryptCode = MD5Util.getMD5(realCode);
         return this;
     }

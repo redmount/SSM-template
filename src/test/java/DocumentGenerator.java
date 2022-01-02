@@ -16,10 +16,6 @@ import java.util.Date;
 import java.util.List;
 
 public class DocumentGenerator {
-    //JDBC配置，请修改为你项目的实际配置
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/test?serverTimezone=UTC";
-    private static final String JDBC_USERNAME = "root";
-    private static final String JDBC_PASSWORD = "root";
 
     private static final String PROJECT_PATH = System.getProperty("user.dir"); //项目在硬盘上的基础路径
 
@@ -31,8 +27,9 @@ public class DocumentGenerator {
     private static final String DATE = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());//@date
 
     public static void main(String[] args) {
-        Connection connection = getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
+        Connection connection = DBUtil.getConnection();
         List<TableComment> tableCommentList = getTables(connection);
+        DBUtil.closeJDBC(connection);
         genDBDocument(tableCommentList);
         genBaseModelJsCode(tableCommentList);
     }
@@ -136,22 +133,12 @@ public class DocumentGenerator {
         }
     }
 
-    private static Connection getConnection(String connectionString, String userName, String password) {
-        Connection connection = null;
-        try {
-            connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return connection;
-    }
-
     private static List<TableComment> getTables(Connection connection) {
         TableComment tableComment;
         List<TableComment> tableCommentList = new ArrayList<>();
         try {
             connection.setAutoCommit(false);
-            PreparedStatement pstmt = connection.prepareStatement(String.format(TABLE_QUERY, getDbNameFromURL(JDBC_URL)));
+            PreparedStatement pstmt = connection.prepareStatement(String.format(TABLE_QUERY, getDbNameFromURL(DBUtil.JDBC_URL)));
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 tableComment = new TableComment();
@@ -181,7 +168,7 @@ public class DocumentGenerator {
         List<ColumnComment> columnCommentList = new ArrayList<>();
         try {
             connection.setAutoCommit(false);
-            PreparedStatement pstmt = connection.prepareStatement(String.format(COLUMN_QUERY, getDbNameFromURL(JDBC_URL)));
+            PreparedStatement pstmt = connection.prepareStatement(String.format(COLUMN_QUERY, getDbNameFromURL(DBUtil.JDBC_URL)));
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.redmount.template.repo.AuthorityModelRepo">
+    <resultMap id="BaseResultMap" type="com.redmount.template.base.model.Authority">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="pk" jdbcType="CHAR" property="pk"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="creator" jdbcType="CHAR" property="creator"/>
+        <result column="created" jdbcType="TIMESTAMP" property="created"/>
+        <result column="updater" jdbcType="CHAR" property="updater"/>
+        <result column="updated" jdbcType="TIMESTAMP" property="updated"/>
+        <result column="deleted" jdbcType="BIT" property="deleted"/>
+    </resultMap>
+
+    <select id="getUserAuthorityCodeList" parameterType="String" resultType="java.lang.String">
+        SELECT distinct a.code
+        FROM USER u
+                 LEFT JOIN r_user_t_role ON u.pk = r_user_t_role.user_pk
+                 LEFT JOIN r_role_t_authority ON r_user_t_role.role_pk = r_role_t_authority.role_pk
+                 LEFT JOIN authority a ON r_role_t_authority.authority_pk = a.pk
+        WHERE u.pk = #{pk}
+          and (a.deleted is null or a.deleted!=1)
+    </select>
+</mapper>

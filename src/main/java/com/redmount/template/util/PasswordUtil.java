@@ -6,7 +6,7 @@ public class PasswordUtil {
         return MD5Util.getMD5(str);
     }
 
-    public static boolean validatePasswordWithSalt(String inputPassword, String password, String salt) {
+    public static boolean validatePassword(String inputPassword, String password, String salt) {
         String passwordSalted = MD5WithSalt(inputPassword, salt);
         return password.equalsIgnoreCase(passwordSalted);
     }

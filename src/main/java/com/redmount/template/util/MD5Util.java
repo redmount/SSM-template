@@ -61,11 +61,12 @@ public class MD5Util {
     /**
      * 获取字符串的MD5值
      */
-    static String getMD5(String str) {
-        if (str != null && str.length() > 0)
+    public static String getMD5(String str) {
+        if (str != null && str.length() > 0) {
             return convertToHexString(Objects.requireNonNull(md5sum(str.getBytes())));
-        else
+        } else {
             return null;
+        }
     }
 
     /**

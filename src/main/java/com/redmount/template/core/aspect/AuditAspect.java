@@ -6,12 +6,15 @@ import com.redmount.template.base.model.User;
 import com.redmount.template.base.service.AuditOperationHistoryBaseService;
 import com.redmount.template.core.annotation.Audit;
 import com.redmount.template.util.UserUtil;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -19,6 +22,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 @Aspect
+@Order(2)
 @Component
 public class AuditAspect {
     @Autowired
@@ -43,7 +47,13 @@ public class AuditAspect {
             audit.setCreator(user.getPk());
             audit.setOperatorPk(user.getPk());
             audit.setDuration(System.currentTimeMillis() - startTimestamp);
-            audit.setOperation(method.getAnnotation(Audit.class).value());
+            String operation = "";
+            if (StringUtils.isNotBlank(method.getAnnotation(Audit.class).value())) {
+                operation = method.getAnnotation(Audit.class).value();
+            } else if (method.isAnnotationPresent(ApiOperation.class)) {
+                operation = method.getAnnotation(ApiOperation.class).value();
+            }
+            audit.setOperation(operation);
             audit.setOperationArguments(Arrays.toString(joinPoint.getArgs()));
             audit.setOperationFunction(joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
             audit.setOperationResult(JSON.toJSONString(obj));
