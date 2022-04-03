@@ -3,8 +3,8 @@ package com.redmount.template.core;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.CaseFormat;
-import com.redmount.template.core.annotation.RelationData;
 import com.redmount.template.core.annotation.LogicDelete;
+import com.redmount.template.core.annotation.RelationData;
 import com.redmount.template.core.annotation.Validate;
 import com.redmount.template.core.exception.ServiceException;
 import com.redmount.template.system.model.SysServiceException;
@@ -105,7 +105,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
                 e.printStackTrace();
             }
         }
-        return model;
+        return afterGetModel(model, relations);
     }
 
     /**
@@ -186,6 +186,9 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     @Override
     public T saveAutomatically(T model, boolean forceSaveNull) {
         validateModelToSave(model);
+        if(!beforeSaveModel(model)){
+            return model;
+        }
         String mainPk = model.getPk();
         List<Field> relationFields;
         Object currentFieldValue;
@@ -224,8 +227,7 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
         mapper = initMainMapper();
         model.setUpdated(new Date());
         mapper.updateByPrimaryKeySelective(model);
-
-        return model;
+        return afterSaveModel(model);
     }
 
     /**
@@ -777,6 +779,46 @@ public abstract class AbstractModelService<T extends BaseDO> implements ModelSer
     public int getCountByCondition(Condition condition) {
         mapper = initMainMapper();
         return mapper.selectCountByCondition(condition);
+    }
+
+    /**
+     * 自定义取数据的方法, 该方法会在挂完关系之后执行
+     * 以满足自定义数据结构的需求
+     *
+     * @param model 已经查询到的实体
+     * @param relations 关系数据列表
+     * @return 自定义实体
+     */
+    @Override
+    public T afterGetModel(T model, String relations) {
+        return model;
+    }
+
+    /**
+     * 保存自定莫模型之前需要做的事.
+     * 这里可以实现自定义的存储.
+     * 还可以通过返回值控制是否继续使用save方法进行保存
+     * true: 继续保存
+     * false: 不继续保存
+     *
+     * @param model 自定义数据模型
+     * @return 是否继续使用save方法进行保存
+     */
+    @Override
+    public boolean beforeSaveModel(T model) {
+        return false;
+    }
+
+    /**
+     * 保存自定义模型之后需要做的事.
+     * 这里也可以实现自定义存储, 多线程记录啊, 什么的.
+     *
+     * @param model 自定义数据模型
+     * @return 保存完之后的数据模型
+     */
+    @Override
+    public T afterSaveModel(T model) {
+        return model;
     }
 
     /**

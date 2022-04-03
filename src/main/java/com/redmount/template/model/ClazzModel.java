@@ -79,4 +79,7 @@ public class ClazzModel extends TestClazz {
     // 没有标记任何本框架下的注解,则本框架忽略不计,此属性可以作为正常属性正常使用.
     @ApiModelProperty("学生数量")
     private Integer studentsCount; // 没有标记,则此体系不掌管这个属性
+
+    @ApiModelProperty("是否为大班")
+    private Boolean isBig;
 }

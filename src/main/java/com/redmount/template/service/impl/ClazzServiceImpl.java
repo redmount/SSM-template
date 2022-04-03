@@ -17,6 +17,11 @@ public class ClazzServiceImpl extends AbstractModelService<ClazzModel> implement
     public ClazzModel getAutomatically(String pk, String relations) {
         ClazzModel clazzModel = super.getAutomatically(pk, relations);
         clazzModel.setStudentsCount(repo.getStudentsCountByClassPk(clazzModel.getPk()));
+        if(clazzModel.getStudentsCount()>0){
+            clazzModel.setIsBig(true);
+        }else{
+            clazzModel.setIsBig(false);
+        }
         return clazzModel;
     }
 }

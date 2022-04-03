@@ -1,13 +1,10 @@
 package com.redmount.template.base.service.impl;
 
-import com.redmount.template.base.repo.SysFileMapper;
 import com.redmount.template.base.model.SysFile;
 import com.redmount.template.base.service.SysFileBaseService;
 import com.redmount.template.core.AbstractModelService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
 
 
 /**

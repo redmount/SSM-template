@@ -281,6 +281,7 @@ public interface ModelService<T> {
 
     /**
      * 根据条件字符串取数量
+     *
      * @param conditionString 条件字符串
      * @return 符合条件的数量
      */
@@ -300,4 +301,35 @@ public interface ModelService<T> {
      * @return 带注释的实体模型
      */
     SortedMap getSchema();
+
+    /**
+     * 自定义取数据的方法, 该方法会在挂完关系之后执行
+     * 以满足自定义数据结构的需求
+     *
+     * @param model 已经查询到的实体
+     * @param relations 关系数据字符串
+     * @return 自定义实体
+     */
+    T afterGetModel(T model, String relations);
+
+    /**
+     * 保存自定莫模型之前需要做的事.
+     * 这里可以实现自定义的存储.
+     * 还可以通过返回值控制是否继续使用save方法进行保存
+     * true: 继续保存
+     * false: 不继续保存
+     *
+     * @param model 自定义数据模型
+     * @return 是否继续使用save方法进行保存
+     */
+    boolean beforeSaveModel(T model);
+
+    /**
+     * 保存自定义模型之后需要做的事.
+     * 这里也可以实现自定义存储, 多线程记录啊, 什么的.
+     *
+     * @param model 自定义数据模型
+     * @return 保存完之后的数据模型
+     */
+    T afterSaveModel(T model);
 }

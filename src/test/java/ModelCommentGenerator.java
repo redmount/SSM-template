@@ -1,6 +1,7 @@
 import com.redmount.template.core.ProjectConstant;
 import org.apache.commons.lang3.StringUtils;
-import org.mybatis.generator.api.*;
+import org.mybatis.generator.api.IntrospectedColumn;
+import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
 import tk.mybatis.mapper.generator.MapperPlugin;
 import tk.mybatis.mapper.util.StringUtil;
@@ -180,7 +181,7 @@ public class ModelCommentGenerator extends MapperPlugin {
     }
 
     private void swaggerApiAnnotation(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
-        Iterator i$;
+        Iterator<Field> i$;
         if (this.swaggerApiEnabled) {
             String apiModel = "io.swagger.annotations.ApiModel";
             String apiModelProperty = "io.swagger.annotations.ApiModelProperty";
