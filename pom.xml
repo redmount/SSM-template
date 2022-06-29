@@ -111,7 +111,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>4.1.0</version>
+            <version>4.1.1</version>
         </dependency>
         <!--Office文件操作类结束-->
         <!--测试工具-->
