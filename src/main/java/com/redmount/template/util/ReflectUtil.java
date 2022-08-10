@@ -8,10 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class ReflectUtil {
 
@@ -301,8 +298,13 @@ public class ReflectUtil {
         assert field != null;
         field.setAccessible(true);
         try {
-            //将 object 中 field 所代表的值 设置为 value
-            field.set(object, value);
+            if (field.getType() == Date.class) {
+                Date date = new Date((Long) value);
+                field.set(object, date);
+            } else {
+                //将 object 中 field 所代表的值 设置为 value
+                field.set(object, value);
+            }
         } catch (IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
         }
