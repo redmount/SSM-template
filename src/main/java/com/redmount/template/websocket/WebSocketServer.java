@@ -1,5 +1,6 @@
 package com.redmount.template.websocket;
 
+import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,8 @@ import javax.annotation.PostConstruct;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,7 +37,10 @@ public class WebSocketServer {
         SessionSet.add(session);
         int cnt = OnlineCount.incrementAndGet(); // 在线数加1
         log.info("有连接加入，当前连接数为：{}", cnt);
-        SendMessage(session, "连接成功");
+        Map<String, Object> map = new HashMap<>();
+        map.put("bizName", "System");
+        map.put("data", "有连接加入，当前连接数为：" + cnt);
+        SendMessage(session, JSON.toJSONString(map));
     }
 
     /**
@@ -78,7 +84,7 @@ public class WebSocketServer {
      */
     public static void SendMessage(Session session, String message) {
         try {
-            session.getBasicRemote().sendText(String.format("%s (From Server，Session ID=%s)", message, session.getId()));
+            session.getBasicRemote().sendText(message);
         } catch (IOException e) {
             log.error("发送消息出错：{}", e.getMessage());
             e.printStackTrace();

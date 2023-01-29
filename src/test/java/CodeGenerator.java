@@ -46,8 +46,9 @@ public class CodeGenerator {
         tableNames.add("test_clazz_info");
         tableNames.add("test_student");
         tableNames.add("test_teacher");
-        /// tableNames.add("sys_service_exception"); 这个的实体已经被定义在项目内部,不允许生成,否则会由于类名相同而无法启动.
+        /// tableNames.add("sys_service_exception");
         for (String tableName : tableNames) {
+            // 这个的实体已经被定义在项目内部,不允许生成,否则会由于类名相同而无法启动.
             if (!"sys_service_exception".equalsIgnoreCase(tableName)) {
                 genCode(tableName);
             }
@@ -96,7 +97,7 @@ public class CodeGenerator {
         genController(tableName, modelName);
     }
 
-    public static void genModelAndMapper(String tableName, String modelName, boolean isTombstoned) {
+    public static void genModelAndMapper(String tableName, String modelName, boolean isLogicDeletion) {
         Context context = new Context(ModelType.FLAT);
         context.setId("Potato");
         context.setTargetRuntime("MyBatis3Simple");
@@ -118,8 +119,8 @@ public class CodeGenerator {
         JavaModelGeneratorConfiguration javaModelGeneratorConfiguration = new JavaModelGeneratorConfiguration();
         javaModelGeneratorConfiguration.setTargetProject(PROJECT_PATH + JAVA_PATH);
         javaModelGeneratorConfiguration.setTargetPackage(MODEL_PACKAGE);
-        if (isTombstoned) {
-            javaModelGeneratorConfiguration.addProperty("rootClass", BASE_PACKAGE + ".core.BaseDOTombstoned");
+        if (isLogicDeletion) {
+            javaModelGeneratorConfiguration.addProperty("rootClass", BASE_PACKAGE + ".core.BaseDOLogicDeletion");
         } else {
             javaModelGeneratorConfiguration.addProperty("rootClass", BASE_PACKAGE + ".core.BaseDO");
         }

@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -37,6 +38,8 @@ public class TestController {
 //        user.setPassword("abc");
         user.setUserName("username");
         user.setPk("pk");
+        Date date = new Date();
+        user.setLastUpdated(date);
         return ResultGenerator.genSuccessResult(JwtUtil.createJWT(user));
     }
 
@@ -52,7 +55,7 @@ public class TestController {
 
     @Token
     @PostMapping("/test/validateToken")
-    public Result validate(@RequestBody ValidateCodeModel model, @RequestHeader(value = "token", defaultValue = "") String token) {
+    public Result validate(@RequestHeader(value = "token", defaultValue = "") String token) {
         User user = service.getUserByToken();
         return ResultGenerator.genSuccessResult(user);
     }
