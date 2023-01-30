@@ -3,8 +3,11 @@ package com.redmount.template.base.service.impl;
 import com.redmount.template.base.model.SysFile;
 import com.redmount.template.base.service.SysFileBaseService;
 import com.redmount.template.core.AbstractModelService;
+import com.redmount.template.core.exception.ServiceException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.File;
 
 
 /**
@@ -15,4 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class SysFileBaseServiceImpl extends AbstractModelService<SysFile> implements SysFileBaseService {
+    @Override
+    public File getFileByPk(String pk) {
+        SysFile fileRecord = findById(pk);
+        if (fileRecord == null) {
+            throw new ServiceException("附件记录不存在");
+        }
+
+        File file = new File(fileRecord.getServerFileName());
+        return file;
+    }
 }
