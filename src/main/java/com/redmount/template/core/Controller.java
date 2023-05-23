@@ -1,9 +1,10 @@
 package com.redmount.template.core;
 
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
+import java.util.SortedMap;
 
 public interface Controller<T> {
     /**
@@ -22,7 +23,7 @@ public interface Controller<T> {
      * @return 增加的实体
      */
     @ApiOperation(value="强制添加资源")
-    Result addAutomatic(T model);
+    Result<T> addAutomatic(T model);
 
     /**
      * 强制修改实体
@@ -32,7 +33,7 @@ public interface Controller<T> {
      * @param pk 待更新的实体pk
      */
     @ApiOperation(value="局部更新资源")
-    Result modifyAutomatic(String pk, T model);
+    Result<T> modifyAutomatic(String pk, T model);
 
     /**
      * 取资源列表
@@ -46,7 +47,7 @@ public interface Controller<T> {
      * @return 带分页信息的实体列表
      */
     @ApiOperation(value="取资源列表(带分页信息)")
-    Result<List<T>> listAutomatic(String keywords, String condition, String relations, String orderBy, int page, int size);
+    Result<PageInfo<T>> listAutomatic(String keywords, String condition, String relations, String orderBy, int page, int size);
 
     /**
      * 按pk取实体
@@ -65,7 +66,7 @@ public interface Controller<T> {
      * @return 删除了多少条(1或0, 1代表删除成功, 0代表没有删除成功)
      */
     @ApiOperation(value="按pk物理删除资源")
-    Result delAutomatic(String pk);
+    Result<Integer> delAutomatic(String pk);
 
     /**
      * 按条件物理删除
@@ -74,7 +75,7 @@ public interface Controller<T> {
      * @return 删除了多少条数据
      */
     @ApiOperation(value="按条件物理删除资源")
-    Result delByConditionAutomatic(String condition);
+    Result<Integer> delByConditionAutomatic(String condition);
 
     /**
      * 按条件取数量
@@ -82,14 +83,14 @@ public interface Controller<T> {
      * @return 符合条件的条数
      */
     @ApiOperation("按条件取数量")
-    Result getCountByCondition(@RequestParam("condition") String condition);
+    Result<Integer> getCountByCondition(@RequestParam("condition") String condition);
     /**
      * 取实体说明
      *
      * @return 带注释的实体说明
      */
     @ApiOperation(value="取资源的全部可见结构")
-    Result getSchema();
+    Result<SortedMap> getSchema();
 
     /**
      * 初始化(目前主要用于初始化service,使之不为空)

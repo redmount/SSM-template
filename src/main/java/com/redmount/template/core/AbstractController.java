@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.SortedMap;
+
 public abstract class AbstractController<T extends BaseDO> implements Controller<T> {
 
     /**
@@ -24,9 +26,9 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
      */
     @PutMapping
     @Override
-    public Result saveAutomatic(@RequestBody T model) {
+    public Result<T> saveAutomatic(@RequestBody T model) {
         initService();
-        return ResultGenerator.genSuccessResult(service.saveAutomatically(model, true));
+        return ResultGenerator.genSuccessResult((T) service.saveAutomatically(model, true));
     }
 
     /**
@@ -43,12 +45,12 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
      */
     @GetMapping
     @Override
-    public Result listAutomatic(@RequestParam(value = "keywords", defaultValue = "") String keywords,
-                                @RequestParam(value = "condition", defaultValue = "") String condition,
-                                @RequestParam(value = "relations", defaultValue = "") String relations,
-                                @RequestParam(value = "orderBy", defaultValue = "updated desc") String orderBy,
-                                @RequestParam(value = "page", defaultValue = "1") int page,
-                                @RequestParam(value = "size", defaultValue = "10") int size) {
+    public Result<PageInfo<T>> listAutomatic(@RequestParam(value = "keywords", defaultValue = "") String keywords,
+                                             @RequestParam(value = "condition", defaultValue = "") String condition,
+                                             @RequestParam(value = "relations", defaultValue = "") String relations,
+                                             @RequestParam(value = "orderBy", defaultValue = "updated desc") String orderBy,
+                                             @RequestParam(value = "page", defaultValue = "1") int page,
+                                             @RequestParam(value = "size", defaultValue = "10") int size) {
         initService();
         PageInfo pageInfo = service.listAutomaticallyWithoutRelations(keywords, condition, relations, orderBy, page, size);
         if (StringUtils.isNotBlank(relations)) {
@@ -66,9 +68,9 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
      */
     @GetMapping("/{pk}")
     @Override
-    public Result getAutomatic(@PathVariable String pk, @RequestParam(defaultValue = "") String relations) {
+    public Result<T> getAutomatic(@PathVariable String pk, @RequestParam(defaultValue = "") String relations) {
         initService();
-        return ResultGenerator.genSuccessResult(service.getAutomatically(pk, relations));
+        return ResultGenerator.genSuccessResult((T) service.getAutomatically(pk, relations));
     }
 
     /**
@@ -79,7 +81,7 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
      */
     @DeleteMapping("/{pk}")
     @Override
-    public Result delAutomatic(@PathVariable String pk) {
+    public Result<Integer> delAutomatic(@PathVariable String pk) {
         initService();
         return ResultGenerator.genSuccessResult(service.delAutomaticallyByPk(pk));
     }
@@ -92,7 +94,7 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
      */
     @DeleteMapping
     @Override
-    public Result delByConditionAutomatic(@RequestParam("condition") String condition) {
+    public Result<Integer> delByConditionAutomatic(@RequestParam("condition") String condition) {
         if (StringUtils.isBlank(condition)) {
             throw new ServiceException(999902);
         }
@@ -108,10 +110,10 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
      */
     @PostMapping
     @Override
-    public Result addAutomatic(@RequestBody T model) {
+    public Result<T> addAutomatic(@RequestBody T model) {
         initService();
         model.setPk(null);
-        return ResultGenerator.genSuccessResult(service.saveAutomatically(model, false));
+        return ResultGenerator.genSuccessResult((T) service.saveAutomatically(model, false));
     }
 
     /**
@@ -122,15 +124,15 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
      */
     @PatchMapping("/{pk}")
     @Override
-    public Result modifyAutomatic(@PathVariable("pk") String pk, @RequestBody T model) {
+    public Result<T> modifyAutomatic(@PathVariable("pk") String pk, @RequestBody T model) {
         initService();
         model.setPk(pk);
-        return ResultGenerator.genSuccessResult(service.saveAutomatically(model, false));
+        return ResultGenerator.genSuccessResult((T) service.saveAutomatically(model, false));
     }
 
     @GetMapping("/count")
     @Override
-    public Result getCountByCondition(@RequestParam("condition") String condition) {
+    public Result<Integer> getCountByCondition(@RequestParam("condition") String condition) {
         initService();
         return ResultGenerator.genSuccessResult(service.getCountByCondition(condition));
     }
@@ -147,7 +149,7 @@ public abstract class AbstractController<T extends BaseDO> implements Controller
      * @return 实体结构说明
      */
     @GetMapping("/schema")
-    public Result getSchema() {
+    public Result<SortedMap> getSchema() {
         if (!"dev".equalsIgnoreCase(env)) {
             try {
                 throw new Exception("禁止访问");

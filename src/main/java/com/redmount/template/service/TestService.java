@@ -5,5 +5,4 @@ import com.redmount.template.model.User;
 
 public interface TestService {
     TestModel test();
-    User getUserByToken();
 }

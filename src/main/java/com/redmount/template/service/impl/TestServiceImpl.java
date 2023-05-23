@@ -14,9 +14,4 @@ public class TestServiceImpl implements TestService {
         test.setName("123");
         return test;
     }
-
-    @Override
-    public User getUserByToken() {
-        return (User) UserUtil.getUserByToken(User.class);
-    }
 }
