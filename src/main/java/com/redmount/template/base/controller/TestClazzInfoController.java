@@ -1,14 +1,13 @@
 package com.redmount.template.base.controller;
 
+import com.redmount.template.core.AbstractController;
 import com.redmount.template.base.model.TestClazzInfo;
 import com.redmount.template.base.service.TestClazzInfoBaseService;
-import com.redmount.template.core.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
-* Created by CodeGenerator on 2020/08/09.
+* Created by CodeGenerator on 2023/05/23.
 */
 @RestController
 @RequestMapping("/testClazzInfo")

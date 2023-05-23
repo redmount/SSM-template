@@ -3,18 +3,18 @@ package com.redmount.template.base.model;
 import com.redmount.template.base.repo.TestTeacherMapper;
 import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
+import com.redmount.template.core.annotation.Validate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
-import javax.persistence.Table;
 import java.io.Serializable;
+import javax.persistence.*;
+import lombok.Data;
 
 /**
  * @author Mybatis Generator
  */
 @Table(name = "test_teacher")
-@ApiModel("TestTeacher（）")
+@ApiModel("TestTeacher（教师对象）")
 @Data
 @RelationData(baseDOClass = TestTeacher.class, baseDOMapperClass = TestTeacherMapper.class)
 public class TestTeacher extends BaseDO implements Serializable {

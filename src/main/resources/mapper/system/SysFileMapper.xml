@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.redmount.template.base.repo.SysFileMapper">
-  <resultMap id="BaseResultMap" type="com.redmount.template.base.model.SysFile">
+<mapper namespace="com.redmount.template.system.repo.SysFileMapper">
+  <resultMap id="BaseResultMap" type="com.redmount.template.system.model.SysFile">
     <!--
       WARNING - @mbg.generated
     -->

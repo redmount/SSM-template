@@ -1,7 +1,7 @@
-package com.redmount.template.base.service.impl;
+package com.redmount.template.system.service.impl;
 
-import com.redmount.template.base.model.SysFile;
-import com.redmount.template.base.service.SysFileBaseService;
+import com.redmount.template.system.model.SysFile;
+import com.redmount.template.system.service.SysFileBaseService;
 import com.redmount.template.core.AbstractModelService;
 import com.redmount.template.core.exception.ServiceException;
 import org.springframework.stereotype.Service;

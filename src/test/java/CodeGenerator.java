@@ -19,8 +19,8 @@ import static com.redmount.template.core.ProjectConstant.*;
  */
 public class CodeGenerator {
     //JDBC配置，请修改为你项目的实际配置
-    private static final String JDBC_URL = "jdbc:mysql://api.redmount.cc:3306/test?serverTimezone=GMT%2B8";
-    private static final String JDBC_USERNAME = "root";
+    private static final String JDBC_URL = "jdbc:mysql://192.144.231.168:3306/ssm?serverTimezone=GMT%2B8";
+    private static final String JDBC_USERNAME = "ssm";
     private static final String JDBC_PASSWORD = "2wsx@WSX";
     private static final String JDBC_DIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
 
@@ -37,6 +37,8 @@ public class CodeGenerator {
     private static final String AUTHOR = "CodeGenerator";//@author
     private static final String DATE = new SimpleDateFormat("yyyy/MM/dd").format(new Date());//@date
 
+    private static final String[] SYSTEM_TABLE_NAMES = new String[]{"sys_service_exception", "sys_file"};
+
     public static void main(String[] args) {
         List<String> tableNames = new ArrayList<>();
         tableNames.add("r_test_teacher_t_test_clazz");
@@ -49,9 +51,11 @@ public class CodeGenerator {
         /// tableNames.add("sys_service_exception");
         for (String tableName : tableNames) {
             // 这个的实体已经被定义在项目内部,不允许生成,否则会由于类名相同而无法启动.
-            if (!"sys_service_exception".equalsIgnoreCase(tableName)) {
-                genCode(tableName);
+            if (Arrays.stream(SYSTEM_TABLE_NAMES).anyMatch(name -> name.equalsIgnoreCase(tableName))) {
+                System.out.println(tableName + "为系统表");
+                continue;
             }
+            genCode(tableName);
         }
         //genCodeByCustomModelName("输入表名","输入自定义Model名称");
         Map<String, Boolean> tombstonedTableMap = new HashMap<>();

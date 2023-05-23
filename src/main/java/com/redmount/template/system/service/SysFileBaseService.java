@@ -1,5 +1,5 @@
-package com.redmount.template.base.service;
-import com.redmount.template.base.model.SysFile;
+package com.redmount.template.system.service;
+import com.redmount.template.system.model.SysFile;
 import com.redmount.template.core.ModelService;
 
 import java.io.File;

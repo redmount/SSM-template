@@ -1,13 +1,12 @@
 package com.redmount.template.system.controller;
 
-import com.redmount.template.base.model.SysFile;
-import com.redmount.template.base.service.SysFileBaseService;
+import com.redmount.template.system.model.SysFile;
+import com.redmount.template.system.service.SysFileBaseService;
 import com.redmount.template.core.Result;
 import com.redmount.template.core.ResultGenerator;
 import com.redmount.template.core.exception.ServiceException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +46,7 @@ public class FileController {
             // 保存的文件路径
             String savedPath = uploadFilePath
                     + Calendar.getInstance().get(Calendar.YEAR) + FILE_SEPARATOR_CHAR
-                    + Calendar.getInstance().get(Calendar.MONTH) + FILE_SEPARATOR_CHAR;
+                    + (Calendar.getInstance().get(Calendar.MONTH) + 1) + FILE_SEPARATOR_CHAR;
             // 返回的结构
             SysFile sysFile = new SysFile();
             // 原始文件名

@@ -5,7 +5,7 @@ import com.redmount.template.core.ModelService;
 
 /**
  * @author CodeGenerator
- * @date 2020/08/09
+ * @date 2023/05/23
  */
 public interface TestTeacherBaseService extends ModelService<TestTeacher> {
 

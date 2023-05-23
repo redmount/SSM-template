@@ -5,11 +5,11 @@
     <!--
       WARNING - @mbg.generated
     -->
-    <id column="pk" jdbcType="CHAR" property="pk" />
-    <result column="clazz_pk" jdbcType="CHAR" property="clazzPk" />
-    <result column="introduction" jdbcType="VARCHAR" property="introduction" />
+    <id column="pk" jdbcType="VARCHAR" property="pk" />
+    <result column="clazz_pk" jdbcType="VARCHAR" property="clazzPk" />
     <result column="created" jdbcType="TIMESTAMP" property="created" />
     <result column="updated" jdbcType="TIMESTAMP" property="updated" />
+    <result column="introduction" jdbcType="LONGVARCHAR" property="introduction" />
     <result column="info" jdbcType="LONGVARCHAR" property="info" />
   </resultMap>
 </mapper>

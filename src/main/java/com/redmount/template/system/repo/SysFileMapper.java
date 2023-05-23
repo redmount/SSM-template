@@ -1,6 +1,6 @@
-package com.redmount.template.base.repo;
+package com.redmount.template.system.repo;
 
-import com.redmount.template.base.model.SysFile;
+import com.redmount.template.system.model.SysFile;
 import com.redmount.template.core.Mapper;
 import org.apache.ibatis.annotations.CacheNamespace;
 

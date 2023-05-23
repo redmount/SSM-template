@@ -1,6 +1,6 @@
-package com.redmount.template.base.model;
+package com.redmount.template.system.model;
 
-import com.redmount.template.base.repo.SysFileMapper;
+import com.redmount.template.system.repo.SysFileMapper;
 import com.redmount.template.core.BaseDO;
 import com.redmount.template.core.annotation.RelationData;
 import io.swagger.annotations.ApiModel;
